@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SpanishClass.Models;
 using SpanishClass.Npgsql;
 
 namespace SpanishClass.Controllers
 {
-    public class CalendarController : Controller
+    public class CalendarController : BaseController
     {
         private readonly SpanishClassDbContext _context;
 
@@ -13,16 +14,16 @@ namespace SpanishClass.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(int month, int year)
+        public async Task<IActionResult> CalendarRepository(int month, int year)
         {
-            var data = await _context.Availabilities
+            var data = await _context.ProfessorAvailabilities
                 .Include(a => a.Lesson)
                     .ThenInclude(l => l.Level)
                 .Include(a => a.Lesson.Professor.User)
                 .Include(a => a.Bookings)
                     .ThenInclude(b => b.Student.User)
                 .Where(a => a.StartTime.Month == month && a.StartTime.Year == year)
-                .Select(a => new CalendarItemViewModel
+                .Select(a => new CalendarViewModel
                 {
                     AvailabilityId = a.Id,
                     Date = a.StartTime,

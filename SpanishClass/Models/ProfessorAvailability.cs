@@ -10,10 +10,10 @@
         public Guid LessonId { get; set; }
         public Lesson Lesson { get; set; } = null!;
 
-        public DateOnly Date { get; set; }
+        public DateTime Date { get; set; }
 
-        public TimeOnly StartTime { get; set; }
-        public TimeOnly EndTime { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
 
         public int MaxSeats { get; set; }
 

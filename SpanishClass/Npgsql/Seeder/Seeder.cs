@@ -1,6 +1,12 @@
-﻿namespace SpanishClass.Npgsql.Seeder
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace SpanishClass.Npgsql.Seeder
 {
-    public class Seeder
+    public static class Seeder
     {
+        public static void Seed(ModelBuilder builder)
+        {
+            LevelSeeder.Seed(builder);
+        }
     }
 }
