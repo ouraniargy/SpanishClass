@@ -1,8 +1,9 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
+
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
 namespace SpanishClass.Migrations
 {
@@ -87,13 +88,9 @@ namespace SpanishClass.Migrations
                 name: "Lessons",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ProfessorId = table.Column<int>(type: "integer", nullable: false),
-                    ProfessorId1 = table.Column<Guid>(type: "uuid", nullable: false),
-                    LevelId = table.Column<int>(type: "integer", nullable: false),
-                    LevelId1 = table.Column<Guid>(type: "uuid", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProfessorId = table.Column<Guid>(type: "uuid", nullable: false),
+                    LevelId = table.Column<Guid>(type: "uuid", nullable: false),
                     DurationMinutes = table.Column<int>(type: "integer", nullable: false),
                     MaxSeats = table.Column<int>(type: "integer", nullable: false)
                 },
@@ -101,14 +98,43 @@ namespace SpanishClass.Migrations
                 {
                     table.PrimaryKey("PK_Lessons", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Lessons_Levels_LevelId1",
-                        column: x => x.LevelId1,
+                        name: "FK_Lessons_Levels_LevelId",
+                        column: x => x.LevelId,
                         principalTable: "Levels",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Lessons_Professors_ProfessorId1",
-                        column: x => x.ProfessorId1,
+                        name: "FK_Lessons_Professors_ProfessorId",
+                        column: x => x.ProfessorId,
+                        principalTable: "Professors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProfessorAvailabilities",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProfessorId = table.Column<Guid>(type: "uuid", nullable: false),
+                    LessonId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    MaxSeats = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProfessorAvailabilities", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProfessorAvailabilities_Lessons_LessonId",
+                        column: x => x.LessonId,
+                        principalTable: "Lessons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProfessorAvailabilities_Professors_ProfessorId",
+                        column: x => x.ProfessorId,
                         principalTable: "Professors",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -118,12 +144,12 @@ namespace SpanishClass.Migrations
                 name: "Bookings",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    LessonId = table.Column<int>(type: "integer", nullable: false),
-                    StudentId = table.Column<int>(type: "integer", nullable: false),
-                    StudentId1 = table.Column<Guid>(type: "uuid", nullable: false),
-                    BookingDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    LessonId = table.Column<Guid>(type: "uuid", nullable: false),
+                    StudentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AvailabilityId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ProfessorAvailabilityId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -135,11 +161,35 @@ namespace SpanishClass.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Bookings_Students_StudentId1",
-                        column: x => x.StudentId1,
+                        name: "FK_Bookings_ProfessorAvailabilities_ProfessorAvailabilityId",
+                        column: x => x.ProfessorAvailabilityId,
+                        principalTable: "ProfessorAvailabilities",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Bookings_Professors_AvailabilityId",
+                        column: x => x.AvailabilityId,
+                        principalTable: "Professors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Bookings_Students_StudentId",
+                        column: x => x.StudentId,
                         principalTable: "Students",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Levels",
+                columns: new[] { "Id", "Description", "Name", "Price", "ProfessorId" },
+                values: new object[,]
+                {
+                    { new Guid("11111111-1111-1111-1111-111111111111"), "Beginner", "A1", 50m, null },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), "Elementary", "A2", 55m, null },
+                    { new Guid("33333333-3333-3333-3333-333333333333"), "Intermediate", "B1", 60m, null },
+                    { new Guid("44444444-4444-4444-4444-444444444444"), "Upper Intermediate", "B2", 65m, null },
+                    { new Guid("55555555-5555-5555-5555-555555555555"), "Advanced", "C1", 70m, null },
+                    { new Guid("66666666-6666-6666-6666-666666666666"), "Proficiency", "C2", 75m, null }
                 });
 
             migrationBuilder.CreateIndex(
@@ -149,28 +199,48 @@ namespace SpanishClass.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Bookings_AvailabilityId",
+                table: "Bookings",
+                column: "AvailabilityId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Bookings_LessonId",
                 table: "Bookings",
                 column: "LessonId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Bookings_StudentId1",
+                name: "IX_Bookings_ProfessorAvailabilityId",
                 table: "Bookings",
-                column: "StudentId1");
+                column: "ProfessorAvailabilityId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Lessons_LevelId1",
-                table: "Lessons",
-                column: "LevelId1");
+                name: "IX_Bookings_StudentId",
+                table: "Bookings",
+                column: "StudentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Lessons_ProfessorId1",
+                name: "IX_Lessons_LevelId",
                 table: "Lessons",
-                column: "ProfessorId1");
+                column: "LevelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Lessons_ProfessorId",
+                table: "Lessons",
+                column: "ProfessorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Levels_ProfessorId",
                 table: "Levels",
+                column: "ProfessorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProfessorAvailabilities_LessonId",
+                table: "ProfessorAvailabilities",
+                column: "LessonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProfessorAvailabilities_ProfessorId",
+                table: "ProfessorAvailabilities",
                 column: "ProfessorId");
 
             migrationBuilder.CreateIndex(
@@ -193,10 +263,13 @@ namespace SpanishClass.Migrations
                 name: "Bookings");
 
             migrationBuilder.DropTable(
-                name: "Lessons");
+                name: "ProfessorAvailabilities");
 
             migrationBuilder.DropTable(
                 name: "Students");
+
+            migrationBuilder.DropTable(
+                name: "Lessons");
 
             migrationBuilder.DropTable(
                 name: "Levels");

@@ -23,6 +23,8 @@ namespace SpanishClass.Npgsql
         {
             base.OnModelCreating(builder);
 
+            Seeder.Seeder.Seed(builder);
+
             builder.Entity<ApplicationUser>()
                 .HasIndex(u => u.Email)
                 .IsUnique();

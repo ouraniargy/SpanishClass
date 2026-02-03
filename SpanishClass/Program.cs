@@ -46,6 +46,12 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseCors(policy =>
+    policy.WithOrigins("http://localhost:3000")
+          .AllowAnyHeader()
+          .AllowAnyMethod()
+          .AllowCredentials());
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

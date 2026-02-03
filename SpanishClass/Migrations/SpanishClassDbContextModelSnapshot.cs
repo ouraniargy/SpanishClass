@@ -54,67 +54,61 @@ namespace SpanishClass.Migrations
 
             modelBuilder.Entity("SpanishClass.Models.Booking", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("uuid");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<Guid>("AvailabilityId")
+                        .HasColumnType("uuid");
 
-                    b.Property<DateTime>("BookingDate")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("LessonId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("LessonId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int>("StudentId")
-                        .HasColumnType("integer");
+                    b.Property<Guid?>("ProfessorAvailabilityId")
+                        .HasColumnType("uuid");
 
-                    b.Property<Guid>("StudentId1")
+                    b.Property<Guid>("StudentId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AvailabilityId");
+
                     b.HasIndex("LessonId");
 
-                    b.HasIndex("StudentId1");
+                    b.HasIndex("ProfessorAvailabilityId");
+
+                    b.HasIndex("StudentId");
 
                     b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("SpanishClass.Models.Lesson", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<int>("DurationMinutes")
                         .HasColumnType("integer");
 
-                    b.Property<int>("LevelId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("LevelId1")
+                    b.Property<Guid>("LevelId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("MaxSeats")
                         .HasColumnType("integer");
 
-                    b.Property<int>("ProfessorId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("ProfessorId1")
+                    b.Property<Guid>("ProfessorId")
                         .HasColumnType("uuid");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LevelId1");
+                    b.HasIndex("LevelId");
 
-                    b.HasIndex("ProfessorId1");
+                    b.HasIndex("ProfessorId");
 
                     b.ToTable("Lessons");
                 });
@@ -143,6 +137,50 @@ namespace SpanishClass.Migrations
                     b.HasIndex("ProfessorId");
 
                     b.ToTable("Levels");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Description = "Beginner",
+                            Name = "A1",
+                            Price = 50m
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Description = "Elementary",
+                            Name = "A2",
+                            Price = 55m
+                        },
+                        new
+                        {
+                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Description = "Intermediate",
+                            Name = "B1",
+                            Price = 60m
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-4444-4444-4444-444444444444"),
+                            Description = "Upper Intermediate",
+                            Name = "B2",
+                            Price = 65m
+                        },
+                        new
+                        {
+                            Id = new Guid("55555555-5555-5555-5555-555555555555"),
+                            Description = "Advanced",
+                            Name = "C1",
+                            Price = 70m
+                        },
+                        new
+                        {
+                            Id = new Guid("66666666-6666-6666-6666-666666666666"),
+                            Description = "Proficiency",
+                            Name = "C2",
+                            Price = 75m
+                        });
                 });
 
             modelBuilder.Entity("SpanishClass.Models.Professor", b =>
@@ -160,6 +198,39 @@ namespace SpanishClass.Migrations
                         .IsUnique();
 
                     b.ToTable("Professors");
+                });
+
+            modelBuilder.Entity("SpanishClass.Models.ProfessorAvailability", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("LessonId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("MaxSeats")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("ProfessorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LessonId");
+
+                    b.HasIndex("ProfessorId");
+
+                    b.ToTable("ProfessorAvailabilities");
                 });
 
             modelBuilder.Entity("SpanishClass.Models.Student", b =>
@@ -181,17 +252,29 @@ namespace SpanishClass.Migrations
 
             modelBuilder.Entity("SpanishClass.Models.Booking", b =>
                 {
+                    b.HasOne("SpanishClass.Models.Professor", "Availability")
+                        .WithMany()
+                        .HasForeignKey("AvailabilityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SpanishClass.Models.Lesson", "Lesson")
                         .WithMany()
                         .HasForeignKey("LessonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("SpanishClass.Models.ProfessorAvailability", null)
+                        .WithMany("Bookings")
+                        .HasForeignKey("ProfessorAvailabilityId");
+
                     b.HasOne("SpanishClass.Models.Student", "Student")
                         .WithMany()
-                        .HasForeignKey("StudentId1")
+                        .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Availability");
 
                     b.Navigation("Lesson");
 
@@ -202,13 +285,13 @@ namespace SpanishClass.Migrations
                 {
                     b.HasOne("SpanishClass.Models.Level", "Level")
                         .WithMany()
-                        .HasForeignKey("LevelId1")
+                        .HasForeignKey("LevelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SpanishClass.Models.Professor", "Professor")
-                        .WithMany()
-                        .HasForeignKey("ProfessorId1")
+                        .WithMany("Lessons")
+                        .HasForeignKey("ProfessorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -235,6 +318,25 @@ namespace SpanishClass.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SpanishClass.Models.ProfessorAvailability", b =>
+                {
+                    b.HasOne("SpanishClass.Models.Lesson", "Lesson")
+                        .WithMany()
+                        .HasForeignKey("LessonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SpanishClass.Models.Professor", "Professor")
+                        .WithMany()
+                        .HasForeignKey("ProfessorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Lesson");
+
+                    b.Navigation("Professor");
+                });
+
             modelBuilder.Entity("SpanishClass.Models.Student", b =>
                 {
                     b.HasOne("SpanishClass.Models.ApplicationUser", "User")
@@ -255,7 +357,14 @@ namespace SpanishClass.Migrations
 
             modelBuilder.Entity("SpanishClass.Models.Professor", b =>
                 {
+                    b.Navigation("Lessons");
+
                     b.Navigation("Levels");
+                });
+
+            modelBuilder.Entity("SpanishClass.Models.ProfessorAvailability", b =>
+                {
+                    b.Navigation("Bookings");
                 });
 #pragma warning restore 612, 618
         }
