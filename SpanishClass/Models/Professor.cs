@@ -9,9 +9,7 @@
 
         public ApplicationUser User { get; set; } = null!;
 
-        public Guid LessonId { get; set; }
-
-        public Lesson Lesson { get; set; } = null!;
+        public ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
 
         public ICollection<Level> Levels { get; set; } = new List<Level>();
     }
