@@ -1,4 +1,4 @@
-const API_URL = "https://localhost:5001/api";
+const API_URL = "https://localhost:7185/api";
 
 export async function apiGet<T>(endpoint: string): Promise<T> {
   const res = await fetch(`${API_URL}${endpoint}`);
