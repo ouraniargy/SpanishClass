@@ -37,7 +37,8 @@ body {
 }
 
 .card input,
-.card button {
+.card button,
+.card select {
   width: 100%;
   padding: 12px;
   font-size: 16px;
@@ -57,6 +58,15 @@ body {
   font-weight: bold;
   cursor: pointer;
   margin: 40px 0 20px 0;
+}
+
+.card select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  margin-bottom: 15px;
+  font-size: 16px;
 }
 
 .card button:hover {
