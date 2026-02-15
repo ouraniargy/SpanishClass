@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { apiPost } from "../../api/api";
 import "../sharedStyles.css";
 import { RegisterRequest } from "./Register.Props";
@@ -17,7 +17,11 @@ export default function Register() {
     const body: RegisterRequest = { email, password, name, surname, role };
     try {
       await apiPost("/account/register", body);
-      navigate("/students", { replace: true });
+      if (role === "Student") {
+        navigate("/students", { replace: true });
+      } else {
+        navigate("/professors", { replace: true });
+      }
     } catch {
       alert("Register failed");
     }
@@ -65,6 +69,9 @@ export default function Register() {
       />
 
       <button onClick={handleRegister}>Register</button>
+      <h5>
+        Already have an account? <Link to="/login">Login</Link>
+      </h5>
     </div>
   );
 }
