@@ -68,6 +68,8 @@ public class AccountController : BaseController
             return BadRequest(ModelState);
 
         var user = await _context.ApplicationUsers
+            .Include(u => u.Student)
+            .Include(u => u.Professor)
             .FirstOrDefaultAsync(u => u.Email == model.Email);
 
         if (user == null)
@@ -80,6 +82,8 @@ public class AccountController : BaseController
 
         string role = user.Student != null ? "Student" :
                       user.Professor != null ? "Professor" : "Unknown";
+
+        HttpContext.Session.SetString("UserId", user.Id.ToString());
 
         return Ok(new
         {

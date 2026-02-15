@@ -5,6 +5,17 @@ using SpanishClass.Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ReactCorsPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -33,8 +44,6 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-app.UseSession();
-
 app.UseRouting();
 if (app.Environment.IsDevelopment())
 {
@@ -46,15 +55,13 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseCors(policy =>
-    policy.WithOrigins("http://localhost:3001")
-          .AllowAnyHeader()
-          .AllowAnyMethod()
-          .AllowCredentials());
-
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseCors("ReactCorsPolicy");
+
+app.UseSession();
 
 app.MapControllers();
 
