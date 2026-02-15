@@ -19,17 +19,19 @@ export default function Login() {
 
       console.log("Login response:", data);
 
-      localStorage.setItem("userId", data.userId);
-      localStorage.setItem("role", data.role);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ userId: data.userId, role: data.role }),
+      );
 
-      const role = data.role?.trim().toLowerCase();
-      console.log("Normalized role:", role);
+      const role = data.role;
 
       switch (role) {
-        case "student":
+        case "Student":
           navigate("/students", { replace: true });
+          // console.log("Login response:", data);
           break;
-        case "professor":
+        case "Professor":
           navigate("/professors", { replace: true });
           break;
         default:

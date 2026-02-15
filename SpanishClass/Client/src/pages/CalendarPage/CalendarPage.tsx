@@ -2,7 +2,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { apiDelete, apiGet, apiPost } from "../../api/api";
 import "./CalendarPage.css";
 
@@ -10,20 +10,21 @@ export default function CalendarPage() {
   const [events, setEvents] = useState<any[]>([]);
   const [selectedLessonId, setSelectedLessonId] = useState<string>("");
   const [lessons, setLessons] = useState<any[]>([]);
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const userId = user?.userId;
+  const role = user?.role;
 
-  const fetchCalendarEvents = () => {
+  const fetchCalendarEvents = useCallback(() => {
     apiGet<any[]>("/booking/booking/availabilities")
       .then((data) => {
         try {
-          const userId = localStorage.getItem("userId");
           const mapped = (data || []).map((a: any) => {
             const start = a.startTime ?? a.start ?? a.date ?? a.startDate;
             const end = a.endTime ?? a.end ?? a.endDate;
             const isMine =
-              userId &&
-              a.professorUserId &&
-              a.professorUserId.toString().toLowerCase() ===
-                userId.toString().toLowerCase();
+              role === "Professor" &&
+              a.professorUserId?.toLowerCase() === userId?.toLowerCase();
+
             const color = isMine
               ? "#2b8cff"
               : a.bookedSeats >= a.maxSeats
@@ -31,13 +32,15 @@ export default function CalendarPage() {
                 : "#28a745";
             const lessonName = a.lessonName ?? "Lesson";
             const professorName = a.professorName ?? "";
+
             return {
               id: a.id,
               title: `${lessonName} - ${professorName}`,
               start: start,
               end: end,
               color,
-              extendedProps: a,
+              editable: !!isMine,
+              extendedProps: { professorUserId: a.professorUserId, isMine },
             };
           });
           setEvents(mapped);
@@ -46,7 +49,7 @@ export default function CalendarPage() {
         }
       })
       .catch((err) => console.error("Failed to load calendar events:", err));
-  };
+  }, [role]);
 
   useEffect(() => {
     apiGet<any[]>("/lesson/lesson")
@@ -58,10 +61,17 @@ export default function CalendarPage() {
 
   useEffect(() => {
     fetchCalendarEvents();
-  }, []);
+  }, [fetchCalendarEvents]);
 
   const handleEventClick = (clickInfo: any) => {
     const eventId = clickInfo.event.id;
+    const { isMine } = clickInfo.event.extendedProps;
+
+    if (!isMine || role !== "Professor") {
+      alert("You can only delete your own availabilities");
+      return;
+    }
+
     const confirmed = window.confirm("Delete this availability?");
     if (!confirmed) return;
 
@@ -143,11 +153,17 @@ export default function CalendarPage() {
             initialView="timeGridWeek"
             events={events}
             height="auto"
-            editable={true}
-            selectable={true}
+            editable={user?.role === "Professor"}
+            selectable={user?.role === "Professor"}
             selectMirror={true}
             select={handleSelect}
             eventClick={handleEventClick}
+            eventDidMount={(info) => {
+              if (!info.event.extendedProps.isMine) {
+                info.el.style.opacity = "0.5";
+                info.el.style.pointerEvents = "none";
+              }
+            }}
           />
         </div>
       </div>

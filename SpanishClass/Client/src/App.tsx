@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
 import CalendarPage from "./pages/CalendarPage/CalendarPage";
 import CreateLessonPage from "./pages/Lesson/CreateLessonPage/CreateLessonPage";
 import ViewLessonsPage from "./pages/Lesson/ViewLessonsPage/ViewLessonsPage";
@@ -15,12 +16,58 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/students" element={<StudentPage />} />
-          <Route path="/professors" element={<ProfessorPage />} />
-          <Route path="/calendar" element={<CalendarPage />} />
-          <Route path="/createLesson" element={<CreateLessonPage />} />
-          <Route path="/viewLessons" element={<ViewLessonsPage />} />
+          <Route
+            path="/students"
+            element={
+              <ProtectedRoute
+                element={<StudentPage />}
+                allowedRoles={["Student"]}
+              />
+            }
+          />
+          <Route
+            path="/professors"
+            element={
+              <ProtectedRoute
+                element={<ProfessorPage />}
+                allowedRoles={["Professor"]}
+              />
+            }
+          />
+          <Route
+            path="/calendar"
+            element={
+              <ProtectedRoute
+                element={<CalendarPage />}
+                allowedRoles={["Student", "Professor"]}
+              />
+            }
+          />
 
+          <Route
+            path="/createLesson"
+            element={
+              <ProtectedRoute
+                element={<CreateLessonPage />}
+                allowedRoles={["Professor"]}
+              />
+            }
+          />
+
+          <Route
+            path="/viewLessons"
+            element={
+              <ProtectedRoute
+                element={<ViewLessonsPage />}
+                allowedRoles={["Student", "Professor"]}
+              />
+            }
+          />
+
+          <Route
+            path="/unauthorized"
+            element={<h1>No access to this page.</h1>}
+          />
           {/* <Levels />
           <Bookings /> */}
         </Routes>
