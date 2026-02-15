@@ -49,7 +49,7 @@ export default function CalendarPage() {
         }
       })
       .catch((err) => console.error("Failed to load calendar events:", err));
-  }, [role]);
+  }, [role, userId]);
 
   useEffect(() => {
     apiGet<any[]>("/lesson/lesson")
@@ -63,7 +63,7 @@ export default function CalendarPage() {
     fetchCalendarEvents();
   }, [fetchCalendarEvents]);
 
-  const handleEventClick = (clickInfo: any) => {
+  const handleProfessorEventClick = (clickInfo: any) => {
     const eventId = clickInfo.event.id;
     const { isMine } = clickInfo.event.extendedProps;
 
@@ -83,6 +83,27 @@ export default function CalendarPage() {
       .catch((err) => {
         console.error("Error deleting availability:", err);
         alert("Failed to delete availability");
+      });
+  };
+
+  const handleStudentEventClick = (clickInfo: any) => {
+    const event = clickInfo.event;
+    const { bookedSeats, maxSeats } = event.extendedProps;
+
+    if (bookedSeats >= maxSeats) {
+      alert("No seats available");
+      return;
+    }
+
+    if (!window.confirm("Book this lesson?")) return;
+
+    apiPost(`/booking/booking/${event.id}?studentUserId=${user.userId}`, {})
+      .then(() => {
+        alert("Seat booked successfully!");
+        fetchCalendarEvents();
+      })
+      .catch(() => {
+        alert("Booking failed");
       });
   };
 
@@ -157,10 +178,24 @@ export default function CalendarPage() {
             selectable={user?.role === "Professor"}
             selectMirror={true}
             select={handleSelect}
-            eventClick={handleEventClick}
+            eventClick={
+              user?.role === "Professor"
+                ? handleProfessorEventClick
+                : handleStudentEventClick
+            }
             eventDidMount={(info) => {
-              if (!info.event.extendedProps.isMine) {
+              const { bookedSeats, maxSeats } = info.event.extendedProps;
+
+              if (
+                user?.role === "Professor" &&
+                !info.event.extendedProps.isMine
+              ) {
                 info.el.style.opacity = "0.5";
+                info.el.style.pointerEvents = "none";
+              }
+
+              if (bookedSeats >= maxSeats) {
+                info.el.style.backgroundColor = "#dc3545";
                 info.el.style.pointerEvents = "none";
               }
             }}

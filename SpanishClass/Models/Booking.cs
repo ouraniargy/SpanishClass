@@ -11,7 +11,7 @@
         public Student Student { get; set; } = null!;
 
         public Guid AvailabilityId { get; set; }
-        public Professor Availability { get; set; } = null!;
+        public ProfessorAvailability Availability { get; set; } = null!;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }

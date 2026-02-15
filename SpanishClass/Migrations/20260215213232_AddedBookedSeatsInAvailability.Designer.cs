@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SpanishClass.Npgsql;
@@ -11,9 +12,11 @@ using SpanishClass.Npgsql;
 namespace SpanishClass.Migrations
 {
     [DbContext(typeof(SpanishClassDbContext))]
-    partial class SpanishClassDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260215213232_AddedBookedSeatsInAvailability")]
+    partial class AddedBookedSeatsInAvailability
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,6 +70,9 @@ namespace SpanishClass.Migrations
                     b.Property<Guid>("LessonId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("ProfessorAvailabilityId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("StudentId")
                         .HasColumnType("uuid");
 
@@ -75,6 +81,8 @@ namespace SpanishClass.Migrations
                     b.HasIndex("AvailabilityId");
 
                     b.HasIndex("LessonId");
+
+                    b.HasIndex("ProfessorAvailabilityId");
 
                     b.HasIndex("StudentId");
 
@@ -254,8 +262,8 @@ namespace SpanishClass.Migrations
 
             modelBuilder.Entity("SpanishClass.Models.Booking", b =>
                 {
-                    b.HasOne("SpanishClass.Models.ProfessorAvailability", "Availability")
-                        .WithMany("Bookings")
+                    b.HasOne("SpanishClass.Models.Professor", "Availability")
+                        .WithMany()
                         .HasForeignKey("AvailabilityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -265,6 +273,10 @@ namespace SpanishClass.Migrations
                         .HasForeignKey("LessonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("SpanishClass.Models.ProfessorAvailability", null)
+                        .WithMany("Bookings")
+                        .HasForeignKey("ProfessorAvailabilityId");
 
                     b.HasOne("SpanishClass.Models.Student", "Student")
                         .WithMany()

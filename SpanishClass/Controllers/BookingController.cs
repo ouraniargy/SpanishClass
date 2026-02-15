@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SpanishClass.Models;
 using SpanishClass.Models.RequestDtos;
@@ -64,6 +65,48 @@ public class BookingController : BaseController
 
         return RedirectToAction("Confirmation", new { id = booking.Id });
     }
+
+    [HttpPost("{availabilityId}")]
+    public async Task<IActionResult> BookAvailability(Guid availabilityId, [FromQuery] Guid studentUserId)
+    {
+        var availability = await _context.ProfessorAvailabilities
+            .FirstOrDefaultAsync(a => a.Id == availabilityId);
+
+        if (availability == null)
+            return NotFound("Availability not found");
+
+        if (availability.BookedSeats >= availability.MaxSeats)
+            return BadRequest("No seats available");
+
+        var student = await _context.Students
+            .FirstOrDefaultAsync(s => s.UserId == studentUserId);
+
+        if (student == null)
+            return BadRequest("Student profile not found");
+
+        var alreadyBooked = await _context.Bookings
+            .AnyAsync(b => b.AvailabilityId == availabilityId && b.StudentId == student.Id);
+
+        if (alreadyBooked)
+            return BadRequest("You already booked this lesson");
+
+        availability.BookedSeats += 1;
+
+        var booking = new Booking
+        {
+            Id = Guid.NewGuid(),
+            AvailabilityId = availabilityId,
+            StudentId = student.Id,
+            LessonId = availability.LessonId
+        };
+
+        _context.Bookings.Add(booking);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Booking successful" });
+    }
+
+
 
     [HttpPost("addAvailability")]
     public async Task<IActionResult> AddAvailability([FromBody] AddAvailabilityRequestDto dto)
