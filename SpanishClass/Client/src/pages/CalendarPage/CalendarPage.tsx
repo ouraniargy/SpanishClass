@@ -150,24 +150,30 @@ export default function CalendarPage() {
         <div className="calendar-header">
           <h2>Calendar of Availabilities and Bookings</h2>
         </div>
-        <div style={{ marginBottom: 12 }}>
-          <label style={{ marginRight: 8 }}>Select Lesson:</label>
-          <select
-            value={selectedLessonId}
-            onChange={(e) => setSelectedLessonId(e.target.value)}
-            style={{ padding: "6px" }}
-          >
-            <option value="" disabled>
-              -- select lesson --
-            </option>
-            {lessons.map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.levelName} - {l.durationMinutes}min
+        {role !== "Professor" ? (
+          <p style={{ marginBottom: 12, fontSize: 20 }}>
+            Click on an event to book a seat. Green means available, red means
+            fully booked.
+          </p>
+        ) : (
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ marginRight: 8 }}>Select Lesson:</label>
+            <select
+              value={selectedLessonId}
+              onChange={(e) => setSelectedLessonId(e.target.value)}
+              style={{ padding: "6px" }}
+            >
+              <option value="" disabled>
+                Select lesson
               </option>
-            ))}
-          </select>
-        </div>
-
+              {lessons.map((l) => (
+                <option key={l.id} value={l.id}>
+                  {l.levelName} - {l.durationMinutes}min
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <div className="calendar-wrapper">
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
