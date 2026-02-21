@@ -6,6 +6,8 @@
 
         public DateTime LessonDate { get; set; }
 
+        public int MaxSeats { get; set; }
+
         public bool SendEmail { get; set; }
     }
 

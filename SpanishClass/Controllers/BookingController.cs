@@ -32,7 +32,8 @@ public class BookingController : BaseController
         return View(new BookingFormViewModel
         {
             AvailabilityId = availabilityId,
-            LessonDate = availability.StartTime
+            LessonDate = availability.StartTime,
+            MaxSeats = availability.Lesson.MaxSeats
         });
     }
 
@@ -44,6 +45,20 @@ public class BookingController : BaseController
 
         if (!await IsStudentAsync(_context))
             return Forbid();
+
+        var availability = await _context.ProfessorAvailabilities
+            .Include(a => a.Bookings)
+            .Include(a => a.Lesson)
+            .FirstOrDefaultAsync(a => a.Id == model.AvailabilityId);
+
+        if (availability == null)
+            return NotFound();
+
+        var bookedSeats = availability.Bookings.Count();
+        var maxSeats = availability.Lesson.MaxSeats;
+
+        if (bookedSeats >= maxSeats)
+            return BadRequest("No seats available");
 
         var userId = LoggedInUserId!.Value;
 
@@ -58,11 +73,6 @@ public class BookingController : BaseController
         _context.Bookings.Add(booking);
         await _context.SaveChangesAsync();
 
-        if (model.SendEmail)
-        {
-            // EmailService.SendBookingEmail
-        }
-
         return RedirectToAction("Confirmation", new { id = booking.Id });
     }
 
@@ -70,12 +80,15 @@ public class BookingController : BaseController
     public async Task<IActionResult> BookAvailability(Guid availabilityId, [FromQuery] Guid studentUserId)
     {
         var availability = await _context.ProfessorAvailabilities
+            .Include(a => a.Lesson)
             .FirstOrDefaultAsync(a => a.Id == availabilityId);
 
         if (availability == null)
             return NotFound("Availability not found");
 
-        if (availability.BookedSeats >= availability.MaxSeats)
+        var maxSeats = availability.Lesson.MaxSeats;
+
+        if (availability.BookedSeats >= maxSeats)
             return BadRequest("No seats available");
 
         var student = await _context.Students
@@ -92,9 +105,6 @@ public class BookingController : BaseController
 
         availability.BookedSeats += 1;
 
-        if (availability.MaxSeats < availability.BookedSeats)
-            return BadRequest("No more seats exist.");
-
         var booking = new Booking
         {
             Id = Guid.NewGuid(),
@@ -108,8 +118,6 @@ public class BookingController : BaseController
 
         return Ok(new { message = "Booking successful" });
     }
-
-
 
     [HttpPost("addAvailability")]
     public async Task<IActionResult> AddAvailability([FromBody] AddAvailabilityRequestDto dto)
@@ -174,7 +182,7 @@ public class BookingController : BaseController
             title = a.Lesson.Level.Name,
             start = a.StartTime,
             end = a.EndTime,
-            maxSeats = a.MaxSeats,
+            maxSeats = a.Lesson.MaxSeats,
             bookedSeats = a.Bookings.Count(),
             ProfessorName = a.Lesson.Professor.User.Name + " " +
                 a.Lesson.Professor.User.Surname,

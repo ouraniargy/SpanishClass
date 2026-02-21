@@ -35,7 +35,7 @@ export default function CalendarPage() {
 
             return {
               id: a.id,
-              title: `${lessonName} - ${professorName}`,
+              title: `${lessonName} - ${professorName} - ${a.bookedSeats}/${a.maxSeats}`,
               start: start,
               end: end,
               color,

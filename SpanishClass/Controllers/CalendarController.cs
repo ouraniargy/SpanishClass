@@ -58,7 +58,7 @@ namespace SpanishClass.Controllers
                     LessonDescription = $"{a.Lesson.Level.Name} - {a.Lesson.DurationMinutes} min",
                     ProfessorName = a.Lesson.Professor.User.Name + " " +
                                     a.Lesson.Professor.User.Surname,
-                    MaxSeats = a.MaxSeats,
+                    MaxSeats = a.Lesson.MaxSeats,
                     BookedSeats = a.Bookings.Count,
                     StudentNames = a.Bookings
                         .Select(b => b.Student.User.Name + " " + b.Student.User.Surname)
