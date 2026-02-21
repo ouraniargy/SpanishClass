@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SpanishClass.Models;
 using SpanishClass.Npgsql;
@@ -56,9 +57,21 @@ public class AccountController : BaseController
             });
         }
 
+        string role = user.Student != null ? "Student" :
+                      user.Professor != null ? "Professor" : "Unknown";
+
+        HttpContext.Session.SetString("UserId", user.Id.ToString());
+
         await _context.SaveChangesAsync();
 
-        return Ok(new { message = "User registered successfully" });
+        return Ok(new
+        {
+            message = "Login successful",
+            userId = user.Id,
+            name = user.Name,
+            surname = user.Surname,
+            role
+        });
     }
 
     [HttpPost("login")]

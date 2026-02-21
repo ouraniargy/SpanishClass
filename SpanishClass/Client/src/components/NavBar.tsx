@@ -15,16 +15,53 @@ export default function Navbar() {
   return (
     <div
       style={{
+        maxWidth: "92%",
         display: "flex",
         justifyContent: "space-between",
-        padding: "15px",
+        alignItems: "center",
+        padding: "15px 30px",
       }}
     >
-      <div>Spanish Class</div>
+      <div
+        style={{
+          fontSize: "18px",
+          fontWeight: "600",
+          letterSpacing: "0.5px",
+        }}
+      >
+        Spanish Class
+      </div>
 
-      <div>
-        👤 {user.name} {user.surname} | {user.role}
-        <button onClick={handleLogout} style={{ marginLeft: "15px" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "15px",
+          fontSize: "14px",
+        }}
+      >
+        <div
+          style={{
+            backgroundColor: "pink",
+            padding: "6px 12px",
+            borderRadius: "20px",
+          }}
+        >
+          👤 {user.name} {user.surname} | {user.role}
+        </div>
+
+        <button
+          onClick={handleLogout}
+          style={{
+            padding: "8px 14px",
+            borderRadius: "6px",
+            border: "none",
+            backgroundColor: "#ef4444",
+            color: "white",
+            cursor: "pointer",
+            fontWeight: "500",
+          }}
+        >
           Logout
         </button>
       </div>

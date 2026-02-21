@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { apiPost } from "../../api/api";
+import { useAuth } from "../../components/AuthContext";
 import "../sharedStyles.css";
 import { RegisterRequest } from "./Register.Props";
 
 export default function Register() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,16 +18,36 @@ export default function Register() {
   async function handleRegister() {
     const body: RegisterRequest = { email, password, name, surname, role };
     try {
-      await apiPost("/account/register", body);
+      const registeredUser = (await apiPost("/account/register", body)) as {
+        userId: string;
+        name: string;
+        surname: string;
+        role: string;
+      };
+
+      login({
+        userId: registeredUser.userId,
+        name: registeredUser.name,
+        surname: registeredUser.surname,
+        role: registeredUser.role,
+      });
+
+      localStorage.setItem("user", JSON.stringify(registeredUser));
+      localStorage.setItem("role", registeredUser.role);
+
       if (role === "Student") {
         navigate("/students", { replace: true });
       } else {
         navigate("/professors", { replace: true });
       }
-    } catch {
-      alert("Register failed");
+    } catch (err) {
+      alert(
+        "Register failed: " +
+          (err instanceof Error ? err.message : String(err)),
+      );
     }
   }
+
   return (
     <div className="card">
       <h2>Register</h2>
