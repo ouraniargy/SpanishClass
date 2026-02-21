@@ -16,12 +16,14 @@ export async function apiGet<T>(endpoint: string): Promise<T> {
 }
 
 export async function apiPost<T>(endpoint: string, body: unknown): Promise<T> {
-  const userId = localStorage.getItem("userId");
+  const userString = localStorage.getItem("user");
+  const user = userString ? JSON.parse(userString) : null;
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
-  if (userId) {
-    headers["X-User-Id"] = userId;
+
+  if (user?.userId) {
+    headers["X-User-Id"] = user.userId;
   }
 
   const res = await fetch(`${API_URL}${endpoint}`, {

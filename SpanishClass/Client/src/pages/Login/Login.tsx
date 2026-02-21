@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { apiPost } from "../../api/api";
+import { useAuth } from "../../components/AuthContext";
 import "../sharedStyles.css";
 import { LoginRequest } from "./Login.Props";
 
@@ -8,6 +9,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   async function handleLogin() {
     const body: LoginRequest = { email, password };
@@ -15,27 +17,26 @@ export default function Login() {
       const data = (await apiPost("/account/login", body)) as {
         userId: string;
         role: string;
+        name: string;
+        surname: string;
       };
 
       console.log("Login response:", data);
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ userId: data.userId, role: data.role }),
-      );
+      login({
+        userId: data.userId,
+        role: data.role,
+        name: data.name,
+        surname: data.surname,
+      });
 
-      const role = data.role;
-
-      switch (role) {
-        case "Student":
-          navigate("/students", { replace: true });
-          // console.log("Login response:", data);
-          break;
-        case "Professor":
-          navigate("/professors", { replace: true });
-          break;
-        default:
-          alert(`Unknown user role: ${data.role}`);
+      const role = data.role?.trim();
+      if (role === "Student") {
+        navigate("/students", { replace: true });
+      } else if (role === "Professor") {
+        navigate("/professors", { replace: true });
+      } else {
+        alert(`Unknown user role: ${data.role}`);
       }
     } catch (err) {
       alert(

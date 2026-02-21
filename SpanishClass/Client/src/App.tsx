@@ -1,4 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "./components/AuthContext";
+import Navbar from "./components/NavBar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CalendarPage from "./pages/CalendarPage/CalendarPage";
 import CreateLessonPage from "./pages/Lesson/CreateLessonPage/CreateLessonPage";
@@ -11,67 +13,70 @@ import StudentPage from "./pages/StudentPage/StudentPage";
 function App() {
   return (
     <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route
-            path="/students"
-            element={
-              <ProtectedRoute
-                element={<StudentPage />}
-                allowedRoles={["Student"]}
-              />
-            }
-          />
-          <Route
-            path="/professors"
-            element={
-              <ProtectedRoute
-                element={<ProfessorPage />}
-                allowedRoles={["Professor"]}
-              />
-            }
-          />
-          <Route
-            path="/calendar"
-            element={
-              <ProtectedRoute
-                element={<CalendarPage />}
-                allowedRoles={["Student", "Professor"]}
-              />
-            }
-          />
+      <AuthProvider>
+        <BrowserRouter>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route
+              path="/students"
+              element={
+                <ProtectedRoute
+                  element={<StudentPage />}
+                  allowedRoles={["Student"]}
+                />
+              }
+            />
+            <Route
+              path="/professors"
+              element={
+                <ProtectedRoute
+                  element={<ProfessorPage />}
+                  allowedRoles={["Professor"]}
+                />
+              }
+            />
+            <Route
+              path="/calendar"
+              element={
+                <ProtectedRoute
+                  element={<CalendarPage />}
+                  allowedRoles={["Student", "Professor"]}
+                />
+              }
+            />
 
-          <Route
-            path="/createLesson"
-            element={
-              <ProtectedRoute
-                element={<CreateLessonPage />}
-                allowedRoles={["Professor"]}
-              />
-            }
-          />
+            <Route
+              path="/createLesson"
+              element={
+                <ProtectedRoute
+                  element={<CreateLessonPage />}
+                  allowedRoles={["Professor"]}
+                />
+              }
+            />
 
-          <Route
-            path="/viewLessons"
-            element={
-              <ProtectedRoute
-                element={<ViewLessonsPage />}
-                allowedRoles={["Student", "Professor"]}
-              />
-            }
-          />
+            <Route
+              path="/viewLessons"
+              element={
+                <ProtectedRoute
+                  element={<ViewLessonsPage />}
+                  allowedRoles={["Student", "Professor"]}
+                />
+              }
+            />
 
-          <Route
-            path="/unauthorized"
-            element={<h1>No access to this page.</h1>}
-          />
-          {/* <Levels />
+            <Route
+              path="/unauthorized"
+              element={<h1>No access to this page.</h1>}
+            />
+            {/* <Levels />
           <Bookings /> */}
-        </Routes>
-      </BrowserRouter>
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </>
   );
 }

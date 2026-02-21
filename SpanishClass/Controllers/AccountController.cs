@@ -89,7 +89,43 @@ public class AccountController : BaseController
         {
             message = "Login successful",
             userId = user.Id,
+            name = user.Name,
+            surname = user.Surname,
             role
+        });
+    }
+
+    [HttpGet("profile")]
+    public async Task<IActionResult> GetCurrentUser()
+    {
+        var userId = LoggedInUserId;
+
+        if (!userId.HasValue)
+            return Unauthorized();
+
+        var result = await _context.ApplicationUsers
+            .Where(u => u.Id == userId.Value)
+            .Select(u => new
+            {
+                u.Name,
+                u.Surname,
+                IsProfessor = _context.Professors.Any(p => p.UserId == u.Id),
+                IsStudent = _context.Students.Any(s => s.UserId == u.Id)
+            })
+            .FirstOrDefaultAsync();
+
+        if (result == null)
+            return NotFound();
+
+        string role = result.IsProfessor ? "Professor"
+                     : result.IsStudent ? "Student"
+                     : "Unknown";
+
+        return Ok(new
+        {
+            result.Name,
+            result.Surname,
+            Role = role
         });
     }
 }

@@ -92,6 +92,9 @@ public class BookingController : BaseController
 
         availability.BookedSeats += 1;
 
+        if (availability.MaxSeats < availability.BookedSeats)
+            return BadRequest("No more seats exist.");
+
         var booking = new Booking
         {
             Id = Guid.NewGuid(),
