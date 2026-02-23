@@ -11,6 +11,9 @@ export default function ProfessorPage() {
         <h2>
           <Link to="/createLesson">Add a lesson</Link>
         </h2>
+        <h2>
+          <Link to="/viewLessons">View lessons</Link>
+        </h2>
       </div>
     </>
   );
