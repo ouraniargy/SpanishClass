@@ -13,6 +13,12 @@ export default function CalendarPage() {
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const userId = user?.userId;
   const role = user?.role;
+  const [showModal, setShowModal] = useState(false);
+  const [studentsForAvailability, setStudentsForAvailability] = useState<any[]>(
+    [],
+  );
+  const [selectedAvailabilityTitle, setSelectedAvailabilityTitle] =
+    useState<string>("");
 
   const fetchCalendarEvents = useCallback(() => {
     apiGet<any[]>("/booking/booking/availabilities")
@@ -71,32 +77,19 @@ export default function CalendarPage() {
   }, [fetchCalendarEvents]);
 
   const handleProfessorEventClick = async (clickInfo: any) => {
-    const eventId = clickInfo.event.id;
+    const { id, title } = clickInfo.event;
     const { isMine } = clickInfo.event.extendedProps;
 
-    if (!isMine || role !== "Professor") {
-      alert("You can only view your own availabilities");
-      return;
-    }
+    if (!isMine || role !== "Professor") return;
 
     try {
       const students = await apiGet<any[]>(
-        `/booking/booking/availabilities/${eventId}/students`,
+        `/booking/booking/availabilities/${id}/students`,
       );
 
-      if (!students || students.length === 0) {
-        alert("No students have booked this lesson yet.");
-        return;
-      }
-
-      const studentList = students
-        .map(
-          (s, index) =>
-            `${index + 1}. Student Name: ${s.studentName} - Email: ${s.email}`,
-        )
-        .join("\n");
-
-      alert(`Students who booked:\n\n${studentList}`);
+      setStudentsForAvailability(students || []);
+      setSelectedAvailabilityTitle(title);
+      setShowModal(true);
     } catch (err) {
       console.error(err);
       alert("Failed to load bookings");
@@ -223,6 +216,97 @@ export default function CalendarPage() {
               }
             }}
           />
+          {showModal && (
+            <div
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                width: "100vw",
+                height: "100vh",
+                backgroundColor: "rgba(0,0,0,0.7)",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                zIndex: 9999,
+              }}
+            >
+              <div
+                style={{
+                  backgroundColor: "#fff",
+                  padding: "24px",
+                  borderRadius: "8px",
+                  width: "80%",
+                  maxHeight: "90%",
+                  overflowY: "auto",
+                  position: "relative",
+                }}
+              >
+                <button
+                  style={{
+                    position: "absolute",
+                    top: "12px",
+                    right: "20px",
+                    fontSize: "40px",
+                    border: "none",
+                    background: "transparent",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => setShowModal(false)}
+                >
+                  ×
+                </button>
+                <h3>Bookings for: {selectedAvailabilityTitle}</h3>
+
+                {studentsForAvailability.length === 0 ? (
+                  <p>No students have booked yet.</p>
+                ) : (
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                    <thead>
+                      <tr>
+                        <th
+                          style={{ border: "1px solid #ccc", padding: "8px" }}
+                        >
+                          #
+                        </th>
+                        <th
+                          style={{ border: "1px solid #ccc", padding: "8px" }}
+                        >
+                          Name
+                        </th>
+                        <th
+                          style={{ border: "1px solid #ccc", padding: "8px" }}
+                        >
+                          Email
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {studentsForAvailability.map((s, index) => (
+                        <tr key={s.studentUserId || index}>
+                          <td
+                            style={{ border: "1px solid #ccc", padding: "8px" }}
+                          >
+                            {index + 1}
+                          </td>
+                          <td
+                            style={{ border: "1px solid #ccc", padding: "8px" }}
+                          >
+                            {s.studentName}
+                          </td>
+                          <td
+                            style={{ border: "1px solid #ccc", padding: "8px" }}
+                          >
+                            {s.studentEmail}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
