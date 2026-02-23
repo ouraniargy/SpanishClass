@@ -12,6 +12,7 @@
 
         public int DurationMinutes { get; set; }
         public required string Description { get; set; }
+        public string? RoomPhoto { get; set; }
 
         public int MaxSeats { get; set; }
         public required string Name { get; set; }

@@ -1,0 +1,11 @@
+export interface BookingDetails {
+  bookingId: string;
+  studentName: string;
+  studentEmail: string;
+  lessonName: string;
+  description: string;
+  seatNumber: number;
+  date: string;
+  roomPhoto: string;
+  guestsEmails: string[];
+}

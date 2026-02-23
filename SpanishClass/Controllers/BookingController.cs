@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SpanishClass.Models;
 using SpanishClass.Models.RequestDtos;
 using SpanishClass.Npgsql;
+using SpanishClass.Services;
 
 namespace SpanishClass.Controllers;
 
@@ -12,10 +13,12 @@ namespace SpanishClass.Controllers;
 public class BookingController : BaseController
 {
     private readonly SpanishClassDbContext _context;
+    private readonly IEmailService _emailService;
 
-    public BookingController(SpanishClassDbContext context)
+    public BookingController(SpanishClassDbContext context, IEmailService emailService)
     {
         _context = context;
+        _emailService = emailService;
     }
 
     [HttpGet]
@@ -77,7 +80,10 @@ public class BookingController : BaseController
     }
 
     [HttpPost("{availabilityId}")]
-    public async Task<IActionResult> BookAvailability(Guid availabilityId, [FromQuery] Guid studentUserId)
+    public async Task<IActionResult> BookAvailability(
+        Guid availabilityId,
+        [FromQuery] Guid studentUserId,
+        [FromQuery] bool sendEmail = false)
     {
         var availability = await _context.ProfessorAvailabilities
             .Include(a => a.Lesson)
@@ -86,12 +92,11 @@ public class BookingController : BaseController
         if (availability == null)
             return NotFound("Availability not found");
 
-        var maxSeats = availability.Lesson.MaxSeats;
-
-        if (availability.BookedSeats >= maxSeats)
+        if (availability.BookedSeats >= availability.Lesson.MaxSeats)
             return BadRequest("No seats available");
 
         var student = await _context.Students
+            .Include(s => s.User)
             .FirstOrDefaultAsync(s => s.UserId == studentUserId);
 
         if (student == null)
@@ -102,9 +107,7 @@ public class BookingController : BaseController
 
         if (alreadyBooked)
             return BadRequest("You already booked this lesson");
-
         availability.BookedSeats += 1;
-
         var booking = new Booking
         {
             Id = Guid.NewGuid(),
@@ -114,9 +117,29 @@ public class BookingController : BaseController
         };
 
         _context.Bookings.Add(booking);
+        availability.BookedSeats += 1;
         await _context.SaveChangesAsync();
 
-        return Ok(new { message = "Booking successful" });
+        var bookingDetails = new BookingDetails
+        {
+            BookingId = booking.Id,
+            AvailabilityId = availabilityId,
+            StudentName = student.User.Name,
+            StudentEmail = student.User.Email,
+            LessonName = availability.Lesson.Name,
+            Description = availability.Lesson.Description,
+            SeatNumber = availability.BookedSeats,
+            Date = availability.StartTime,
+            RoomPhoto = availability.Lesson.RoomPhoto,
+            GuestsEmails = new List<string> { student.User.Email }
+        };
+
+        if (sendEmail)
+        {
+            await _emailService.SendBookingEmailAsync(bookingDetails);
+        }
+
+        return Ok(bookingDetails);
     }
 
     [HttpPost("addAvailability")]
@@ -163,9 +186,12 @@ public class BookingController : BaseController
     [HttpGet("availabilities")]
     public async Task<IActionResult> GetAvailabilities()
     {
-        var userId = LoggedInUserId;
-        if (!userId.HasValue)
-            return Unauthorized("User not logged in");
+        var userId = LoggedInUserId!.Value;
+
+        var studentId = await _context.Students
+            .Where(s => s.UserId == userId)
+            .Select(s => s.Id)
+            .FirstOrDefaultAsync();
 
         var availabilities = await _context.ProfessorAvailabilities
             .Include(a => a.Lesson)
@@ -174,6 +200,8 @@ public class BookingController : BaseController
                 .ThenInclude(l => l.Professor)
                     .ThenInclude(p => p.User)
             .Include(a => a.Bookings)
+                .ThenInclude(b => b.Student)
+                    .ThenInclude(s => s.User) 
             .ToListAsync();
 
         var result = availabilities.Select(a => new
@@ -184,12 +212,12 @@ public class BookingController : BaseController
             end = a.EndTime,
             maxSeats = a.Lesson.MaxSeats,
             bookedSeats = a.Bookings.Count(),
-            ProfessorName = a.Lesson.Professor.User.Name + " " +
-                a.Lesson.Professor.User.Surname,
+            ProfessorName = a.Lesson.Professor.User.Name + " " + a.Lesson.Professor.User.Surname,
             professorUserId = a.Lesson.Professor.UserId,
             description = a.Lesson.Description,
             name = a.Lesson.Name,
-            lessonName = a.Lesson.Name
+            lessonName = a.Lesson.Name,
+            bookedByMe = a.Bookings.Any(b => b.StudentId == studentId)
         });
 
         return Ok(result);

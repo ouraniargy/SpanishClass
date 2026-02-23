@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SpanishClass.Models;
 using SpanishClass.Npgsql;
+using SpanishClass.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,8 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 
