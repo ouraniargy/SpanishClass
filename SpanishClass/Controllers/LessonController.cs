@@ -42,7 +42,8 @@ public class LessonController : BaseController
             LevelId = model.LevelId,
             DurationMinutes = model.DurationMinutes,
             MaxSeats = model.MaxSeats,
-            LessonName = model.LessonName
+            Name = model.Name,
+            Description = model.Description
         };
 
         _context.Lessons.Add(lesson);
@@ -55,7 +56,8 @@ public class LessonController : BaseController
             lesson.LevelId,
             lesson.DurationMinutes,
             lesson.MaxSeats,
-            lesson.LessonName
+            lesson.Name,
+            lesson.Description
         });
     }
 
@@ -81,7 +83,8 @@ public class LessonController : BaseController
                 LevelName = l.Level.Name,
                 ProfessorName = l.Professor.User.Name + " " + l.Professor.User.Surname,
                 l.ProfessorId,
-                l.LessonName
+                l.Name,
+                l.Description
             })
             .ToListAsync();
 
@@ -132,7 +135,8 @@ public class LessonController : BaseController
 
         lesson.DurationMinutes = model.DurationMinutes;
         lesson.MaxSeats = model.MaxSeats;
-        lesson.LessonName = model.LessonName;
+        lesson.Name = model.Name;
+        lesson.Description = model.Description;
 
         _context.Lessons.Update(lesson);
         await _context.SaveChangesAsync();

@@ -30,17 +30,24 @@ export default function CalendarPage() {
               : a.bookedSeats >= a.maxSeats
                 ? "#dc3545"
                 : "#28a745";
-            const lessonName = a.lessonName ?? "Lesson";
+            const name = a.name ?? "Lesson";
+            const description = a.description ?? "";
             const professorName = a.professorName ?? "";
 
             return {
               id: a.id,
-              title: `${lessonName} - ${professorName} - ${a.bookedSeats}/${a.maxSeats}`,
+              title: `${name} - ${description} - ${professorName} - ${a.bookedSeats}/${a.maxSeats}`,
               start: start,
               end: end,
               color,
               editable: !!isMine,
-              extendedProps: { professorUserId: a.professorUserId, isMine },
+              extendedProps: {
+                professorUserId: a.professorUserId,
+                isMine,
+                description: a.description,
+                bookedSeats: a.bookedSeats,
+                maxSeats: a.maxSeats,
+              },
             };
           });
           setEvents(mapped);
@@ -168,7 +175,7 @@ export default function CalendarPage() {
               </option>
               {lessons.map((l) => (
                 <option key={l.id} value={l.id}>
-                  {l.levelName} - {l.durationMinutes}min
+                  {l.name} - {l.levelName} - {l.durationMinutes}min
                 </option>
               ))}
             </select>

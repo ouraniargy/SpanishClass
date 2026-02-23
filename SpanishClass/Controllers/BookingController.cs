@@ -187,7 +187,9 @@ public class BookingController : BaseController
             ProfessorName = a.Lesson.Professor.User.Name + " " +
                 a.Lesson.Professor.User.Surname,
             professorUserId = a.Lesson.Professor.UserId,
-            lessonName = a.Lesson.LessonName
+            description = a.Lesson.Description,
+            name = a.Lesson.Name,
+            lessonName = a.Lesson.Name
         });
 
         return Ok(result);

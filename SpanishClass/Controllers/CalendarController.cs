@@ -27,7 +27,6 @@ namespace SpanishClass.Controllers
                 {
                     AvailabilityId = a.Id,
                     Date = a.StartTime,
-                    LessonDescription = $"{a.Lesson.Level.Name} - {a.Lesson.DurationMinutes} min",
                     ProfessorName = a.Lesson.Professor.User.Name + " " +
                                     a.Lesson.Professor.User.Surname,
                     MaxSeats = a.MaxSeats,
@@ -47,7 +46,7 @@ namespace SpanishClass.Controllers
             var data = await _context.ProfessorAvailabilities
                 .Include(a => a.Lesson)
                     .ThenInclude(l => l.Level)
-                .Include(a => a.Lesson.Professor.User)
+                .Include(a => a.Lesson)
                 .Include(a => a.Bookings)
                     .ThenInclude(b => b.Student.User)
                 .Where(a => a.StartTime.Month == month && a.StartTime.Year == year)
@@ -55,7 +54,6 @@ namespace SpanishClass.Controllers
                 {
                     AvailabilityId = a.Id,
                     Date = a.StartTime,
-                    LessonDescription = $"{a.Lesson.Level.Name} - {a.Lesson.DurationMinutes} min",
                     ProfessorName = a.Lesson.Professor.User.Name + " " +
                                     a.Lesson.Professor.User.Surname,
                     MaxSeats = a.Lesson.MaxSeats,

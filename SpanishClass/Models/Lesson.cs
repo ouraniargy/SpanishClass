@@ -11,7 +11,9 @@
         public Level Level { get; set; } = null!;
 
         public int DurationMinutes { get; set; }
+        public required string Description { get; set; }
+
         public int MaxSeats { get; set; }
-        public required string LessonName { get; set; }
+        public required string Name { get; set; }
     }
 }

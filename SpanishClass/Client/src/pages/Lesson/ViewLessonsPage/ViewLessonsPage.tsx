@@ -30,7 +30,8 @@ export default function ViewLessonsPage() {
     setEditData({
       durationMinutes: lesson.durationMinutes,
       maxSeats: lesson.maxSeats,
-      lessonName: lesson.lessonName,
+      name: lesson.name,
+      description: lesson.description,
     });
   };
 
@@ -92,6 +93,7 @@ export default function ViewLessonsPage() {
             <tr style={{ borderBottom: "2px solid #ccc" }}>
               <th style={{ padding: "10px" }}>Level</th>
               <th style={{ padding: "10px" }}>Lesson Name</th>
+              <th style={{ padding: "10px" }}>Description</th>
               <th style={{ padding: "10px" }}>Duration (min)</th>
               <th style={{ padding: "10px" }}>Max Seats</th>
               <th style={{ padding: "10px" }}>Actions</th>
@@ -105,16 +107,32 @@ export default function ViewLessonsPage() {
                   {editingId === lesson.id ? (
                     <input
                       type="text"
-                      value={editData.lessonName}
+                      value={editData.name}
                       onChange={(e) =>
                         setEditData({
                           ...editData,
-                          lessonName: e.target.value,
+                          name: e.target.value,
                         })
                       }
                     />
                   ) : (
-                    lesson.lessonName
+                    lesson.name
+                  )}
+                </td>
+                <td style={{ padding: "10px" }}>
+                  {editingId === lesson.id ? (
+                    <input
+                      type="text"
+                      value={editData.description}
+                      onChange={(e) =>
+                        setEditData({
+                          ...editData,
+                          description: e.target.value,
+                        })
+                      }
+                    />
+                  ) : (
+                    lesson.description
                   )}
                 </td>
                 <td style={{ padding: "10px" }}>

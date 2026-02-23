@@ -6,8 +6,6 @@
 
         public DateTime Date { get; set; }
 
-        public string LessonDescription { get; set; } = null!;
-
         public string ProfessorName { get; set; } = null!;
 
         public int MaxSeats { get; set; }

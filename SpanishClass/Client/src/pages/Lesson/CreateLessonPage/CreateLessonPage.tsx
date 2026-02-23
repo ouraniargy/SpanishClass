@@ -7,7 +7,8 @@ export default function CreateLessonPage() {
   const [levelId, setLevelId] = useState("");
   const [durationMinutes, setDurationMinutes] = useState(60);
   const [maxSeats, setMaxSeats] = useState(1);
-  const [lessonName, setLessonName] = useState("");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     fetch("https://localhost:7185/api/levels")
@@ -29,7 +30,8 @@ export default function CreateLessonPage() {
         levelId,
         durationMinutes,
         maxSeats,
-        lessonName,
+        name,
+        description,
       });
 
       alert("Lesson created successfully");
@@ -47,8 +49,15 @@ export default function CreateLessonPage() {
       <label>Lesson Name</label>
       <input
         type="text"
-        value={lessonName}
-        onChange={(e) => setLessonName(e.target.value)}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+
+      <label>Description</label>
+      <input
+        type="text"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
       />
 
       <label>Level</label>

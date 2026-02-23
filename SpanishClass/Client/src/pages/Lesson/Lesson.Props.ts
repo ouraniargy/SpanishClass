@@ -4,5 +4,6 @@ export interface Lesson {
   professorId: string;
   durationMinutes: number;
   maxSeats: number;
-  lessonName: string;
+  name: string;
+  description: string;
 }
