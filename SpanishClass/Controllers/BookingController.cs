@@ -217,5 +217,26 @@ public class BookingController : BaseController
 
         return Ok(new { message = "Availability deleted successfully" });
     }
+
+    [HttpGet("availabilities/{availabilityId}/students")]
+    public async Task<IActionResult> GetStudentsForAvailability(Guid availabilityId)
+    {
+        var bookings = await _context.Bookings
+            .Include(a => a.Student)
+            .ThenInclude(a => a.User)
+            .Where(b => b.AvailabilityId == availabilityId)
+            .Select(b => new
+            {
+                b.Student.UserId,
+                StudentName = b.Student.User.Name + " " + b.Student.User.Surname,
+                b.Student.User.Email
+            })
+            .ToListAsync();
+
+        if (bookings == null)
+            return NotFound();
+
+        return Ok(bookings);
+    }
 }
 

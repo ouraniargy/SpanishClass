@@ -3,7 +3,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { useCallback, useEffect, useState } from "react";
-import { apiDelete, apiGet, apiPost } from "../../api/api";
+import { apiGet, apiPost } from "../../api/api";
 import "./CalendarPage.css";
 
 export default function CalendarPage() {
@@ -70,27 +70,37 @@ export default function CalendarPage() {
     fetchCalendarEvents();
   }, [fetchCalendarEvents]);
 
-  const handleProfessorEventClick = (clickInfo: any) => {
+  const handleProfessorEventClick = async (clickInfo: any) => {
     const eventId = clickInfo.event.id;
     const { isMine } = clickInfo.event.extendedProps;
 
     if (!isMine || role !== "Professor") {
-      alert("You can only delete your own availabilities");
+      alert("You can only view your own availabilities");
       return;
     }
 
-    const confirmed = window.confirm("Delete this availability?");
-    if (!confirmed) return;
+    try {
+      const students = await apiGet<any[]>(
+        `/booking/booking/availabilities/${eventId}/students`,
+      );
 
-    apiDelete(`/booking/booking/availabilities/${eventId}`)
-      .then(() => {
-        fetchCalendarEvents();
-        alert("Availability deleted successfully");
-      })
-      .catch((err) => {
-        console.error("Error deleting availability:", err);
-        alert("Failed to delete availability");
-      });
+      if (!students || students.length === 0) {
+        alert("No students have booked this lesson yet.");
+        return;
+      }
+
+      const studentList = students
+        .map(
+          (s, index) =>
+            `${index + 1}. Student Name: ${s.studentName} - Email: ${s.email}`,
+        )
+        .join("\n");
+
+      alert(`Students who booked:\n\n${studentList}`);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load bookings");
+    }
   };
 
   const handleStudentEventClick = (clickInfo: any) => {
