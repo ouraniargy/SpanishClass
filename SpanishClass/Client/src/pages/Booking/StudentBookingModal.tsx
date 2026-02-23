@@ -86,7 +86,12 @@ export default function StudentBookingModal({
           </>
         ) : (
           <>
-            <h2>Booking Confirmed!</h2>
+            <h1 style={{ color: "#394d67", fontSize: "30px" }}>
+              Booking Confirmed!
+            </h1>
+            <p style={{ fontWeight: "bold", fontSize: "25px" }}>
+              <strong>Date:</strong> {new Date(booking.date).toLocaleString()}
+            </p>
             <p>
               <strong>Student:</strong> {booking.studentName}
             </p>
@@ -98,9 +103,6 @@ export default function StudentBookingModal({
             </p>
             <p>
               <strong>Seat:</strong> {booking.seatNumber}
-            </p>
-            <p>
-              <strong>Date:</strong> {new Date(booking.date).toLocaleString()}
             </p>
             <img
               src={booking.roomPhoto}
