@@ -4,6 +4,7 @@ import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { useCallback, useEffect, useState } from "react";
 import { apiGet, apiPost } from "../../api/api";
+import StudentBookingModal from "../Booking/StudentBookingModal";
 import "./CalendarPage.css";
 
 export default function CalendarPage() {
@@ -19,6 +20,10 @@ export default function CalendarPage() {
   );
   const [selectedAvailabilityTitle, setSelectedAvailabilityTitle] =
     useState<string>("");
+  const [showStudentBookingModal, setShowStudentBookingModal] = useState(false);
+  const [selectedAvailabilityId, setSelectedAvailabilityId] = useState<
+    string | null
+  >(null);
 
   const fetchCalendarEvents = useCallback(() => {
     apiGet<any[]>("/booking/booking/availabilities")
@@ -31,28 +36,30 @@ export default function CalendarPage() {
               role === "Professor" &&
               a.professorUserId?.toLowerCase() === userId?.toLowerCase();
 
-            const color = isMine
-              ? "#2b8cff"
-              : a.bookedSeats >= a.maxSeats
-                ? "#dc3545"
-                : "#28a745";
-            const name = a.name ?? "Lesson";
-            const description = a.description ?? "";
-            const professorName = a.professorName ?? "";
+            const bookedByMe = a.bookedByMe;
+
+            console.log(bookedByMe);
+            const color = bookedByMe
+              ? "#ffc107"
+              : isMine
+                ? "#2b8cff"
+                : a.bookedSeats >= a.maxSeats
+                  ? "#dc3545"
+                  : "#28a745";
 
             return {
               id: a.id,
-              title: `${name} - ${description} - ${professorName} - ${a.bookedSeats}/${a.maxSeats}`,
-              start: start,
-              end: end,
+              title: `${a.name} - ${a.description} - ${a.professorName} - ${a.bookedSeats}/${a.maxSeats}`,
+              start,
+              end,
               color,
               editable: !!isMine,
               extendedProps: {
                 professorUserId: a.professorUserId,
                 isMine,
-                description: a.description,
                 bookedSeats: a.bookedSeats,
                 maxSeats: a.maxSeats,
+                bookedByMe,
               },
             };
           });
@@ -105,16 +112,8 @@ export default function CalendarPage() {
       return;
     }
 
-    if (!window.confirm("Book this lesson?")) return;
-
-    apiPost(`/booking/booking/${event.id}?studentUserId=${user.userId}`, {})
-      .then(() => {
-        alert("Seat booked successfully!");
-        fetchCalendarEvents();
-      })
-      .catch(() => {
-        alert("Booking failed");
-      });
+    setSelectedAvailabilityId(event.id);
+    setShowStudentBookingModal(true);
   };
 
   const handleSelect = (selectionInfo: any) => {
@@ -200,19 +199,28 @@ export default function CalendarPage() {
                 : handleStudentEventClick
             }
             eventDidMount={(info) => {
-              const { bookedSeats, maxSeats } = info.event.extendedProps;
+              const { bookedSeats, maxSeats, bookedByMe, isMine } =
+                info.event.extendedProps;
 
-              if (
-                user?.role === "Professor" &&
-                !info.event.extendedProps.isMine
-              ) {
-                info.el.style.opacity = "0.5";
-                info.el.style.pointerEvents = "none";
+              if (bookedByMe) {
+                info.el.style.backgroundColor = "#ffc107";
+                info.el.style.color = "#000";
+              }
+
+              if (!bookedByMe && bookedSeats < maxSeats) {
+                info.el.style.backgroundColor = "#28a745";
+                info.el.style.color = "#fff";
               }
 
               if (bookedSeats >= maxSeats) {
                 info.el.style.backgroundColor = "#dc3545";
-                info.el.style.pointerEvents = "none";
+                if (role !== "Professor") {
+                  info.el.style.pointerEvents = "none";
+                }
+              }
+
+              if (role === "Professor" && !isMine) {
+                info.el.style.opacity = "0.5";
               }
             }}
           />
@@ -306,6 +314,16 @@ export default function CalendarPage() {
                 )}
               </div>
             </div>
+          )}
+          {showStudentBookingModal && selectedAvailabilityId && (
+            <StudentBookingModal
+              availabilityId={selectedAvailabilityId}
+              studentUserId={user.userId}
+              onClose={() => {
+                setShowStudentBookingModal(false);
+                fetchCalendarEvents();
+              }}
+            />
           )}
         </div>
       </div>
