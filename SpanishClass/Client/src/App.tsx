@@ -5,6 +5,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import CalendarPage from "./pages/CalendarPage/CalendarPage";
 import CreateLessonPage from "./pages/Lesson/CreateLessonPage/CreateLessonPage";
 import ViewLessonsPage from "./pages/Lesson/ViewLessonsPage/ViewLessonsPage";
+import CreateLevelPage from "./pages/Level/CreateLevelPage/CreateLevelPage";
 import Login from "./pages/Login/Login";
 import ProfessorPage from "./pages/ProfessorPage/ProfessorPage";
 import Register from "./pages/Register/Register";
@@ -64,6 +65,16 @@ function App() {
                 <ProtectedRoute
                   element={<ViewLessonsPage />}
                   allowedRoles={["Student", "Professor"]}
+                />
+              }
+            />
+
+            <Route
+              path="/createLevel"
+              element={
+                <ProtectedRoute
+                  element={<CreateLevelPage />}
+                  allowedRoles={["Professor"]}
                 />
               }
             />
