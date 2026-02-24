@@ -17,6 +17,9 @@ export default function ProfessorPage() {
         <h2>
           <Link to="/createLevel">Create a level</Link>
         </h2>
+        <h2>
+          <Link to="/viewLevels">View levels</Link>
+        </h2>
       </div>
     </>
   );

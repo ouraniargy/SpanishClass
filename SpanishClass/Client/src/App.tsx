@@ -6,6 +6,7 @@ import CalendarPage from "./pages/CalendarPage/CalendarPage";
 import CreateLessonPage from "./pages/Lesson/CreateLessonPage/CreateLessonPage";
 import ViewLessonsPage from "./pages/Lesson/ViewLessonsPage/ViewLessonsPage";
 import CreateLevelPage from "./pages/Level/CreateLevelPage/CreateLevelPage";
+import ViewLevelsPage from "./pages/Level/ViewLevelsPage/ViewLevelsPage";
 import Login from "./pages/Login/Login";
 import ProfessorPage from "./pages/ProfessorPage/ProfessorPage";
 import Register from "./pages/Register/Register";
@@ -74,6 +75,16 @@ function App() {
               element={
                 <ProtectedRoute
                   element={<CreateLevelPage />}
+                  allowedRoles={["Professor"]}
+                />
+              }
+            />
+
+            <Route
+              path="/viewLevels"
+              element={
+                <ProtectedRoute
+                  element={<ViewLevelsPage />}
                   allowedRoles={["Professor"]}
                 />
               }
