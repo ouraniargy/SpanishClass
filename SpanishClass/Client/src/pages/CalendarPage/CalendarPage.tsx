@@ -3,7 +3,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { useCallback, useEffect, useState } from "react";
-import { apiGet, apiPost } from "../../api/api";
+import { apiDelete, apiGet, apiPost } from "../../api/api";
 import StudentBookingModal from "../Booking/StudentBookingModal";
 import "./CalendarPage.css";
 
@@ -38,7 +38,6 @@ export default function CalendarPage() {
 
             const bookedByMe = a.bookedByMe;
 
-            console.log(bookedByMe);
             const color = bookedByMe
               ? "#ffc107"
               : isMine
@@ -72,7 +71,7 @@ export default function CalendarPage() {
   }, [role, userId]);
 
   useEffect(() => {
-    apiGet<any[]>("/lesson/lesson")
+    apiGet<any[]>("/lesson")
       .then((data) => {
         setLessons(data);
       })
@@ -96,6 +95,7 @@ export default function CalendarPage() {
 
       setStudentsForAvailability(students || []);
       setSelectedAvailabilityTitle(title);
+      setSelectedAvailabilityId(id);
       setShowModal(true);
     } catch (err) {
       console.error(err);
@@ -151,6 +151,20 @@ export default function CalendarPage() {
         console.error("Error:", err);
         alert("Failed to add availability");
       });
+  };
+
+  const deleteAvailability = async (availabilityId: string) => {
+    if (!availabilityId) return;
+
+    try {
+      await apiDelete(`/booking/booking/availabilities/${availabilityId}`);
+      fetchCalendarEvents();
+      setShowModal(false);
+      alert("Availability deleted successfully");
+    } catch (err) {
+      console.error("Error deleting availability:", err);
+      alert("Failed to delete availability");
+    }
   };
 
   return (
@@ -267,50 +281,83 @@ export default function CalendarPage() {
                 <h3>Bookings for: {selectedAvailabilityTitle}</h3>
 
                 {studentsForAvailability.length === 0 ? (
-                  <p>No students have booked yet.</p>
+                  <>
+                    <p>No students have booked yet.</p>
+                    <button
+                      onClick={() =>
+                        deleteAvailability(selectedAvailabilityId!)
+                      }
+                      style={{ marginTop: 12 }}
+                    >
+                      Delete Availability
+                    </button>
+                  </>
                 ) : (
-                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                    <thead>
-                      <tr>
-                        <th
-                          style={{ border: "1px solid #ccc", padding: "8px" }}
-                        >
-                          #
-                        </th>
-                        <th
-                          style={{ border: "1px solid #ccc", padding: "8px" }}
-                        >
-                          Name
-                        </th>
-                        <th
-                          style={{ border: "1px solid #ccc", padding: "8px" }}
-                        >
-                          Email
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {studentsForAvailability.map((s, index) => (
-                        <tr key={s.studentUserId || index}>
-                          <td
+                  <>
+                    {" "}
+                    <table
+                      style={{ width: "100%", borderCollapse: "collapse" }}
+                    >
+                      <thead>
+                        <tr>
+                          <th
                             style={{ border: "1px solid #ccc", padding: "8px" }}
                           >
-                            {index + 1}
-                          </td>
-                          <td
+                            #
+                          </th>
+                          <th
                             style={{ border: "1px solid #ccc", padding: "8px" }}
                           >
-                            {s.studentName}
-                          </td>
-                          <td
+                            Name
+                          </th>
+                          <th
                             style={{ border: "1px solid #ccc", padding: "8px" }}
                           >
-                            {s.studentEmail}
-                          </td>
+                            Email
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {studentsForAvailability.map((s, index) => (
+                          <tr key={s.studentUserId || index}>
+                            <td
+                              style={{
+                                border: "1px solid #ccc",
+                                padding: "8px",
+                              }}
+                            >
+                              {index + 1}
+                            </td>
+                            <td
+                              style={{
+                                border: "1px solid #ccc",
+                                padding: "8px",
+                              }}
+                            >
+                              {s.studentName}
+                            </td>
+                            <td
+                              style={{
+                                border: "1px solid #ccc",
+                                padding: "8px",
+                              }}
+                            >
+                              {s.studentEmail}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {JSON.stringify(selectedAvailabilityId)}
+                    <button
+                      onClick={() =>
+                        deleteAvailability(selectedAvailabilityId!)
+                      }
+                      style={{ marginTop: 12 }}
+                    >
+                      Delete Availability
+                    </button>
+                  </>
                 )}
               </div>
             </div>

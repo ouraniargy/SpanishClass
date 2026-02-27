@@ -11,7 +11,7 @@ export default function CreateLessonPage() {
   const [description, setDescription] = useState("");
 
   useEffect(() => {
-    fetch("https://localhost:7185/api/levels")
+    fetch("https://localhost:7185/api/level")
       .then((res) => res.json())
       .then((data) => setLevels(data))
       .catch((err) => console.error(err));
@@ -26,7 +26,7 @@ export default function CreateLessonPage() {
     }
 
     try {
-      await apiPost("/lesson/lesson/lesson", {
+      await apiPost("/lesson", {
         levelId,
         durationMinutes,
         maxSeats,

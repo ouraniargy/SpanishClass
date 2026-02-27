@@ -26,7 +26,7 @@ export default function ViewLessonsPage() {
     }
 
     try {
-      await apiDelete(`/lesson/lesson/${lessonId}`);
+      await apiDelete(`/lesson/${lessonId}`);
       setLessons(lessons.filter((l) => l.id !== lessonId));
       alert("Lesson deleted successfully");
     } catch (err) {
@@ -46,7 +46,7 @@ export default function ViewLessonsPage() {
 
   const handleEditSave = async (lessonId: string) => {
     try {
-      await apiPut(`/lesson/lesson/${lessonId}`, editData);
+      await apiPut(`/lesson/${lessonId}`, editData);
       setLessons(
         currentLessons.map((l) =>
           l.id === lessonId ? { ...l, ...editData } : l,
@@ -69,7 +69,7 @@ export default function ViewLessonsPage() {
     const fetchLessons = async () => {
       try {
         setLoading(true);
-        const data = await apiGet<any[]>("/lesson/lesson");
+        const data = await apiGet<any[]>("/lesson");
         setLessons(data);
         setError(null);
       } catch (err) {
