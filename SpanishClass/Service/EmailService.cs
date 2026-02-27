@@ -11,7 +11,7 @@ namespace SpanishClass.Services
         private readonly string _smtpHost = "smtp.gmail.com";
         private readonly int _smtpPort = 587;
 
-        public async Task SendBookingEmailAsync(BookingDetails booking)
+        public async Task SendBookingEmailAsync(BookingDetails? booking)
         {
             using var client = new SmtpClient(_smtpHost, _smtpPort)
             {
@@ -22,7 +22,7 @@ namespace SpanishClass.Services
             var message = new MailMessage();
             message.From = new MailAddress(_smtpUser, "Booking System");
 
-            foreach (var email in booking.GuestsEmails)
+            foreach (var email in booking?.GuestsEmails)
                 message.To.Add(email);
 
             message.Subject = "Booking Confirmation";
@@ -35,6 +35,29 @@ namespace SpanishClass.Services
                 <p><strong>Seat Number:</strong> {booking.SeatNumber}</p>
                 <img src='{booking.RoomPhoto}' alt='Room' style='max-width:400px;' />
             ";
+
+            await client.SendMailAsync(message);
+        }
+        public async Task SendNotificationEmailAsync(string email, string subject, string body)
+        {
+            if (!MailAddress.TryCreate(email, out _))
+                return;
+
+            using var client = new SmtpClient(_smtpHost, _smtpPort)
+            {
+                Credentials = new NetworkCredential(_smtpUser, _smtpPass),
+                EnableSsl = true
+            };
+
+            var message = new MailMessage
+            {
+                From = new MailAddress(_smtpUser, "Booking System"),
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true
+            };
+
+            message.To.Add(email);
 
             await client.SendMailAsync(message);
         }

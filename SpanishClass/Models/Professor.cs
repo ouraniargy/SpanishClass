@@ -12,5 +12,6 @@
         public ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
 
         public ICollection<Level> Levels { get; set; } = new List<Level>();
+
     }
 }

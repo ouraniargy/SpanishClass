@@ -16,5 +16,8 @@
 
         public int MaxSeats { get; set; }
         public required string Name { get; set; }
+
+        public ICollection<ProfessorAvailability> ProfessorAvailabilities { get; set; } = new List<ProfessorAvailability>();
+
     }
 }

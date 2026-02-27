@@ -232,6 +232,7 @@ public class BookingController : BaseController
 
         var availability = await _context.ProfessorAvailabilities
             .Include(a => a.Professor)
+            .Include(a => a.Lesson)
             .FirstOrDefaultAsync(a => a.Id == id);
 
         if (availability == null)
@@ -240,10 +241,42 @@ public class BookingController : BaseController
         if (availability.Professor.UserId != userId.Value)
             return Forbid("You can only delete your own availabilities");
 
+        var affectedBookings = await _context.Bookings
+            .Include(b => b.Student)
+                .ThenInclude(s => s.User)
+            .Include(b => b.Lesson)
+            .Include(b => b.Availability)
+            .Where(b => b.AvailabilityId == id)
+            .ToListAsync();
+
+        foreach (var booking in affectedBookings)
+        {
+            var email = booking.Student?.User?.Email;
+
+            if (string.IsNullOrWhiteSpace(email))
+                continue;
+
+            await _emailService.SendNotificationEmailAsync(
+                email,
+                "Lesson Cancelled",
+                $@"
+            <h2>Lesson Cancellation</h2>
+            <p>Dear {booking.Student.User.Name},</p>
+            <p>The lesson <strong>{booking.Lesson.Name}</strong> 
+            scheduled on {booking.Availability.StartTime:dd/MM/yyyy HH:mm}
+            has been cancelled by the professor.</p>
+            <p>Please log in to book another available time.</p>
+            "
+            );
+        }
+
+        _context.Bookings.RemoveRange(affectedBookings);
+
         _context.ProfessorAvailabilities.Remove(availability);
+
         await _context.SaveChangesAsync();
 
-        return Ok(new { message = "Availability deleted successfully" });
+        return Ok(new { message = "Availability deleted and students notified" });
     }
 
     [HttpGet("availabilities/{availabilityId}/students")]

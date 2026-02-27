@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SpanishClass.Models;
 using SpanishClass.Models.RequestDtos;
 using SpanishClass.Npgsql;
+using SpanishClass.Services;
 
 namespace SpanishClass.Controllers;
 
@@ -11,10 +12,12 @@ namespace SpanishClass.Controllers;
 public class LevelController : BaseController
 {
     private readonly SpanishClassDbContext _context;
+    private readonly IEmailService _emailService;
 
-    public LevelController(SpanishClassDbContext context)
+    public LevelController(SpanishClassDbContext context, IEmailService emailService)
     {
         _context = context;
+        _emailService = emailService;
     }
 
     [HttpPost("level")]
@@ -59,21 +62,49 @@ public class LevelController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteLevel(Guid id)
     {
-        var level = await _context.Levels.FindAsync(id);
+        var level = await _context.Levels
+            .Include(l => l.Lessons)
+            .FirstOrDefaultAsync(l => l.Id == id);
 
         if (level == null)
             return NotFound("Level not found");
 
-        var isUsed = await _context.Lessons
-            .AnyAsync(l => l.LevelId == id);
+        var lessonIds = level.Lessons.Select(l => l.Id).ToList();
 
-        if (isUsed)
-            return BadRequest("Cannot delete level. It is used by lessons.");
+        var affectedBookings = await _context.Bookings
+            .Include(b => b.Student)
+                .ThenInclude(s => s.User)
+            .Include(b => b.Lesson)
+            .Include(b => b.Availability)
+            .Where(b => lessonIds.Contains(b.LessonId))
+            .ToListAsync();
 
+        foreach (var booking in affectedBookings)
+        {
+            await _emailService.SendNotificationEmailAsync(
+                booking.Student.User.Email,
+                "Lesson Cancelled",
+                $@"
+            <h2>Lesson Cancellation</h2>
+            <p>Dear {booking.Student.User.Name},</p>
+            <p>The lesson <strong>{booking.Lesson.Name}</strong> 
+            scheduled on {booking.Availability.StartTime:dd/MM/yyyy HH:mm}
+            has been cancelled because the level was removed.</p>
+            <p>Please check the platform for other available lessons.</p>
+            "
+            );
+        }
+
+        _context.Bookings.RemoveRange(affectedBookings);
+        _context.Lessons.RemoveRange(level.Lessons);
         _context.Levels.Remove(level);
+
         await _context.SaveChangesAsync();
 
-        return Ok(new { message = "Level deleted successfully" });
+        return Ok(new
+        {
+            message = "Level deleted successfully and affected users were notified"
+        });
     }
 
     [HttpPut("{id}")]

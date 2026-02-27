@@ -4,21 +4,24 @@ using SpanishClass.Models;
 using SpanishClass.Models.RequestDtos;
 using SpanishClass.Models.ResponseDtos;
 using SpanishClass.Npgsql;
+using SpanishClass.Services;
 
 namespace SpanishClass.Controllers;
 
 [ApiController]
-[Route("api/lesson/[controller]")]
+[Route("api/[controller]")]
 public class LessonController : BaseController
 {
     private readonly SpanishClassDbContext _context;
+    private readonly IEmailService _emailService;
 
-    public LessonController(SpanishClassDbContext context)
+    public LessonController(SpanishClassDbContext context, IEmailService emailService)
     {
+        _emailService = emailService;
         _context = context;
     }
 
-    [HttpPost("lesson")]
+    [HttpPost]
     public async Task<IActionResult> CreateLesson([FromBody] CreateLessonDto model)
     {
         if (!ModelState.IsValid)
@@ -101,6 +104,7 @@ public class LessonController : BaseController
 
         var lesson = await _context.Lessons
             .Include(l => l.Professor)
+            .Include(l => l.ProfessorAvailabilities)
             .FirstOrDefaultAsync(l => l.Id == id);
 
         if (lesson == null)
@@ -109,10 +113,44 @@ public class LessonController : BaseController
         if (lesson.Professor.UserId != userId.Value)
             return Forbid("You can only delete your own lessons");
 
+        var availabilityIds = lesson.ProfessorAvailabilities.Select(a => a.Id).ToList();
+
+        var affectedBookings = await _context.Bookings
+            .Include(b => b.Student)
+                .ThenInclude(s => s.User)
+            .Include(b => b.Lesson)
+            .Include(b => b.Availability)
+            .Where(b => availabilityIds.Contains(b.AvailabilityId))
+            .ToListAsync();
+
+        foreach (var booking in affectedBookings)
+        {
+            var email = booking.Student?.User?.Email;
+
+            if (string.IsNullOrWhiteSpace(email))
+                continue;
+
+            await _emailService.SendNotificationEmailAsync(
+                email,
+                "Lesson Cancelled",
+                $@"
+            <h2>Lesson Cancellation</h2>
+            <p>Dear {booking.Student.User.Name},</p>
+            <p>The lesson <strong>{booking.Lesson.Name}</strong> 
+            scheduled on {booking.Availability.StartTime:dd/MM/yyyy HH:mm}
+            has been cancelled because the lesson was removed.</p>
+            <p>Please log in to book another available lesson.</p>
+            "
+            );
+        }
+
+        _context.Bookings.RemoveRange(affectedBookings);
+        _context.ProfessorAvailabilities.RemoveRange(lesson.ProfessorAvailabilities);
         _context.Lessons.Remove(lesson);
+
         await _context.SaveChangesAsync();
 
-        return Ok(new { message = "Lesson deleted successfully" });
+        return Ok(new { message = "Lesson deleted and students notified" });
     }
 
     [HttpPut("{id}")]
