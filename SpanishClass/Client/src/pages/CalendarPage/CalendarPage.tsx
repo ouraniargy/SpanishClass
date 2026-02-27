@@ -26,7 +26,7 @@ export default function CalendarPage() {
   >(null);
 
   const fetchCalendarEvents = useCallback(() => {
-    apiGet<any[]>("/booking/booking/availabilities")
+    apiGet<any[]>("/booking/availabilities")
       .then((data) => {
         try {
           const mapped = (data || []).map((a: any) => {
@@ -90,7 +90,7 @@ export default function CalendarPage() {
 
     try {
       const students = await apiGet<any[]>(
-        `/booking/booking/availabilities/${id}/students`,
+        `/booking/availabilities/${id}/students`,
       );
 
       setStudentsForAvailability(students || []);
@@ -137,7 +137,7 @@ export default function CalendarPage() {
       return;
     }
 
-    apiPost("/booking/booking/addAvailability", {
+    apiPost("/booking/addAvailability", {
       startTime: new Date(start).toISOString(),
       endTime: new Date(end).toISOString(),
       maxSeats: 1,
@@ -157,7 +157,7 @@ export default function CalendarPage() {
     if (!availabilityId) return;
 
     try {
-      await apiDelete(`/booking/booking/availabilities/${availabilityId}`);
+      await apiDelete(`/booking/availabilities/${availabilityId}`);
       fetchCalendarEvents();
       setShowModal(false);
       alert("Availability deleted successfully");

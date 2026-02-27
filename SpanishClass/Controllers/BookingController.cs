@@ -9,7 +9,7 @@ using SpanishClass.Services;
 namespace SpanishClass.Controllers;
 
 [ApiController]
-[Route("api/booking/[controller]")]
+[Route("api/[controller]")]
 public class BookingController : BaseController
 {
     private readonly SpanishClassDbContext _context;

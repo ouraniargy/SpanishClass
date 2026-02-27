@@ -20,7 +20,7 @@ public class LevelController : BaseController
         _emailService = emailService;
     }
 
-    [HttpPost("level")]
+    [HttpPost]
     public async Task<IActionResult> CreateLevel([FromBody] Level model)
     {
         if (!ModelState.IsValid)

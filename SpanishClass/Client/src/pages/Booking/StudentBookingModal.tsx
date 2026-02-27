@@ -17,7 +17,7 @@ export default function StudentBookingModal({
   const handleBook = async () => {
     try {
       const result: BookingDetails = await apiPost(
-        `/booking/booking/${availabilityId}?studentUserId=${studentUserId}&sendEmail=${sendEmail}`,
+        `/booking/${availabilityId}?studentUserId=${studentUserId}&sendEmail=${sendEmail}`,
         {},
       );
       setBooking(result);

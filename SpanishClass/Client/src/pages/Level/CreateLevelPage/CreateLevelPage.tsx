@@ -11,7 +11,7 @@ export default function CreateLevelPage() {
 
   async function handleCreateLevel() {
     try {
-      await apiPost("/Level/level", {
+      await apiPost("/Level", {
         price,
         name,
         description,
