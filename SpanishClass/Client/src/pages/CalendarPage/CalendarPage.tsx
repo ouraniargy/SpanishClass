@@ -182,12 +182,14 @@ export default function CalendarPage() {
             fully booked.
           </p>
         ) : (
-          <div style={{ marginBottom: 12 }}>
-            <label style={{ marginRight: 8 }}>Select Lesson:</label>
+          <div style={{ marginBottom: 12, width: "100%", maxWidth: "500px" }}>
+            <label style={{ display: "block", marginBottom: 4 }}>
+              Select Lesson:
+            </label>
             <select
               value={selectedLessonId}
               onChange={(e) => setSelectedLessonId(e.target.value)}
-              style={{ padding: "6px" }}
+              style={{ width: "100%", padding: "6px", boxSizing: "border-box" }}
             >
               <option value="" disabled>
                 Select lesson
