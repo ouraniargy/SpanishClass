@@ -4,7 +4,6 @@ body {
 }
 
 body {
-  display: flex;
   justify-content: center;
   align-items: center;
   background: linear-gradient(to bottom right, purple, indigo);

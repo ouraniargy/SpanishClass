@@ -102,24 +102,10 @@
   transition: all 0.3s ease;
 }
 
-.calendar-wrapper :global(.fc-timegrid-slot) {
-  height: 3em;
-}
-
 .calendar-wrapper :global(.fc-col-time-cell) {
   vertical-align: middle;
 }
 
 .calendar-wrapper :global(.fc-daygrid-day-frame) {
   min-height: 120px;
-}
-
-@media (max-width: 768px) {
-  .calendar-wrapper :global(.fc-timegrid-slot) {
-    height: 2em;
-  }
-}
-
-.fc-timegrid-slot {
-  height: 3em;
 }

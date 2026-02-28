@@ -3,6 +3,7 @@ body {
   height: auto;
   min-height: 100%;
   overflow-y: auto;
+  overflow-x: auto;
 }
 
 code {

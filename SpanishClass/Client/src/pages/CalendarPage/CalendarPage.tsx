@@ -358,7 +358,6 @@ export default function CalendarPage() {
                         ))}
                       </tbody>
                     </table>
-                    {JSON.stringify(selectedAvailabilityId)}
                     <button
                       onClick={() =>
                         deleteAvailability(selectedAvailabilityId!)
