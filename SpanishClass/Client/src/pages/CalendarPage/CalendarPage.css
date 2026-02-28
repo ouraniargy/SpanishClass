@@ -1,5 +1,5 @@
 .calendar-container {
-  max-width: 90%;
+  /* min-height: 100vh; */
   margin: 0 auto;
   padding: 30px 20px;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -26,7 +26,8 @@
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   padding: 30px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: visible;
 }
 
 .calendar-wrapper :global(.fc) {
@@ -115,19 +116,11 @@
 }
 
 @media (max-width: 768px) {
-  .calendar-container {
-    padding: 20px 10px;
+  .calendar-wrapper :global(.fc-timegrid-slot) {
+    height: 2em;
   }
+}
 
-  .calendar-header h2 {
-    font-size: 4rem;
-  }
-
-  .calendar-wrapper {
-    padding: 15px;
-  }
-
-  .calendar-wrapper :global(.fc-daygrid-day-frame) {
-    min-height: 80px;
-  }
+.fc-timegrid-slot {
+  height: 3em;
 }

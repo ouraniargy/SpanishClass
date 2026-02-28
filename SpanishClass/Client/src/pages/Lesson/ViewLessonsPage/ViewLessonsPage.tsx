@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiDelete, apiGet, apiPut } from "../../../api/api";
+import { handleBack } from "../../../shared/handleBack";
 import "../../sharedStyles.css";
 
 export default function ViewLessonsPage() {
@@ -16,6 +17,7 @@ export default function ViewLessonsPage() {
   const indexOfLastLesson = currentPage * lessonsPerPage;
   const indexOfFirstLesson = indexOfLastLesson - lessonsPerPage;
   const currentLessons = lessons.slice(indexOfFirstLesson, indexOfLastLesson);
+  const goBack = handleBack();
 
   const handleDelete = async (lessonId: string) => {
     if (!window.confirm("Are you sure you want to delete this lesson?")) {
@@ -285,6 +287,12 @@ export default function ViewLessonsPage() {
       <button onClick={() => navigate("/createLesson")}>
         Create New Lesson
       </button>
+
+      <div>
+        <button type="button" onClick={goBack}>
+          Back
+        </button>
+      </div>
     </div>
   );
 }

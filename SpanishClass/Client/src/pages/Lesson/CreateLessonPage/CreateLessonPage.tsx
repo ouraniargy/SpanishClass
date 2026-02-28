@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiPost } from "../../../api/api";
+import { handleBack } from "../../../shared/handleBack";
 
 export default function CreateLessonPage() {
   const [levels, setLevels] = useState<any[]>([]);
@@ -9,6 +10,7 @@ export default function CreateLessonPage() {
   const [maxSeats, setMaxSeats] = useState(1);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const goBack = handleBack();
 
   useEffect(() => {
     fetch("https://localhost:7185/api/level")
@@ -91,6 +93,12 @@ export default function CreateLessonPage() {
       />
 
       <button onClick={handleCreateLesson}>Create Lesson</button>
+
+      <div>
+        <button type="button" onClick={goBack}>
+          Back
+        </button>
+      </div>
     </div>
   );
 }

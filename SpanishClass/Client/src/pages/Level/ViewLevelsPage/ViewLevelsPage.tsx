@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiDelete, apiGet, apiPut } from "../../../api/api";
+import { handleBack } from "../../../shared/handleBack";
 import "../../sharedStyles.css";
 
 export default function ViewLevelsPage() {
@@ -16,6 +17,7 @@ export default function ViewLevelsPage() {
   const indexOfLastLevel = currentPage * levelsPerPage;
   const indexOfFirstLevel = indexOfLastLevel - levelsPerPage;
   const currentLevels = levels.slice(indexOfFirstLevel, indexOfLastLevel);
+  const goBack = handleBack();
 
   const handleDelete = async (levelId: string) => {
     if (!window.confirm("Are you sure you want to delete this level?")) {
@@ -263,6 +265,12 @@ export default function ViewLevelsPage() {
       )}
 
       <button onClick={() => navigate("/createLevel")}>Create New Level</button>
+
+      <div>
+        <button type="button" onClick={goBack}>
+          Back
+        </button>
+      </div>
     </div>
   );
 }

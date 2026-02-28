@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiPost } from "../../../api/api";
+import { handleBack } from "../../../shared/handleBack";
 
 export default function CreateLevelPage() {
   const [price, setPrice] = useState(1);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-
+  const goBack = handleBack();
   const navigate = useNavigate();
 
   async function handleCreateLevel() {
@@ -51,6 +52,12 @@ export default function CreateLevelPage() {
       />
 
       <button onClick={handleCreateLevel}>Create Level</button>
+
+      <div>
+        <button type="button" onClick={goBack}>
+          Back
+        </button>
+      </div>
     </div>
   );
 }

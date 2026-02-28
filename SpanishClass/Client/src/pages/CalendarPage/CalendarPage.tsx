@@ -4,6 +4,7 @@ import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { useCallback, useEffect, useState } from "react";
 import { apiDelete, apiGet, apiPost } from "../../api/api";
+import { handleBack } from "../../shared/handleBack";
 import StudentBookingModal from "../Booking/StudentBookingModal";
 import "./CalendarPage.css";
 
@@ -24,6 +25,8 @@ export default function CalendarPage() {
   const [selectedAvailabilityId, setSelectedAvailabilityId] = useState<
     string | null
   >(null);
+  const goBack = handleBack();
+  const isMobile = window.innerWidth < 768;
 
   const fetchCalendarEvents = useCallback(() => {
     apiGet<any[]>("/booking/availabilities")
@@ -200,9 +203,16 @@ export default function CalendarPage() {
         <div className="calendar-wrapper">
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            initialView="timeGridWeek"
-            events={events}
+            initialView={isMobile ? "timeGridDay" : "timeGridWeek"}
+            headerToolbar={{
+              left: "prev,next today",
+              center: "title",
+              right: isMobile
+                ? "timeGridDay,dayGridMonth"
+                : "timeGridWeek,dayGridMonth",
+            }}
             height="auto"
+            events={events}
             editable={user?.role === "Professor"}
             selectable={user?.role === "Professor"}
             selectMirror={true}
@@ -372,6 +382,20 @@ export default function CalendarPage() {
               }}
             />
           )}
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <button
+              type="button"
+              onClick={goBack}
+              style={{
+                marginTop: "20px",
+                padding: "10px 20px",
+                fontSize: "16px",
+                cursor: "pointer",
+              }}
+            >
+              Back
+            </button>
+          </div>
         </div>
       </div>
     </div>
