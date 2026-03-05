@@ -1,29 +1,44 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { apiPost } from "../../api/api";
 import { useAuth } from "../../components/AuthContext";
 import "../sharedStyles.css";
-import { RegisterRequest } from "./Register.Props";
 
 export default function Register() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
+  const [photo, setPhoto] = useState<File | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const [role, setRole] = useState("Student");
+  const [mobilePhone, setMobilePhone] = useState("");
 
   async function handleRegister() {
-    const body: RegisterRequest = { email, password, name, surname, role };
     try {
-      const registeredUser = (await apiPost("/account/register", body)) as {
-        userId: string;
-        name: string;
-        surname: string;
-        role: string;
-      };
+      const formData = new FormData();
+
+      formData.append("email", email);
+      formData.append("password", password);
+      formData.append("name", name);
+      formData.append("surname", surname);
+      formData.append("role", role);
+      formData.append("mobilePhone", mobilePhone);
+
+      if (photo) {
+        formData.append("photo", photo);
+      }
+
+      const res = await fetch("https://localhost:7185/api/account/register", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+
+      if (!res.ok) throw new Error("Register failed");
+
+      const registeredUser = await res.json();
 
       login({
         userId: registeredUser.userId,
@@ -74,6 +89,33 @@ export default function Register() {
           <option value="Student">Student</option>
           <option value="Professor">Professor</option>
         </select>
+
+        <h4>Photo</h4>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            if (e.target.files) {
+              setPhoto(e.target.files[0]);
+            }
+          }}
+        />
+
+        {photo && (
+          <img
+            src={URL.createObjectURL(photo)}
+            alt="preview"
+            style={{ width: "100px", borderRadius: "50%", marginTop: "10px" }}
+          />
+        )}
+
+        <h4>Mobile Phone</h4>
+        <input
+          type="mobilePhone"
+          placeholder="Mobile Phone"
+          value={mobilePhone}
+          onChange={(e) => setMobilePhone(e.target.value)}
+        />
 
         <h4>Email</h4>
         <input

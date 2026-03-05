@@ -26,7 +26,7 @@ namespace SpanishClass.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        public async Task<IActionResult> Register([FromForm] RegisterViewModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -35,13 +35,28 @@ namespace SpanishClass.Controllers
             if (existingUser != null)
                 return BadRequest("Email already registered.");
 
+            string? photoPath = null;
+
+            if (model.Photo != null)
+            {
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.Photo.FileName);
+                var filePath = Path.Combine("wwwroot/uploads", fileName);
+
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await model.Photo.CopyToAsync(stream);
+
+                photoPath = "/uploads/" + fileName;
+            }
+
             var user = new ApplicationUser
             {
-                Id = Guid.NewGuid(),
                 UserName = model.Email,
+                Id = Guid.NewGuid(),
                 Email = model.Email,
                 Name = model.Name,
-                Surname = model.Surname
+                Surname = model.Surname,
+                PhoneNumber = model.MobilePhone,
+                Photo = photoPath
             };
 
             var createResult = await _userManager.CreateAsync(user, model.Password);
@@ -59,7 +74,7 @@ namespace SpanishClass.Controllers
 
             await _context.SaveChangesAsync();
 
-            await _signInManager.SignInAsync(user, isPersistent: false);
+            await _signInManager.SignInAsync(user, false);
 
             return Ok(new
             {
@@ -67,7 +82,10 @@ namespace SpanishClass.Controllers
                 userId = user.Id,
                 name = user.Name,
                 surname = user.Surname,
-                role = model.Role
+                role = model.Role,
+                photo = user.Photo,
+                email = model.Email,
+                mobilePhone = model.MobilePhone
             });
         }
 
@@ -143,7 +161,7 @@ namespace SpanishClass.Controllers
         {
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
-                return Redirect("http://localhost:3000/login"); // fallback if info is null
+                return Redirect("http://localhost:3000/login");
 
             ApplicationUser user;
 
@@ -160,7 +178,7 @@ namespace SpanishClass.Controllers
             {
                 var email = info.Principal.FindFirstValue(ClaimTypes.Email);
                 if (email == null)
-                    return Redirect("http://localhost:3000/login"); // fallback if email missing
+                    return Redirect("http://localhost:3000/login");
 
                 user = await _userManager.FindByEmailAsync(email);
                 if (user == null)
@@ -184,7 +202,6 @@ namespace SpanishClass.Controllers
                 await _signInManager.SignInAsync(user, isPersistent: true);
             }
 
-            // Determine user role
             string role;
             if (await _context.Students.AnyAsync(s => s.UserId == user.Id))
                 role = "Student";
@@ -193,7 +210,6 @@ namespace SpanishClass.Controllers
             else
                 role = "select-role";
 
-            // Redirect to frontend with query parameters so React can log in the user
             var frontendUrl = $"http://localhost:3000/select-role?userId={user.Id}&role={role}&name={user.Name}&surname={user.Surname}";
             return Redirect(frontendUrl);
         }
@@ -230,7 +246,6 @@ namespace SpanishClass.Controllers
             if (user == null)
                 return NotFound("User not found");
 
-            // Check if the user already has a role
             var role = await _context.Students.AnyAsync(s => s.UserId == user.Id)
                 ? "Student"
                 : await _context.Professors.AnyAsync(p => p.UserId == user.Id)
