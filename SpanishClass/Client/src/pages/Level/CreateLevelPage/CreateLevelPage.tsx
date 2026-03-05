@@ -27,36 +27,38 @@ export default function CreateLevelPage() {
   }
 
   return (
-    <div className="card">
-      <h2>Create Level</h2>
+    <div className="page-center">
+      <div className="card">
+        <h2>Create Level</h2>
 
-      <label>Level Name</label>
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
+        <label>Level Name</label>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
 
-      <label>Description</label>
-      <input
-        type="text"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
+        <label>Description</label>
+        <input
+          type="text"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
 
-      <label>Price (euros)</label>
-      <input
-        type="number"
-        value={price}
-        onChange={(e) => setPrice(Number(e.target.value))}
-      />
+        <label>Price (euros)</label>
+        <input
+          type="number"
+          value={price}
+          onChange={(e) => setPrice(Number(e.target.value))}
+        />
 
-      <button onClick={handleCreateLevel}>Create Level</button>
+        <button onClick={handleCreateLevel}>Create Level</button>
 
-      <div>
-        <button type="button" onClick={goBack}>
-          Back
-        </button>
+        <div>
+          <button type="button" onClick={goBack}>
+            Back
+          </button>
+        </div>
       </div>
     </div>
   );

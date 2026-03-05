@@ -12,7 +12,7 @@ export default function Bookings() {
   }
 
   return (
-    <div>
+    <div className="page-center">
       <h2>Create Booking</h2>
       <input
         placeholder="Lesson Id"

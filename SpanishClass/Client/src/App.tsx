@@ -3,10 +3,12 @@ import { AuthProvider } from "./components/AuthContext";
 import Navbar from "./components/NavBar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CalendarPage from "./pages/CalendarPage/CalendarPage";
+import GoogleRoleSelect from "./pages/GoogleRoleSelect";
 import CreateLessonPage from "./pages/Lesson/CreateLessonPage/CreateLessonPage";
 import ViewLessonsPage from "./pages/Lesson/ViewLessonsPage/ViewLessonsPage";
 import CreateLevelPage from "./pages/Level/CreateLevelPage/CreateLevelPage";
 import ViewLevelsPage from "./pages/Level/ViewLevelsPage/ViewLevelsPage";
+import ExternalLoginCallback from "./pages/Login/ExternalLoginCallback";
 import Login from "./pages/Login/Login";
 import ProfessorPage from "./pages/ProfessorPage/ProfessorPage";
 import Register from "./pages/Register/Register";
@@ -89,7 +91,11 @@ function App() {
                 />
               }
             />
-
+            <Route
+              path="/external-login-callback"
+              element={<ExternalLoginCallback />}
+            />
+            <Route path="/select-role" element={<GoogleRoleSelect />} />
             <Route
               path="/unauthorized"
               element={<h1>No access to this page.</h1>}

@@ -104,11 +104,13 @@ export default function StudentBookingModal({
             <p>
               <strong>Seat:</strong> {booking.seatNumber}
             </p>
-            <img
-              src={booking.roomPhoto}
-              alt="Room"
-              style={{ width: "100%", maxHeight: 200 }}
-            />
+            {booking.roomPhoto && (
+              <img
+                src={booking.roomPhoto}
+                alt="Room"
+                style={{ width: "100%", maxHeight: 200 }}
+              />
+            )}
             <p>
               <strong>Email sent to:</strong> {booking.guestsEmails.join(", ")}
             </p>

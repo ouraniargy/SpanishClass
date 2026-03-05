@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SpanishClass.Models;
 using SpanishClass.Npgsql;
@@ -11,17 +12,8 @@ namespace SpanishClass.Controllers
         {
             get
             {
-                var userIdString = HttpContext.Session.GetString("UserId");
-
-                if (string.IsNullOrEmpty(userIdString))
-                {
-                    userIdString = HttpContext.Request.Headers["X-User-Id"].ToString();
-                }
-
-                if (string.IsNullOrEmpty(userIdString))
-                    return null;
-
-                return Guid.TryParse(userIdString, out var userId) ? userId : null;
+                var claimId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                return Guid.TryParse(claimId, out var id) ? id : (Guid?)null;
             }
         }
 

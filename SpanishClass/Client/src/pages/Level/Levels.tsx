@@ -10,7 +10,7 @@ export default function Levels() {
   }, []);
 
   return (
-    <div>
+    <div className="page-center">
       <h2>Spanish Levels</h2>
       {levels.map((l) => (
         <li key={l.id}>

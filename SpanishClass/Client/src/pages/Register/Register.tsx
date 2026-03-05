@@ -49,51 +49,69 @@ export default function Register() {
   }
 
   return (
-    <div className="card">
-      <h2>Register</h2>
+    <div className="page-center">
+      <div className="card">
+        <h2>Register</h2>
 
-      <h4>Name</h4>
-      <input
-        type="name"
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
+        <h4>Name</h4>
+        <input
+          type="name"
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
 
-      <h4>Surname</h4>
-      <input
-        type="Surname"
-        placeholder="Surname"
-        value={surname}
-        onChange={(e) => setSurname(e.target.value)}
-      />
+        <h4>Surname</h4>
+        <input
+          type="Surname"
+          placeholder="Surname"
+          value={surname}
+          onChange={(e) => setSurname(e.target.value)}
+        />
 
-      <h4>Role</h4>
-      <select value={role} onChange={(e) => setRole(e.target.value)}>
-        <option value="Student">Student</option>
-        <option value="Professor">Professor</option>
-      </select>
+        <h4>Role</h4>
+        <select value={role} onChange={(e) => setRole(e.target.value)}>
+          <option value="Student">Student</option>
+          <option value="Professor">Professor</option>
+        </select>
 
-      <h4>Email</h4>
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+        <h4>Email</h4>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-      <h4>Password</h4>
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <h4>Password</h4>
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-      <button onClick={handleRegister}>Register</button>
-      <h5>
-        Already have an account? <Link to="/login">Login</Link>
-      </h5>
+        <button onClick={handleRegister}>Register</button>
+        <a
+          href="https://localhost:7185/api/account/external-login?provider=Google"
+          style={{
+            display: "block",
+            marginTop: "20px",
+            backgroundColor: "#4285F4",
+            color: "white",
+            fontWeight: "bold",
+            padding: "10px",
+            borderRadius: "8px",
+            textAlign: "center",
+            textDecoration: "none",
+          }}
+        >
+          Login with Google
+        </a>
+        <h5>
+          Already have an account? <Link to="/login">Login</Link>
+        </h5>
+      </div>
     </div>
   );
 }

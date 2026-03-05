@@ -45,59 +45,61 @@ export default function CreateLessonPage() {
   }
 
   return (
-    <div className="card">
-      <h2>Create Lesson</h2>
+    <div className="page-center">
+      <div className="card">
+        <h2>Create Lesson</h2>
 
-      <label>Lesson Name</label>
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
+        <label>Lesson Name</label>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
 
-      <label>Description</label>
-      <input
-        type="text"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
+        <label>Description</label>
+        <input
+          type="text"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
 
-      <label>Level</label>
-      <select
-        value={levelId}
-        onChange={(e) => setLevelId(e.target.value)}
-        disabled={levels.length === 0}
-      >
-        <option value="" disabled>
-          Select Level
-        </option>
-        {levels.map((level) => (
-          <option key={level.id} value={level.id}>
-            {level.name}
+        <label>Level</label>
+        <select
+          value={levelId}
+          onChange={(e) => setLevelId(e.target.value)}
+          disabled={levels.length === 0}
+        >
+          <option value="" disabled>
+            Select Level
           </option>
-        ))}
-      </select>
+          {levels.map((level) => (
+            <option key={level.id} value={level.id}>
+              {level.name}
+            </option>
+          ))}
+        </select>
 
-      <label>Duration (minutes)</label>
-      <input
-        type="number"
-        value={durationMinutes}
-        onChange={(e) => setDurationMinutes(Number(e.target.value))}
-      />
+        <label>Duration (minutes)</label>
+        <input
+          type="number"
+          value={durationMinutes}
+          onChange={(e) => setDurationMinutes(Number(e.target.value))}
+        />
 
-      <label>Max Seats</label>
-      <input
-        type="number"
-        value={maxSeats}
-        onChange={(e) => setMaxSeats(Number(e.target.value))}
-      />
+        <label>Max Seats</label>
+        <input
+          type="number"
+          value={maxSeats}
+          onChange={(e) => setMaxSeats(Number(e.target.value))}
+        />
 
-      <button onClick={handleCreateLesson}>Create Lesson</button>
+        <button onClick={handleCreateLesson}>Create Lesson</button>
 
-      <div>
-        <button type="button" onClick={goBack}>
-          Back
-        </button>
+        <div>
+          <button type="button" onClick={goBack}>
+            Back
+          </button>
+        </div>
       </div>
     </div>
   );

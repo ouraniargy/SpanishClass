@@ -91,185 +91,191 @@ export default function ViewLevelsPage() {
 
   if (loading) {
     return (
-      <div className="card">
-        <h2>Loading levels</h2>
+      <div className="page-center">
+        <div className="card">
+          <h2>Loading levels</h2>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="card">
-      <h2>Levels</h2>
+    <div className="page-center">
+      <div className="card">
+        <h2>Levels</h2>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {currentLevels.length === 0 ? (
-        <p>No levels created yet.</p>
-      ) : (
-        <>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ borderBottom: "2px solid #ccc" }}>
-                <th style={{ padding: "10px" }}>Level</th>
-                <th style={{ padding: "10px" }}>Lesson Name</th>
-                <th style={{ padding: "10px" }}>Description</th>
-                <th style={{ padding: "10px" }}>Duration (min)</th>
-                <th style={{ padding: "10px" }}>Max Seats</th>
-                <th style={{ padding: "10px" }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentLevels.map((level) => (
-                <tr key={level.id} style={{ borderBottom: "1px solid #ddd" }}>
-                  <td style={{ padding: "10px" }}>{level.levelName}</td>
-                  <td style={{ padding: "10px" }}>
-                    {editingId === level.id ? (
-                      <input
-                        type="text"
-                        value={editData.name}
-                        onChange={(e) =>
-                          setEditData({
-                            ...editData,
-                            name: e.target.value,
-                          })
-                        }
-                      />
-                    ) : (
-                      level.name
-                    )}
-                  </td>
-                  <td style={{ padding: "10px" }}>
-                    {editingId === level.id ? (
-                      <input
-                        type="text"
-                        value={editData.description}
-                        onChange={(e) =>
-                          setEditData({
-                            ...editData,
-                            description: e.target.value,
-                          })
-                        }
-                      />
-                    ) : (
-                      level.description
-                    )}
-                  </td>
-                  <td style={{ padding: "10px" }}>
-                    {editingId === level.id ? (
-                      <input
-                        type="number"
-                        value={editData.price}
-                        onChange={(e) =>
-                          setEditData({
-                            ...editData,
-                            price: Number(e.target.value),
-                          })
-                        }
-                      />
-                    ) : (
-                      level.price
-                    )}
-                  </td>
-                  <td style={{ padding: "10px" }}>
-                    {editingId === level.id ? (
-                      <>
-                        <button
-                          onClick={() => handleEditSave(level.id)}
-                          style={{
-                            background: "#28a745",
-                            color: "white",
-                            border: "none",
-                            padding: "5px 10px",
-                            cursor: "pointer",
-                            marginRight: "5px",
-                          }}
-                        >
-                          Save
-                        </button>
-                        <button
-                          onClick={handleEditCancel}
-                          style={{
-                            background: "#6c757d",
-                            color: "white",
-                            border: "none",
-                            padding: "5px 10px",
-                            cursor: "pointer",
-                            marginRight: "5px",
-                          }}
-                        >
-                          Cancel
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => handleEditStart(level)}
-                          style={{
-                            background: "#007bff",
-                            color: "white",
-                            border: "none",
-                            padding: "5px 10px",
-                            cursor: "pointer",
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(level.id)}
-                          style={{
-                            background: "#dc3545",
-                            color: "white",
-                            border: "none",
-                            padding: "5px 10px",
-                            cursor: "pointer",
-                          }}
-                        >
-                          Delete
-                        </button>
-                      </>
-                    )}
-                  </td>
+        {currentLevels.length === 0 ? (
+          <p>No levels created yet.</p>
+        ) : (
+          <>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ borderBottom: "2px solid #ccc" }}>
+                  <th style={{ padding: "10px" }}>Level</th>
+                  <th style={{ padding: "10px" }}>Lesson Name</th>
+                  <th style={{ padding: "10px" }}>Description</th>
+                  <th style={{ padding: "10px" }}>Duration (min)</th>
+                  <th style={{ padding: "10px" }}>Max Seats</th>
+                  <th style={{ padding: "10px" }}>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {currentLevels.map((level) => (
+                  <tr key={level.id} style={{ borderBottom: "1px solid #ddd" }}>
+                    <td style={{ padding: "10px" }}>{level.levelName}</td>
+                    <td style={{ padding: "10px" }}>
+                      {editingId === level.id ? (
+                        <input
+                          type="text"
+                          value={editData.name}
+                          onChange={(e) =>
+                            setEditData({
+                              ...editData,
+                              name: e.target.value,
+                            })
+                          }
+                        />
+                      ) : (
+                        level.name
+                      )}
+                    </td>
+                    <td style={{ padding: "10px" }}>
+                      {editingId === level.id ? (
+                        <input
+                          type="text"
+                          value={editData.description}
+                          onChange={(e) =>
+                            setEditData({
+                              ...editData,
+                              description: e.target.value,
+                            })
+                          }
+                        />
+                      ) : (
+                        level.description
+                      )}
+                    </td>
+                    <td style={{ padding: "10px" }}>
+                      {editingId === level.id ? (
+                        <input
+                          type="number"
+                          value={editData.price}
+                          onChange={(e) =>
+                            setEditData({
+                              ...editData,
+                              price: Number(e.target.value),
+                            })
+                          }
+                        />
+                      ) : (
+                        level.price
+                      )}
+                    </td>
+                    <td style={{ padding: "10px" }}>
+                      {editingId === level.id ? (
+                        <>
+                          <button
+                            onClick={() => handleEditSave(level.id)}
+                            style={{
+                              background: "#28a745",
+                              color: "white",
+                              border: "none",
+                              padding: "5px 10px",
+                              cursor: "pointer",
+                              marginRight: "5px",
+                            }}
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={handleEditCancel}
+                            style={{
+                              background: "#6c757d",
+                              color: "white",
+                              border: "none",
+                              padding: "5px 10px",
+                              cursor: "pointer",
+                              marginRight: "5px",
+                            }}
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => handleEditStart(level)}
+                            style={{
+                              background: "#007bff",
+                              color: "white",
+                              border: "none",
+                              padding: "5px 10px",
+                              cursor: "pointer",
+                            }}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(level.id)}
+                            style={{
+                              background: "#dc3545",
+                              color: "white",
+                              border: "none",
+                              padding: "5px 10px",
+                              cursor: "pointer",
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-          <div
-            style={{
-              marginTop: "20px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "15px",
-            }}
-          >
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            <div
+              style={{
+                marginTop: "20px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "15px",
+              }}
             >
-              Previous
-            </button>
-            <span style={{ whiteSpace: "nowrap" }}>
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              disabled={currentPage === totalPages}
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-            >
-              Next
-            </button>
-          </div>
-        </>
-      )}
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              >
+                Previous
+              </button>
+              <span style={{ whiteSpace: "nowrap" }}>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+              >
+                Next
+              </button>
+            </div>
+          </>
+        )}
 
-      <button onClick={() => navigate("/createLevel")}>Create New Level</button>
-
-      <div>
-        <button type="button" onClick={goBack}>
-          Back
+        <button onClick={() => navigate("/createLevel")}>
+          Create New Level
         </button>
+
+        <div>
+          <button type="button" onClick={goBack}>
+            Back
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -3,7 +3,7 @@ import "../sharedStyles.css";
 
 export default function ProfessorPage() {
   return (
-    <>
+    <div className="page-center">
       <div className="card">
         <h2>
           <Link to="/calendar">Calendar of Availabilities and Bookings</Link>
@@ -21,6 +21,6 @@ export default function ProfessorPage() {
           <Link to="/viewLevels">View levels</Link>
         </h2>
       </div>
-    </>
+    </div>
   );
 }

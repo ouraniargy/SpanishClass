@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SpanishClass.Models;
 
 namespace SpanishClass.Npgsql
 {
-    public class SpanishClassDbContext : DbContext
+    public class SpanishClassDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
         public SpanishClassDbContext(DbContextOptions<SpanishClassDbContext> options)
         : base(options)

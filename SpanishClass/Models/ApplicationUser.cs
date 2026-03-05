@@ -2,17 +2,15 @@
 
 namespace SpanishClass.Models
 {
-    public class ApplicationUser
+    public class ApplicationUser : IdentityUser<Guid>
     {
-        public Guid Id { get; set; }
-
-        public string Email { get; set; } = null!;
-        public string PasswordHash { get; set; } = null!;
-
         public string Name { get; set; } = null!;
         public string Surname { get; set; } = null!;
 
         public Student? Student { get; set; }
         public Professor? Professor { get; set; }
+
+        public string? AuthProvider { get; set; }
+        public string? ProviderId { get; set; }
     }
 }

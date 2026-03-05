@@ -169,7 +169,7 @@ public class LessonController : BaseController
             return NotFound("Lesson not found");
 
         if (lesson.Professor.UserId != userId.Value)
-            return Forbid("You can only edit your own lessons");
+            return StatusCode(403, "You can only edit your own lessons");
 
         lesson.DurationMinutes = model.DurationMinutes;
         lesson.MaxSeats = model.MaxSeats;

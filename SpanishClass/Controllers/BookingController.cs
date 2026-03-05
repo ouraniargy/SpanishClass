@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SpanishClass.Models;
@@ -159,7 +160,7 @@ public class BookingController : BaseController
             return BadRequest("Professor for lesson not found");
 
         if (LoggedInUserId == null || professor.UserId != LoggedInUserId.Value)
-            return Forbid("You can only add availability for your own lessons");
+            return StatusCode(403, "You can only add availability for your own lessons");
 
         var avail = new ProfessorAvailability
         {
@@ -186,7 +187,12 @@ public class BookingController : BaseController
     [HttpGet("availabilities")]
     public async Task<IActionResult> GetAvailabilities()
     {
-        var userId = LoggedInUserId!.Value;
+        var userId = LoggedInUserId;
+        if (!userId.HasValue)
+            return Unauthorized("User not logged in");
+
+        // now safe to use
+        var professor = await _context.Professors.FirstOrDefaultAsync(p => p.UserId == userId.Value);
 
         var studentId = await _context.Students
             .Where(s => s.UserId == userId)
@@ -223,11 +229,12 @@ public class BookingController : BaseController
         return Ok(result);
     }
 
+    [Authorize]
     [HttpDelete("availabilities/{id}")]
     public async Task<IActionResult> DeleteAvailability(Guid id)
     {
-        var userId = LoggedInUserId;
-        if (!userId.HasValue)
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
             return Unauthorized("User not logged in");
 
         var availability = await _context.ProfessorAvailabilities
@@ -238,8 +245,8 @@ public class BookingController : BaseController
         if (availability == null)
             return NotFound("Availability not found");
 
-        if (availability.Professor.UserId != userId.Value)
-            return Forbid("You can only delete your own availabilities");
+        if (availability.Professor.UserId != userId)
+            return StatusCode(403, "You can only delete your own availabilities");
 
         var affectedBookings = await _context.Bookings
             .Include(b => b.Student)
@@ -252,9 +259,7 @@ public class BookingController : BaseController
         foreach (var booking in affectedBookings)
         {
             var email = booking.Student?.User?.Email;
-
-            if (string.IsNullOrWhiteSpace(email))
-                continue;
+            if (string.IsNullOrWhiteSpace(email)) continue;
 
             await _emailService.SendNotificationEmailAsync(
                 email,
@@ -265,15 +270,12 @@ public class BookingController : BaseController
             <p>The lesson <strong>{booking.Lesson.Name}</strong> 
             scheduled on {booking.Availability.StartTime:dd/MM/yyyy HH:mm}
             has been cancelled by the professor.</p>
-            <p>Please log in to book another available time.</p>
-            "
+            <p>Please log in to book another available time.</p>"
             );
         }
 
         _context.Bookings.RemoveRange(affectedBookings);
-
         _context.ProfessorAvailabilities.Remove(availability);
-
         await _context.SaveChangesAsync();
 
         return Ok(new { message = "Availability deleted and students notified" });

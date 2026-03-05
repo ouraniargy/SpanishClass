@@ -32,7 +32,43 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+builder.Services
+    .AddIdentity<ApplicationUser, IdentityRole<Guid>>()
+    .AddEntityFrameworkStores<SpanishClassDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication()
+    .AddGoogle(options =>
+    {
+        options.ClientId = "311751176999-v6i6inu9cd0dbbb7ecb0rric64fr33qs.apps.googleusercontent.com";
+        options.ClientSecret = "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";
+        options.CallbackPath = "/signin-google";
+    });
+
 builder.Services.AddScoped<IEmailService, EmailService>();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Events.OnRedirectToLogin = ctx =>
+    {
+        if (ctx.Request.Path.StartsWithSegments("/api"))
+        {
+            ctx.Response.StatusCode = 401;
+        }
+        else
+        {
+            ctx.Response.Redirect(ctx.RedirectUri);
+        }
+        return Task.CompletedTask;
+    };
+});
+
+builder.Services.AddAuthentication(options => {
+    options.DefaultScheme = IdentityConstants.ApplicationScheme;
+})
+.AddCookie();
 
 var app = builder.Build();
 
@@ -44,7 +80,6 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -59,7 +94,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseCors("ReactCorsPolicy");
@@ -67,9 +102,5 @@ app.UseCors("ReactCorsPolicy");
 app.UseSession();
 
 app.MapControllers();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
