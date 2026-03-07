@@ -307,11 +307,14 @@ public class BookingController : BaseController
     public async Task<IActionResult> SearchBooking([FromBody] SearchBookingRequest model)
     {
         var bookings = await _context.Bookings
-            .Include(b => b.Student)
-                .ThenInclude(s => s.User)
-            .Include(b => b.Lesson)
-            .Where(b => b.Student.User.Email == model.Email)
-            .ToListAsync();
+       .Include(b => b.Student)
+           .ThenInclude(s => s.User)
+               .Include(b => b.Lesson)
+               .Where(b =>
+                   (!string.IsNullOrEmpty(model.Email) && b.Student.User.Email == model.Email) ||
+                   (!string.IsNullOrEmpty(model.Phone) && b.Student.User.PhoneNumber == model.Phone)
+               )
+               .ToListAsync();
 
         if (bookings.Count == 0)
         {

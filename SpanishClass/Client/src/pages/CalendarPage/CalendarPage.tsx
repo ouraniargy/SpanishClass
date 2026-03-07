@@ -21,6 +21,7 @@ export default function CalendarPage() {
     [],
   );
   const [searchEmail, setSearchEmail] = useState("");
+  const [searchMobilePhone, setSearchMobilePhone] = useState("");
   const [searchResult, setSearchResult] = useState<any[]>([]);
   const [selectedAvailabilityTitle, setSelectedAvailabilityTitle] =
     useState<string>("");
@@ -49,17 +50,21 @@ export default function CalendarPage() {
       console.error("Failed to load QR code", err);
     }
   };
+
   const handleSearch = async () => {
+    if (!searchEmail && !searchMobilePhone) {
+      alert("Enter email or phone to search");
+      return;
+    }
+
     try {
       const result = await apiPost<Booking[]>("/booking/search-booking", {
         email: searchEmail,
+        phone: searchMobilePhone,
       });
 
       setSearchResult(result);
-
-      result.forEach((b) => {
-        fetchQrCode(b.bookingCode);
-      });
+      await Promise.all(result.map((b) => fetchQrCode(b.bookingCode)));
 
       setCurrentIndex(0);
       setShowSearchResults(true);
@@ -262,31 +267,67 @@ export default function CalendarPage() {
         )}
         <div className="calendar-wrapper">
           <div style={{ marginBottom: 12, width: "100%", maxWidth: "500px" }}>
-            <input
-              type="email"
-              placeholder="Enter email to find booking"
-              value={searchEmail}
-              onChange={(e) => setSearchEmail(e.target.value)}
-              style={{ padding: "8px", marginRight: "10px", flex: 1 }}
-            />
-
-            <button onClick={handleSearch} style={{ marginRight: 10 }}>
-              Search Booking
-            </button>
-
-            {showSearchResults && (
-              <button
-                onClick={() => setShowSearchResults(false)}
+            <div style={{ display: "flex", gap: "10px", marginBottom: "15px" }}>
+              <input
+                type="email"
+                placeholder="Enter email"
+                value={searchEmail}
+                onChange={(e) => setSearchEmail(e.target.value)}
                 style={{
-                  background: "transparent",
+                  padding: "20px 30px",
+                  flex: 1,
+                  borderRadius: "6px",
+                  border: "1px solid #ccc",
+                  outline: "none",
+                  fontSize: "14px",
+                }}
+              />
+
+              <input
+                placeholder="Enter mobile phone"
+                value={searchMobilePhone}
+                onChange={(e) => setSearchMobilePhone(e.target.value)}
+                style={{
+                  padding: "20px 30px",
+                  flex: 1,
+                  borderRadius: "6px",
+                  border: "1px solid #ccc",
+                  outline: "none",
+                  fontSize: "14px",
+                }}
+              />
+
+              <button
+                onClick={handleSearch}
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: "6px",
                   border: "none",
-                  fontSize: 20,
+                  backgroundColor: "#3b82f6",
+                  color: "white",
+                  fontWeight: "500",
                   cursor: "pointer",
+                  fontSize: "14px",
+                  transition: "background-color 0.2s",
                 }}
               >
-                X
+                Search Booking
               </button>
-            )}
+
+              {showSearchResults && (
+                <button
+                  onClick={() => setShowSearchResults(false)}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    fontSize: 20,
+                    cursor: "pointer",
+                  }}
+                >
+                  X
+                </button>
+              )}
+            </div>
           </div>
           {showSearchResults && (
             <>
