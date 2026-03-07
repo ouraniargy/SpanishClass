@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using QRCoder;
 using SpanishClass.Models;
 using SpanishClass.Models.RequestDtos;
 using SpanishClass.Npgsql;
@@ -300,6 +301,70 @@ public class BookingController : BaseController
             return NotFound();
 
         return Ok(bookings);
+    }
+
+    [HttpPost("search-booking")]
+    public async Task<IActionResult> SearchBooking([FromBody] SearchBookingRequest model)
+    {
+        var bookings = await _context.Bookings
+            .Include(b => b.Student)
+                .ThenInclude(s => s.User)
+            .Include(b => b.Lesson)
+            .Where(b => b.Student.User.Email == model.Email)
+            .ToListAsync();
+
+        if (bookings.Count == 0)
+        {
+            return NotFound(new
+            {
+                message = "No bookings found."
+            });
+        }
+
+        return Ok(bookings.Select(b => new
+        {
+            message = $"Welcome {b.Student.User.Name}!",
+            bookingCode = b.Id,
+            lesson = b.Lesson.Name,
+            description = b.Lesson.Description,
+            roomPhoto = b.Lesson.RoomPhoto
+        }));
+    }
+
+    [HttpGet("qrcode/{bookingId}")]
+    public IActionResult GenerateQrCode(Guid bookingId)
+    {
+        var qrGenerator = new QRCodeGenerator();
+        var qrData = qrGenerator.CreateQrCode(bookingId.ToString(), QRCodeGenerator.ECCLevel.Q);
+        var qrCode = new Base64QRCode(qrData);
+        var qrBase64 = qrCode.GetGraphic(20);
+
+        return Ok(new { qrImageBase64 = qrBase64 });
+    }
+
+    [HttpPost("validate-ticket")]
+    public async Task<IActionResult> ValidateTicket([FromBody] ValidateTicketRequest model)
+    {
+        var booking = await _context.Bookings
+            .Include(b => b.Student)
+            .FirstOrDefaultAsync(b => b.Id == model.BookingId);
+
+        if (booking == null)
+            return NotFound(new { message = "Booking not found" });
+
+        if (booking.Used)
+            return BadRequest(new { message = "Ticket already used" });
+
+        booking.Used = true;
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Ticket valid, welcome!" });
+    }
+
+    [HttpPost("qrcode/downloaded")]
+    public IActionResult QrDownloaded([FromBody] QrDownloadRequest request)
+    {
+        return Ok(new { success = true });
     }
 }
 

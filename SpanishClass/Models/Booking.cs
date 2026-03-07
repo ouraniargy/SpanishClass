@@ -9,6 +9,7 @@
 
         public Guid StudentId { get; set; }
         public Student Student { get; set; } = null!;
+        public bool Used { get; set; }
 
         public Guid AvailabilityId { get; set; }
         public ProfessorAvailability Availability { get; set; } = null!;

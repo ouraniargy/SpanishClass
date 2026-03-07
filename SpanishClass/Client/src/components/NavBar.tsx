@@ -15,7 +15,7 @@ export default function Navbar() {
   return (
     <div
       style={{
-        maxWidth: "92%",
+        maxWidth: "100%",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
@@ -38,6 +38,7 @@ export default function Navbar() {
           alignItems: "center",
           gap: "15px",
           fontSize: "14px",
+          marginLeft: "auto",
         }}
       >
         <div

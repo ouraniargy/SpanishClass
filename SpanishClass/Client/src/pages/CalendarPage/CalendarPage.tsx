@@ -5,6 +5,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import { useCallback, useEffect, useState } from "react";
 import { apiDelete, apiGet, apiPost } from "../../api/api";
 import { handleBack } from "../../shared/handleBack";
+import { Booking, QrResponse } from "../../shared/types";
 import StudentBookingModal from "../Booking/StudentBookingModal";
 import "./CalendarPage.css";
 
@@ -19,6 +20,8 @@ export default function CalendarPage() {
   const [studentsForAvailability, setStudentsForAvailability] = useState<any[]>(
     [],
   );
+  const [searchEmail, setSearchEmail] = useState("");
+  const [searchResult, setSearchResult] = useState<any[]>([]);
   const [selectedAvailabilityTitle, setSelectedAvailabilityTitle] =
     useState<string>("");
   const [showStudentBookingModal, setShowStudentBookingModal] = useState(false);
@@ -27,6 +30,61 @@ export default function CalendarPage() {
   >(null);
   const goBack = handleBack();
   const isMobile = window.innerWidth < 768;
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const cardsPerView = 2;
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [qrCodes, setQrCodes] = useState<Record<string, string>>({});
+
+  const fetchQrCode = async (bookingId: string) => {
+    try {
+      const res = await apiGet<QrResponse>(`/booking/qrcode/${bookingId}`);
+
+      console.log("QR RESPONSE:", res);
+
+      setQrCodes((prev) => ({
+        ...prev,
+        [bookingId]: res.qrImageBase64,
+      }));
+    } catch (err) {
+      console.error("Failed to load QR code", err);
+    }
+  };
+  const handleSearch = async () => {
+    try {
+      const result = await apiPost<Booking[]>("/booking/search-booking", {
+        email: searchEmail,
+      });
+
+      setSearchResult(result);
+
+      result.forEach((b) => {
+        fetchQrCode(b.bookingCode);
+      });
+
+      setCurrentIndex(0);
+      setShowSearchResults(true);
+    } catch (err) {
+      alert("No booking found");
+      setSearchResult([]);
+      setShowSearchResults(false);
+    }
+  };
+
+  const handleDownloadQr = (bookingCode: string) => {
+    apiPost("/booking/qrcode/downloaded", {
+      bookingCode,
+      userId,
+    });
+
+    const link = document.createElement("a");
+    link.href = `data:image/png;base64,${qrCodes[bookingCode]}`;
+    link.download = `Booking-${bookingCode}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    alert("QR downloaded!");
+  };
 
   const fetchCalendarEvents = useCallback(() => {
     apiGet<any[]>("/booking/availabilities")
@@ -203,6 +261,116 @@ export default function CalendarPage() {
           </div>
         )}
         <div className="calendar-wrapper">
+          <div style={{ marginBottom: 12, width: "100%", maxWidth: "500px" }}>
+            <input
+              type="email"
+              placeholder="Enter email to find booking"
+              value={searchEmail}
+              onChange={(e) => setSearchEmail(e.target.value)}
+              style={{ padding: "8px", marginRight: "10px", flex: 1 }}
+            />
+
+            <button onClick={handleSearch} style={{ marginRight: 10 }}>
+              Search Booking
+            </button>
+
+            {showSearchResults && (
+              <button
+                onClick={() => setShowSearchResults(false)}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  fontSize: 20,
+                  cursor: "pointer",
+                }}
+              >
+                X
+              </button>
+            )}
+          </div>
+          {showSearchResults && (
+            <>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: 10,
+                }}
+              >
+                <button
+                  onClick={() =>
+                    setCurrentIndex((prev) => Math.max(prev - cardsPerView, 0))
+                  }
+                  disabled={currentIndex === 0}
+                >
+                  ◀
+                </button>
+                <button
+                  onClick={() =>
+                    setCurrentIndex((prev) =>
+                      Math.min(
+                        prev + cardsPerView,
+                        searchResult.length - cardsPerView,
+                      ),
+                    )
+                  }
+                  disabled={currentIndex >= searchResult.length - cardsPerView}
+                >
+                  ▶
+                </button>
+              </div>
+
+              <div style={{ display: "flex", gap: 10, overflow: "hidden" }}>
+                {searchResult
+                  .slice(currentIndex, currentIndex + cardsPerView)
+                  .map((b: any) => (
+                    <div
+                      key={b.bookingCode}
+                      style={{
+                        flex: "0 0 50%",
+                        background: "#f5f5f5",
+                        padding: 20,
+                        borderRadius: 8,
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                      }}
+                    >
+                      <h3>Welcome {b.studentName}</h3>
+
+                      <p>
+                        <b>Lesson:</b> {b.lesson}
+                      </p>
+
+                      <p>
+                        <b>Description:</b> {b.description}
+                      </p>
+
+                      <p>
+                        <b>Date:</b> {new Date(b.date).toLocaleString()}
+                      </p>
+
+                      {qrCodes[b.bookingCode] && (
+                        <>
+                          <img
+                            src={`data:image/png;base64,${qrCodes[b.bookingCode]}`}
+                            alt="Booking QR"
+                            style={{ marginTop: 15, width: 140, height: 140 }}
+                          />
+                          <br />
+                          <button
+                            onClick={() => handleDownloadQr(b.bookingCode)}
+                          >
+                            Download QR
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            </>
+          )}
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView={isMobile ? "timeGridDay" : "timeGridWeek"}
