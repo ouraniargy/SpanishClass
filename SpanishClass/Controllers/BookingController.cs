@@ -327,7 +327,8 @@ public class BookingController : BaseController
             bookingCode = b.Id,
             lesson = b.Lesson.Name,
             description = b.Lesson.Description,
-            roomPhoto = b.Lesson.RoomPhoto
+            roomPhoto = b.Lesson.RoomPhoto,
+            date = b.CreatedAt
         }));
     }
 
