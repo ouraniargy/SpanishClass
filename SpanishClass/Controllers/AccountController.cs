@@ -1,8 +1,10 @@
-﻿using System.Security.Claims;
+﻿using System.Data;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SpanishClass.Models;
+using SpanishClass.Models.RequestDtos;
 using SpanishClass.Npgsql;
 
 namespace SpanishClass.Controllers
@@ -257,9 +259,38 @@ namespace SpanishClass.Controllers
                 userId = user.Id,
                 user.Name,
                 user.Surname,
+                user.Email,
                 role
             });
         }
 
+        [HttpPut("update-user")]
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequest model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+                return NotFound("User not found");
+
+            user.Name = model.Name;
+            user.Surname = model.Surname;
+
+            if (!string.IsNullOrEmpty(model.Password))
+            {
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var result = await _userManager.ResetPasswordAsync(user, token, model.Password);
+
+                if (!result.Succeeded)
+                    return BadRequest(result.Errors);
+            }
+
+            await _userManager.UpdateAsync(user);
+
+            return Ok(new
+            {
+                userId = user.Id,
+                name = user.Name,
+                surname = user.Surname
+            });
+        }
     }
 }

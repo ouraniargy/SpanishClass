@@ -13,6 +13,7 @@ import Login from "./pages/Login/Login";
 import ProfessorPage from "./pages/ProfessorPage/ProfessorPage";
 import Register from "./pages/Register/Register";
 import StudentPage from "./pages/StudentPage/StudentPage";
+import ProfilePage from "./pages/User/ProfilePage";
 
 function App() {
   return (
@@ -91,6 +92,17 @@ function App() {
                 />
               }
             />
+
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute
+                  element={<ProfilePage />}
+                  allowedRoles={["Student", "Professor"]}
+                />
+              }
+            />
+
             <Route
               path="/external-login-callback"
               element={<ExternalLoginCallback />}

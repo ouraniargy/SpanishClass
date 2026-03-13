@@ -47,6 +47,7 @@ export default function Navbar() {
             padding: "6px 12px",
             borderRadius: "20px",
           }}
+          onClick={() => navigate("/profile")}
         >
           👤 {user.name} {user.surname} | {user.role}
         </div>
