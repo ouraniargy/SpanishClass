@@ -446,16 +446,16 @@ export default function CalendarPage() {
                 return;
               }
 
-              if (isMine) {
-                info.el.style.backgroundColor = "#2b8cff";
-                info.el.style.color = "#fff";
-                return;
-              }
-
-              if (bookedSeats >= maxSeats) {
+              if (isMine && bookedSeats >= maxSeats) {
                 info.el.style.backgroundColor = "#dc3545";
                 info.el.style.color = "#fff";
                 if (role !== "Professor") info.el.style.pointerEvents = "none";
+                return;
+              }
+
+              if (isMine) {
+                info.el.style.backgroundColor = "#2b8cff";
+                info.el.style.color = "#fff";
                 return;
               }
 
