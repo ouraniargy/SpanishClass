@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { apiDelete, apiGet, apiPost } from "../../api/api";
 import { handleBack } from "../../shared/handleBack";
 import { Booking, QrResponse } from "../../shared/types";
+import CancelBookingModal from "../Booking/CancelBookingModal";
 import StudentBookingModal from "../Booking/StudentBookingModal";
 import "./CalendarPage.css";
 
@@ -26,9 +27,10 @@ export default function CalendarPage() {
   const [selectedAvailabilityTitle, setSelectedAvailabilityTitle] =
     useState<string>("");
   const [showStudentBookingModal, setShowStudentBookingModal] = useState(false);
-  const [selectedAvailabilityId, setSelectedAvailabilityId] = useState<
-    string | null
-  >(null);
+  const [showCancelBookingModal, setShowCancelBookingModal] = useState(false);
+  const [selectedAvailability, setSelectedAvailability] = useState<any | null>(
+    null,
+  );
   const goBack = handleBack();
   const isMobile = window.innerWidth < 768;
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -94,44 +96,35 @@ export default function CalendarPage() {
   const fetchCalendarEvents = useCallback(() => {
     apiGet<any[]>("/booking/availabilities")
       .then((data) => {
-        try {
-          const mapped = (data || []).map((a: any) => {
-            const start = a.startTime ?? a.start ?? a.date ?? a.startDate;
-            const end = a.endTime ?? a.end ?? a.endDate;
-            const isMine =
-              role === "Professor" &&
-              a.professorUserId?.toLowerCase() === userId?.toLowerCase();
+        const mapped = (data || []).map((a: any) => {
+          const start = a.startTime ?? a.start ?? a.date ?? a.startDate;
+          const end = a.endTime ?? a.end ?? a.endDate;
 
-            const bookedByMe = a.bookedByMe;
+          const isMine =
+            role === "Professor" &&
+            a.professorUserId?.toLowerCase() === userId?.toLowerCase();
 
-            const color = bookedByMe
-              ? "#ffc107"
-              : isMine
-                ? "#2b8cff"
-                : a.bookedSeats >= a.maxSeats
-                  ? "#dc3545"
-                  : "#28a745";
+          const bookedByMe = a.bookedByMe;
 
-            return {
-              id: a.id,
-              title: `${a.name} - ${a.description} - ${a.professorName} - ${a.bookedSeats}/${a.maxSeats}`,
-              start,
-              end,
-              color,
-              editable: !!isMine,
-              extendedProps: {
-                professorUserId: a.professorUserId,
-                isMine,
-                bookedSeats: a.bookedSeats,
-                maxSeats: a.maxSeats,
-                bookedByMe,
-              },
-            };
-          });
-          setEvents(mapped);
-        } catch (err) {
-          setEvents(data as any[]);
-        }
+          return {
+            id: a.id,
+            title: `${a.name} - ${a.description} - ${a.professorName} - ${a.bookedSeats}/${a.maxSeats}`,
+            start,
+            end,
+            editable: !!isMine,
+            extendedProps: {
+              bookingId: a.bookingId,
+              professorUserId: a.professorUserId,
+              isMine,
+              bookedSeats: a.bookedSeats,
+              maxSeats: a.maxSeats,
+              bookedByMe,
+              bookingDetails: bookedByMe ? a : null,
+            },
+          };
+        });
+
+        setEvents(mapped);
       })
       .catch((err) => console.error("Failed to load calendar events:", err));
   }, [role, userId]);
@@ -161,7 +154,7 @@ export default function CalendarPage() {
 
       setStudentsForAvailability(students || []);
       setSelectedAvailabilityTitle(title);
-      setSelectedAvailabilityId(id);
+      setSelectedAvailability(clickInfo.event);
       setShowModal(true);
     } catch (err) {
       console.error(err);
@@ -171,14 +164,24 @@ export default function CalendarPage() {
 
   const handleStudentEventClick = (clickInfo: any) => {
     const event = clickInfo.event;
-    const { bookedSeats, maxSeats } = event.extendedProps;
+    const { bookedSeats, maxSeats, bookedByMe } = event.extendedProps;
 
-    if (bookedSeats >= maxSeats) {
+    if (bookedSeats >= maxSeats && !bookedByMe) {
       alert("No seats available");
       return;
     }
 
-    setSelectedAvailabilityId(event.id);
+    console.log(bookedByMe);
+    if (event.extendedProps.bookedByMe) {
+      setSelectedAvailability({
+        id: event.extendedProps.bookingId,
+        ...event,
+      });
+      setShowCancelBookingModal(true);
+      return;
+    }
+
+    setSelectedAvailability(event);
     setShowStudentBookingModal(true);
   };
 
@@ -440,23 +443,24 @@ export default function CalendarPage() {
               if (bookedByMe) {
                 info.el.style.backgroundColor = "#ffc107";
                 info.el.style.color = "#000";
+                return;
               }
 
-              if (!bookedByMe && bookedSeats < maxSeats) {
-                info.el.style.backgroundColor = "#28a745";
+              if (isMine) {
+                info.el.style.backgroundColor = "#2b8cff";
                 info.el.style.color = "#fff";
+                return;
               }
 
               if (bookedSeats >= maxSeats) {
                 info.el.style.backgroundColor = "#dc3545";
-                if (role !== "Professor") {
-                  info.el.style.pointerEvents = "none";
-                }
+                info.el.style.color = "#fff";
+                if (role !== "Professor") info.el.style.pointerEvents = "none";
+                return;
               }
 
-              if (role === "Professor" && !isMine) {
-                info.el.style.opacity = "0.5";
-              }
+              info.el.style.backgroundColor = "#28a745";
+              info.el.style.color = "#fff";
             }}
           />
           {showModal && (
@@ -506,7 +510,7 @@ export default function CalendarPage() {
                     <p>No students have booked yet.</p>
                     <button
                       onClick={() =>
-                        deleteAvailability(selectedAvailabilityId!)
+                        deleteAvailability(selectedAvailability?.id!)
                       }
                       style={{ marginTop: 12 }}
                     >
@@ -571,7 +575,7 @@ export default function CalendarPage() {
                     </table>
                     <button
                       onClick={() =>
-                        deleteAvailability(selectedAvailabilityId!)
+                        deleteAvailability(selectedAvailability?.id!)
                       }
                       style={{ marginTop: 12 }}
                     >
@@ -582,14 +586,46 @@ export default function CalendarPage() {
               </div>
             </div>
           )}
-          {showStudentBookingModal && selectedAvailabilityId && (
+          {showStudentBookingModal && selectedAvailability?.id && (
             <StudentBookingModal
-              availabilityId={selectedAvailabilityId}
+              availability={selectedAvailability}
               studentUserId={user.userId}
               onClose={() => {
                 setShowStudentBookingModal(false);
                 fetchCalendarEvents();
               }}
+              refreshCalendar={fetchCalendarEvents}
+              markBookingAsMine={(availabilityId, bookingId) =>
+                setEvents((prevEvents) =>
+                  prevEvents.map((evt) =>
+                    evt.id === availabilityId
+                      ? {
+                          ...evt,
+                          color: "#ffc107",
+                          extendedProps: {
+                            ...evt.extendedProps,
+                            bookedByMe: true,
+                            bookingId,
+                            bookingDetails: {
+                              ...evt.extendedProps.bookingDetails,
+                              bookingId,
+                            },
+                          },
+                        }
+                      : evt,
+                  ),
+                )
+              }
+            />
+          )}
+          {showCancelBookingModal && selectedAvailability && (
+            <CancelBookingModal
+              booking={selectedAvailability}
+              onClose={() => {
+                setShowCancelBookingModal(false);
+                fetchCalendarEvents();
+              }}
+              refreshCalendar={fetchCalendarEvents}
             />
           )}
           <div style={{ display: "flex", justifyContent: "flex-end" }}>

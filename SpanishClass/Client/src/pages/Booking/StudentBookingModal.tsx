@@ -1,29 +1,59 @@
 import { useState } from "react";
-import { apiPost } from "../../api/api";
+import { apiDelete, apiPost } from "../../api/api";
 import { BookingDetails } from "./BookingDetails";
 
 export default function StudentBookingModal({
-  availabilityId,
+  availability,
   studentUserId,
   onClose,
+  refreshCalendar,
+  markBookingAsMine, // <-- προσθέτουμε callback από parent
 }: {
-  availabilityId: string;
+  availability: any;
   studentUserId: string;
   onClose: () => void;
+  refreshCalendar: () => void;
+  markBookingAsMine: (availabilityId: string, bookingId: string) => void;
 }) {
   const [sendEmail, setSendEmail] = useState(false);
   const [booking, setBooking] = useState<BookingDetails | null>(null);
 
   const handleBook = async () => {
     try {
-      const result: BookingDetails = await apiPost(
-        `/booking/${availabilityId}?studentUserId=${studentUserId}&sendEmail=${sendEmail}`,
+      const result = await apiPost<BookingDetails>(
+        `/booking/${availability.id}?studentUserId=${studentUserId}`,
         {},
       );
+
+      // Άμεση ενημέρωση στο calendar (κιτρινο)
+      if (result.bookingId) {
+        markBookingAsMine(availability.id, result.bookingId);
+      }
+
       setBooking(result);
       alert("Booking successful!");
-    } catch (err: any) {
-      alert(err?.response?.data?.message || "Booking failed");
+    } catch (err) {
+      console.error(err);
+      alert("Booking failed");
+    }
+  };
+
+  const handleCancelBooking = async () => {
+    if (!booking) return;
+
+    const confirmCancel = window.confirm("Cancel this booking?");
+    if (!confirmCancel) return;
+
+    try {
+      await apiDelete(`/booking/${booking.bookingId}`);
+      alert("Booking cancelled");
+      setBooking(null);
+      // Refresh calendar αν θέλεις
+      refreshCalendar();
+      onClose();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to cancel booking");
     }
   };
 
@@ -70,7 +100,7 @@ export default function StudentBookingModal({
 
         {!booking ? (
           <>
-            <h2>Book this lesson</h2>
+            <h2>Book this lesson: {availability.title}</h2>
             <label>
               <input
                 type="checkbox"
@@ -80,7 +110,10 @@ export default function StudentBookingModal({
               Send email
             </label>
             <br />
-            <button onClick={handleBook} style={{ marginTop: 12 }}>
+            <button
+              onClick={handleBook}
+              style={{ marginTop: 12, padding: "10px 20px" }}
+            >
               Confirm Booking
             </button>
           </>
@@ -89,7 +122,7 @@ export default function StudentBookingModal({
             <h1 style={{ color: "#394d67", fontSize: "30px" }}>
               Booking Confirmed!
             </h1>
-            <p style={{ fontWeight: "bold", fontSize: "25px" }}>
+            <p>
               <strong>Date:</strong> {new Date(booking.date).toLocaleString()}
             </p>
             <p>
@@ -104,16 +137,20 @@ export default function StudentBookingModal({
             <p>
               <strong>Seat:</strong> {booking.seatNumber}
             </p>
-            {booking.roomPhoto && (
-              <img
-                src={booking.roomPhoto}
-                alt="Room"
-                style={{ width: "100%", maxHeight: 200 }}
-              />
-            )}
-            <p>
-              <strong>Email sent to:</strong> {booking.guestsEmails.join(", ")}
-            </p>
+
+            <button
+              onClick={handleCancelBooking}
+              style={{
+                marginTop: 15,
+                padding: "10px 20px",
+                background: "#dc3545",
+                color: "white",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              Cancel Booking
+            </button>
           </>
         )}
       </div>

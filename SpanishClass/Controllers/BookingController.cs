@@ -109,7 +109,6 @@ public class BookingController : BaseController
 
         if (alreadyBooked)
             return BadRequest("You already booked this lesson");
-        availability.BookedSeats += 1;
         var booking = new Booking
         {
             Id = Guid.NewGuid(),
@@ -192,7 +191,6 @@ public class BookingController : BaseController
         if (!userId.HasValue)
             return Unauthorized("User not logged in");
 
-        // now safe to use
         var professor = await _context.Professors.FirstOrDefaultAsync(p => p.UserId == userId.Value);
 
         var studentId = await _context.Students
@@ -224,7 +222,11 @@ public class BookingController : BaseController
             description = a.Lesson.Description,
             name = a.Lesson.Name,
             lessonName = a.Lesson.Name,
-            bookedByMe = a.Bookings.Any(b => b.StudentId == studentId)
+            bookedByMe = a.Bookings.Any(b => b.StudentId == studentId),
+            bookingId = a.Bookings
+                .Where(b => b.StudentId == studentId)
+                .Select(b => b.Id)
+                .FirstOrDefault()
         });
 
         return Ok(result);
@@ -301,6 +303,24 @@ public class BookingController : BaseController
             return NotFound();
 
         return Ok(bookings);
+    }
+
+    [HttpDelete("{bookingId}")]
+    public async Task<IActionResult> CancelBooking(Guid bookingId)
+    {
+        var booking = await _context.Bookings
+            .Include(b => b.Availability)
+            .FirstOrDefaultAsync(b => b.Id == bookingId);
+
+        if (booking == null)
+            return NotFound("Booking not found");
+
+        booking.Availability.BookedSeats -= 1;
+
+        _context.Bookings.Remove(booking);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Booking cancelled" });
     }
 
     [HttpPost("search-booking")]
