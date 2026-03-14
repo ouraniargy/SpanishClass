@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { apiPost, apiPut } from "../../api/api";
+import { apiPost } from "../../api/api";
 import { useAuth } from "../../components/AuthContext";
 
 interface UserProfile {
@@ -18,6 +18,7 @@ export default function ProfilePage() {
     password: "",
     profilePicture: "",
   });
+  const [photo, setPhoto] = useState<File | null>(null);
 
   useEffect(() => {
     if (!user?.userId) return;
@@ -51,11 +52,36 @@ export default function ProfilePage() {
     e.preventDefault();
 
     try {
-      await apiPut("/account/update-user", {
-        userId: user?.userId,
-        name: formData.name,
-        surname: formData.surname,
-        password: formData.password,
+      const form = new FormData();
+
+      form.append("userId", user!.userId);
+      form.append("name", formData.name || "");
+      form.append("surname", formData.surname || "");
+
+      if (formData.password) {
+        form.append("password", formData.password);
+      }
+
+      if (photo) {
+        form.append("photo", photo);
+      }
+
+      const res = await fetch(
+        "https://localhost:7185/api/account/update-user",
+        { method: "PUT", body: form },
+      );
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Update failed:", errorText);
+        return;
+      }
+
+      const data = await res.json();
+
+      setFormData({
+        ...formData,
+        profilePicture: data.profilePicture,
       });
 
       login({
@@ -63,20 +89,42 @@ export default function ProfilePage() {
         role: user!.role,
         name: formData.name,
         surname: formData.surname,
+        profilePicture: data.profilePicture,
       });
-
+      console.log("Profile updated:", data.profilePicture);
       alert("Profile updated!");
     } catch (err) {
-      alert(
-        "Update failed: " + (err instanceof Error ? err.message : String(err)),
-      );
+      console.error(err);
     }
   };
+
+  //   const profileSrc = formData.profilePicture?.startsWith("/uploads/")
+  //     ? formData.profilePicture
+  //     : "/uploads/" + formData.profilePicture;
+
+  const displayPhoto = photo
+    ? URL.createObjectURL(photo)
+    : formData.profilePicture
+      ? `https://localhost:7185/uploads/${user?.profilePicture}`
+      : null;
 
   return (
     <div className="page-center">
       <div className="card">
         <h2>Profile</h2>
+        {displayPhoto && (
+          <img
+            src={displayPhoto}
+            alt="profile"
+            style={{
+              width: "50%",
+              height: "50%",
+              borderRadius: "20%",
+              objectFit: "cover",
+              marginBottom: "20px",
+            }}
+          />
+        )}
         <form onSubmit={handleSubmit}>
           <input
             name="name"
@@ -105,10 +153,13 @@ export default function ProfilePage() {
             onChange={handleChange}
           />
           <input
-            name="profilePicture"
-            placeholder="Profile Picture URL"
-            value={formData.profilePicture}
-            onChange={handleChange}
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              if (e.target.files) {
+                setPhoto(e.target.files[0]);
+              }
+            }}
           />
           <button type="submit">Update Profile</button>
         </form>

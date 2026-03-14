@@ -49,7 +49,19 @@ export default function Navbar() {
           }}
           onClick={() => navigate("/profile")}
         >
-          👤 {user.name} {user.surname} | {user.role}
+          👤 {user.name} {user.surname} | {user.role}{" "}
+          {user.profilePicture && (
+            <img
+              src={`https://localhost:7185/uploads/${user.profilePicture}`}
+              alt="profile"
+              style={{
+                width: "20px",
+                height: "20px",
+                borderRadius: "50%",
+                marginLeft: "5px",
+              }}
+            />
+          )}
         </div>
 
         <button

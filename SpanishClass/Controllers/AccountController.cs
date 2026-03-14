@@ -41,11 +41,20 @@ namespace SpanishClass.Controllers
 
             if (model.Photo != null)
             {
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.Photo.FileName);
-                var filePath = Path.Combine("wwwroot/uploads", fileName);
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
 
-                using var stream = new FileStream(filePath, FileMode.Create);
-                await model.Photo.CopyToAsync(stream);
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.Photo.FileName);
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.Photo.CopyToAsync(stream);
+                }
 
                 photoPath = "/uploads/" + fileName;
             }
@@ -257,40 +266,48 @@ namespace SpanishClass.Controllers
             return Ok(new
             {
                 userId = user.Id,
-                user.Name,
-                user.Surname,
-                user.Email,
+                name = user.Name,
+                surname = user.Surname,
+                email = user.Email,
+                profilePicture = user.Photo,
                 role
             });
         }
 
         [HttpPut("update-user")]
-        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequest model)
+        public async Task<IActionResult> UpdateUser(
+            [FromForm] string userId,
+            [FromForm] string name,
+            [FromForm] string surname,
+            [FromForm] string password,
+            IFormFile? photo)
         {
-            var user = await _userManager.FindByIdAsync(model.UserId);
+            var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
-                return NotFound("User not found");
+                return NotFound();
 
-            user.Name = model.Name;
-            user.Surname = model.Surname;
+            user.Name = name;
+            user.Surname = surname;
 
-            if (!string.IsNullOrEmpty(model.Password))
+            if (photo != null)
             {
-                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var result = await _userManager.ResetPasswordAsync(user, token, model.Password);
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
 
-                if (!result.Succeeded)
-                    return BadRequest(result.Errors);
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                var fileName = Guid.NewGuid() + Path.GetExtension(photo.FileName);
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await photo.CopyToAsync(stream);
+
+                user.Photo = fileName;
             }
 
             await _userManager.UpdateAsync(user);
 
-            return Ok(new
-            {
-                userId = user.Id,
-                name = user.Name,
-                surname = user.Surname
-            });
+            return Ok(new { profilePicture = user.Photo });
         }
     }
 }

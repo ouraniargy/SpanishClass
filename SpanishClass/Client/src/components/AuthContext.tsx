@@ -5,6 +5,7 @@ type User = {
   name: string;
   surname: string;
   role: string;
+  profilePicture?: string;
 } | null;
 
 type AuthContextType = {
