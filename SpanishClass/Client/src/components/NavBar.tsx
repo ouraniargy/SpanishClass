@@ -41,15 +41,16 @@ export default function Navbar() {
           marginLeft: "auto",
         }}
       >
-        <div
+        <button
           style={{
             backgroundColor: "pink",
             padding: "6px 12px",
             borderRadius: "20px",
+            cursor: "pointer",
           }}
           onClick={() => navigate("/profile")}
         >
-          👤 {user.name} {user.surname} | {user.role}{" "}
+          👤 {user.name} {user.surname} | {user.role}
           {user.profilePicture && (
             <img
               src={`https://localhost:7185/uploads/${user.profilePicture}`}
@@ -62,7 +63,7 @@ export default function Navbar() {
               }}
             />
           )}
-        </div>
+        </button>
 
         <button
           onClick={handleLogout}

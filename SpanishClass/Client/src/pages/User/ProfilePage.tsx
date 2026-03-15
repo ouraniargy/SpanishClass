@@ -11,11 +11,13 @@ interface UserProfile {
 
 export default function ProfilePage() {
   const { user, login } = useAuth();
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     surname: "",
     email: "",
-    password: "",
+    oldPassword: "",
+    newPassword: "",
     profilePicture: "",
   });
   const [photo, setPhoto] = useState<File | null>(null);
@@ -33,7 +35,8 @@ export default function ProfilePage() {
           name: data.name,
           surname: data.surname,
           email: data.email,
-          password: "",
+          oldPassword: "",
+          newPassword: "",
           profilePicture: data.profilePicture || "",
         });
       } catch (err) {
@@ -50,6 +53,7 @@ export default function ProfilePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
 
     try {
       const form = new FormData();
@@ -58,8 +62,9 @@ export default function ProfilePage() {
       form.append("name", formData.name || "");
       form.append("surname", formData.surname || "");
 
-      if (formData.password) {
-        form.append("password", formData.password);
+      form.append("oldPassword", formData.oldPassword || "");
+      if (formData.newPassword) {
+        form.append("newPassword", formData.newPassword);
       }
 
       if (photo) {
@@ -72,8 +77,16 @@ export default function ProfilePage() {
       );
 
       if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Update failed:", errorText);
+        const errorData = await res.json();
+
+        if (errorData[0]?.code === "PasswordMismatch") {
+          setError(
+            "The current password is incorrect. Profile was not updated.",
+          );
+        } else {
+          setError(errorData[0]?.description || "Update failed.");
+        }
+
         return;
       }
 
@@ -82,6 +95,8 @@ export default function ProfilePage() {
       setFormData({
         ...formData,
         profilePicture: data.profilePicture,
+        oldPassword: "",
+        newPassword: "",
       });
 
       login({
@@ -91,10 +106,9 @@ export default function ProfilePage() {
         surname: formData.surname,
         profilePicture: data.profilePicture,
       });
-      console.log("Profile updated:", data.profilePicture);
-      alert("Profile updated!");
     } catch (err) {
       console.error(err);
+      setError("Something went wrong.");
     }
   };
 
@@ -146,12 +160,21 @@ export default function ProfilePage() {
             onChange={handleChange}
           />
           <input
-            name="password"
+            name="oldPassword"
             type="password"
-            placeholder="New Password"
-            value={formData.password}
+            placeholder="Current Password"
+            value={formData.oldPassword}
             onChange={handleChange}
           />
+
+          <input
+            name="newPassword"
+            type="password"
+            placeholder="New Password"
+            value={formData.newPassword}
+            onChange={handleChange}
+          />
+
           <input
             type="file"
             accept="image/*"
@@ -161,6 +184,8 @@ export default function ProfilePage() {
               }
             }}
           />
+          {error && <p style={{ color: "red" }}>{error}</p>}
+
           <button type="submit">Update Profile</button>
         </form>
       </div>
