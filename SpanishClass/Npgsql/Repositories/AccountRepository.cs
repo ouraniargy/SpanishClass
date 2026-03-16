@@ -13,11 +13,6 @@ public class AccountRepository : IAccountRepository
         _context = context;
     }
 
-    public async Task<ApplicationUser?> GetUserByIdAsync(string userId)
-    {
-        return await _context.Users.FindAsync(Guid.Parse(userId));
-    }
-
     public async Task<ApplicationUser?> GetUserByEmailAsync(string email)
     {
         return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);

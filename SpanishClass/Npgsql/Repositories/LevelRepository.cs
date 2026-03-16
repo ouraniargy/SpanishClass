@@ -13,13 +13,6 @@ public class LevelRepository : ILevelRepository
         _context = context;
     }
 
-    public async Task<Level?> GetLevelByIdAsync(Guid levelId)
-    {
-        return await _context.Levels
-            .Include(l => l.Lessons)
-            .FirstOrDefaultAsync(l => l.Id == levelId);
-    }
-
     public async Task<List<Level>> GetAllLevelsAsync()
     {
         return await _context.Levels.ToListAsync();
