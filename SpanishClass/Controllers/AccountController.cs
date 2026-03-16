@@ -1,11 +1,8 @@
-﻿using System.Data;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SpanishClass.Models;
-using SpanishClass.Models.RequestDtos;
-using SpanishClass.Npgsql;
+using SpanishClass.Npgsql.IRepositories;
 
 namespace SpanishClass.Controllers
 {
@@ -13,16 +10,18 @@ namespace SpanishClass.Controllers
     [Route("api/[controller]")]
     public class AccountController : BaseController
     {
-        private readonly SpanishClassDbContext _context;
+        private readonly IAccountRepository _accountRepo;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
 
         public AccountController(
-            SpanishClassDbContext context,
+            IBookingRepository bookingRepository,
+            IAccountRepository accountRepo,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager)
+             : base(bookingRepository)
         {
-            _context = context;
+            _accountRepo = accountRepo;
             _userManager = userManager;
             _signInManager = signInManager;
         }
@@ -42,20 +41,14 @@ namespace SpanishClass.Controllers
             if (model.Photo != null)
             {
                 var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-
                 if (!Directory.Exists(uploadsFolder))
-                {
                     Directory.CreateDirectory(uploadsFolder);
-                }
 
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.Photo.FileName);
+                var fileName = Guid.NewGuid() + Path.GetExtension(model.Photo.FileName);
                 var filePath = Path.Combine(uploadsFolder, fileName);
 
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await model.Photo.CopyToAsync(stream);
-                }
-
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await model.Photo.CopyToAsync(stream);
                 photoPath = "/uploads/" + fileName;
             }
 
@@ -75,16 +68,11 @@ namespace SpanishClass.Controllers
                 return BadRequest(createResult.Errors);
 
             if (model.Role == "Student")
-            {
-                _context.Students.Add(new Student { Id = Guid.NewGuid(), UserId = user.Id });
-            }
+                await _accountRepo.AddStudentAsync(user.Id);
             else if (model.Role == "Professor")
-            {
-                _context.Professors.Add(new Professor { Id = Guid.NewGuid(), UserId = user.Id });
-            }
+                await _accountRepo.AddProfessorAsync(user.Id);
 
-            await _context.SaveChangesAsync();
-
+            await _accountRepo.SaveChangesAsync();
             await _signInManager.SignInAsync(user, false);
 
             return Ok(new
@@ -95,8 +83,8 @@ namespace SpanishClass.Controllers
                 surname = user.Surname,
                 role = model.Role,
                 photo = user.Photo,
-                email = model.Email,
-                mobilePhone = model.MobilePhone
+                email = user.Email,
+                mobilePhone = user.PhoneNumber
             });
         }
 
@@ -114,8 +102,8 @@ namespace SpanishClass.Controllers
             if (!signInResult.Succeeded)
                 return BadRequest("Invalid email or password.");
 
-            string role = await _context.Students.AnyAsync(s => s.UserId == user.Id) ? "Student" :
-                          await _context.Professors.AnyAsync(p => p.UserId == user.Id) ? "Professor" :
+            string role = await _accountRepo.IsStudentAsync(user.Id) ? "Student" :
+                          await _accountRepo.IsProfessorAsync(user.Id) ? "Professor" :
                           "Unknown";
 
             await _signInManager.SignInAsync(user, isPersistent: false);
@@ -134,15 +122,13 @@ namespace SpanishClass.Controllers
         public async Task<IActionResult> GetCurrentUser()
         {
             var userId = LoggedInUserId;
-            if (!userId.HasValue)
-                return Unauthorized();
+            if (!userId.HasValue) return Unauthorized();
 
             var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user == null)
-                return NotFound();
+            if (user == null) return NotFound();
 
-            string role = await _context.Students.AnyAsync(s => s.UserId == user.Id) ? "Student" :
-                          await _context.Professors.AnyAsync(p => p.UserId == user.Id) ? "Professor" :
+            string role = await _accountRepo.IsStudentAsync(user.Id) ? "Student" :
+                          await _accountRepo.IsProfessorAsync(user.Id) ? "Professor" :
                           "Unknown";
 
             return Ok(new
@@ -160,9 +146,7 @@ namespace SpanishClass.Controllers
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
 
             if (provider == "Google")
-            {
                 properties.Items["prompt"] = "select_account";
-            }
 
             return Challenge(properties, provider);
         }
@@ -176,10 +160,7 @@ namespace SpanishClass.Controllers
 
             ApplicationUser user;
 
-            var signInResult = await _signInManager.ExternalLoginSignInAsync(
-                info.LoginProvider,
-                info.ProviderKey,
-                isPersistent: false);
+            var signInResult = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
 
             if (signInResult.Succeeded)
             {
@@ -213,13 +194,9 @@ namespace SpanishClass.Controllers
                 await _signInManager.SignInAsync(user, isPersistent: true);
             }
 
-            string role;
-            if (await _context.Students.AnyAsync(s => s.UserId == user.Id))
-                role = "Student";
-            else if (await _context.Professors.AnyAsync(p => p.UserId == user.Id))
-                role = "Professor";
-            else
-                role = "select-role";
+            string role = await _accountRepo.IsStudentAsync(user.Id) ? "Student" :
+                          await _accountRepo.IsProfessorAsync(user.Id) ? "Professor" :
+                          "select-role";
 
             var frontendUrl = $"http://localhost:3000/select-role?userId={user.Id}&role={role}&name={user.Name}&surname={user.Surname}";
             return Redirect(frontendUrl);
@@ -232,14 +209,13 @@ namespace SpanishClass.Controllers
             if (user == null) return NotFound("User not found");
 
             if (model.Role == "Student")
-                _context.Students.Add(new Student { Id = Guid.NewGuid(), UserId = user.Id });
+                await _accountRepo.AddStudentAsync(user.Id);
             else if (model.Role == "Professor")
-                _context.Professors.Add(new Professor { Id = Guid.NewGuid(), UserId = user.Id });
+                await _accountRepo.AddProfessorAsync(user.Id);
             else
                 return BadRequest("Invalid role");
 
-            _context.Professors.Add(new Professor { Id = Guid.NewGuid(), UserId = user.Id });
-            await _context.SaveChangesAsync();
+            await _accountRepo.SaveChangesAsync();
 
             return Ok(new
             {
@@ -257,11 +233,9 @@ namespace SpanishClass.Controllers
             if (user == null)
                 return NotFound("User not found");
 
-            var role = await _context.Students.AnyAsync(s => s.UserId == user.Id)
-                ? "Student"
-                : await _context.Professors.AnyAsync(p => p.UserId == user.Id)
-                    ? "Professor"
-                    : null;
+            string? role = await _accountRepo.IsStudentAsync(user.Id) ? "Student" :
+                           await _accountRepo.IsProfessorAsync(user.Id) ? "Professor" :
+                           null;
 
             return Ok(new
             {
@@ -279,12 +253,16 @@ namespace SpanishClass.Controllers
             [FromForm] string userId,
             [FromForm] string name,
             [FromForm] string surname,
-            [FromForm] string password,
+            [FromForm] string oldPassword,
+            [FromForm] string? newPassword,
             IFormFile? photo)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
                 return NotFound();
+
+            if (string.IsNullOrEmpty(oldPassword) || !await _userManager.CheckPasswordAsync(user, oldPassword))
+                return BadRequest("Password is wrong.");
 
             user.Name = name;
             user.Surname = surname;
@@ -292,7 +270,6 @@ namespace SpanishClass.Controllers
             if (photo != null)
             {
                 var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-
                 if (!Directory.Exists(uploadsFolder))
                     Directory.CreateDirectory(uploadsFolder);
 

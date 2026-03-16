@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using SpanishClass.Models;
 using SpanishClass.Npgsql;
+using SpanishClass.Npgsql.IRepositories;
+using SpanishClass.Npgsql.Repositories;
 using SpanishClass.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,10 +19,22 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddControllersWithViews();
-builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler =
+            System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.WriteIndented = true;
+    }); builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<ILessonRepository, LessonRepository>();
+builder.Services.AddScoped<ILevelRepository, LevelRepository>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddControllers();
 builder.Services.AddDbContext<SpanishClassDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -37,15 +51,17 @@ builder.Services
     .AddEntityFrameworkStores<SpanishClassDbContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddAuthentication()
-    .AddGoogle(options =>
+builder.Services.AddAuthentication(options =>
+{
+options.DefaultScheme = IdentityConstants.ApplicationScheme;
+})
+.AddCookie()
+.AddGoogle(options =>
     {
-        options.ClientId = "311751176999-v6i6inu9cd0dbbb7ecb0rric64fr33qs.apps.googleusercontent.com";
+    options.ClientId = "311751176999-v6i6inu9cd0dbbb7ecb0rric64fr33qs.apps.googleusercontent.com";
         options.ClientSecret = "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";
         options.CallbackPath = "/signin-google";
     });
-
-builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -64,11 +80,6 @@ builder.Services.ConfigureApplicationCookie(options =>
         return Task.CompletedTask;
     };
 });
-
-builder.Services.AddAuthentication(options => {
-    options.DefaultScheme = IdentityConstants.ApplicationScheme;
-})
-.AddCookie();
 
 var app = builder.Build();
 

@@ -7,7 +7,7 @@ export default function StudentBookingModal({
   studentUserId,
   onClose,
   refreshCalendar,
-  markBookingAsMine, // <-- προσθέτουμε callback από parent
+  markBookingAsMine,
 }: {
   availability: any;
   studentUserId: string;
@@ -25,7 +25,6 @@ export default function StudentBookingModal({
         {},
       );
 
-      // Άμεση ενημέρωση στο calendar (κιτρινο)
       if (result.bookingId) {
         markBookingAsMine(availability.id, result.bookingId);
       }
@@ -48,7 +47,6 @@ export default function StudentBookingModal({
       await apiDelete(`/booking/${booking.bookingId}`);
       alert("Booking cancelled");
       setBooking(null);
-      // Refresh calendar αν θέλεις
       refreshCalendar();
       onClose();
     } catch (err) {

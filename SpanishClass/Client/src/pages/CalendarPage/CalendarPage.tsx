@@ -93,7 +93,7 @@ export default function CalendarPage() {
     alert("QR downloaded!");
   };
 
-  const fetchCalendarEvents = useCallback(() => {
+  const fetchCalendarEvents = useCallback(async () => {
     apiGet<any[]>("/booking/availabilities")
       .then((data) => {
         const mapped = (data || []).map((a: any) => {
@@ -171,7 +171,6 @@ export default function CalendarPage() {
       return;
     }
 
-    console.log(bookedByMe);
     if (event.extendedProps.bookedByMe) {
       setSelectedAvailability({
         id: event.extendedProps.bookingId,
@@ -236,6 +235,44 @@ export default function CalendarPage() {
     }
   };
 
+  const markBookingAsMine = (availabilityId: string, bookingId: string) => {
+    setEvents((prev) =>
+      prev.map((evt) =>
+        evt.id === availabilityId
+          ? {
+              ...evt,
+              color: "#ffc107",
+              extendedProps: {
+                ...evt.extendedProps,
+                bookedByMe: true,
+                bookingId,
+                bookingDetails: {
+                  ...evt.extendedProps.bookingDetails,
+                  bookingId,
+                },
+              },
+            }
+          : evt,
+      ),
+    );
+  };
+
+  const unmarkBookingAsMine = (availabilityId: string) => {
+    setEvents((prev) =>
+      prev.map((evt) =>
+        evt.id === availabilityId
+          ? {
+              ...evt,
+              extendedProps: {
+                ...evt.extendedProps,
+                bookedByMe: false,
+              },
+            }
+          : evt,
+      ),
+    );
+  };
+
   return (
     <div>
       <div className="calendar-container">
@@ -244,8 +281,10 @@ export default function CalendarPage() {
         </div>
         {role !== "Professor" ? (
           <p style={{ marginBottom: 12, fontSize: 20 }}>
-            Click on an event to book a seat. Green means available, red means
-            fully booked.
+            Click on an event to book a seat.
+            <br />
+            Green means available, red means fully booked. Yellow means you have
+            booked a seat, blue means it's your own current availability.
           </p>
         ) : (
           <div style={{ marginBottom: 12, width: "100%", maxWidth: "500px" }}>
@@ -447,14 +486,21 @@ export default function CalendarPage() {
               }
 
               if (isMine && bookedSeats >= maxSeats) {
+                info.el.style.backgroundColor = "#a59899";
+                info.el.style.color = "#fff";
+                if (role !== "Professor") info.el.style.pointerEvents = "none";
+                return;
+              }
+
+              if (bookedSeats >= maxSeats) {
                 info.el.style.backgroundColor = "#dc3545";
                 info.el.style.color = "#fff";
                 if (role !== "Professor") info.el.style.pointerEvents = "none";
                 return;
               }
 
-              if (isMine) {
-                info.el.style.backgroundColor = "#2b8cff";
+              if (isMine && role === "Professor") {
+                info.el.style.backgroundColor = "#28a745";
                 info.el.style.color = "#fff";
                 return;
               }
@@ -595,27 +641,7 @@ export default function CalendarPage() {
                 fetchCalendarEvents();
               }}
               refreshCalendar={fetchCalendarEvents}
-              markBookingAsMine={(availabilityId, bookingId) =>
-                setEvents((prevEvents) =>
-                  prevEvents.map((evt) =>
-                    evt.id === availabilityId
-                      ? {
-                          ...evt,
-                          color: "#ffc107",
-                          extendedProps: {
-                            ...evt.extendedProps,
-                            bookedByMe: true,
-                            bookingId,
-                            bookingDetails: {
-                              ...evt.extendedProps.bookingDetails,
-                              bookingId,
-                            },
-                          },
-                        }
-                      : evt,
-                  ),
-                )
-              }
+              markBookingAsMine={markBookingAsMine}
             />
           )}
           {showCancelBookingModal && selectedAvailability && (
@@ -623,9 +649,11 @@ export default function CalendarPage() {
               booking={selectedAvailability}
               onClose={() => {
                 setShowCancelBookingModal(false);
+                unmarkBookingAsMine(selectedAvailability.id);
                 fetchCalendarEvents();
               }}
               refreshCalendar={fetchCalendarEvents}
+              markBookingAsMine={markBookingAsMine}
             />
           )}
           <div style={{ display: "flex", justifyContent: "flex-end" }}>

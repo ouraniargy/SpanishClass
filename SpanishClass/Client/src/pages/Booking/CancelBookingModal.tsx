@@ -4,21 +4,28 @@ export default function CancelBookingModal({
   booking,
   onClose,
   refreshCalendar,
+  markBookingAsMine,
 }: {
   booking: any;
   onClose: () => void;
   refreshCalendar: () => void;
+  markBookingAsMine?: (availabilityId: string, bookingId: string) => void;
 }) {
   const handleCancel = async () => {
     if (!booking) return;
+
     const confirmCancel = window.confirm("Cancel this booking?");
     if (!confirmCancel) return;
 
     try {
-      await apiDelete(`/booking/${booking.bookingId}`);
-      alert("Booking cancelled");
-      refreshCalendar();
+      await apiDelete(`/booking/${booking.id}`);
+      if (markBookingAsMine && booking.extendedProps?.bookingId) {
+        markBookingAsMine(booking.id, booking.extendedProps.bookingId);
+      }
+
+      await refreshCalendar();
       onClose();
+      alert("Booking cancelled");
     } catch {
       alert("Failed to cancel booking");
     }

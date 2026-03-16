@@ -1,6 +1,4 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using SpanishClass.Models;
 
 namespace SpanishClass.Controllers
 {
@@ -13,14 +11,7 @@ namespace SpanishClass.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+        public IActionResult Index() => View();
+        public IActionResult Privacy() => View();
     }
 }
