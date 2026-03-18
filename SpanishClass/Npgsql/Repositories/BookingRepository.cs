@@ -89,7 +89,7 @@ public class BookingRepository : IBookingRepository
     {
         return await _context.Professors
             .Include(p => p.User)
-            .FirstOrDefaultAsync(p => p.UserId == userId);
+            .FirstOrDefaultAsync(p => p.User.Id == userId);
     }
 
     public async Task<Student?> GetStudentByUserIdAsync(Guid userId)

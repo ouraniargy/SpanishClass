@@ -188,10 +188,10 @@ export default function CalendarPage() {
     const start = selectionInfo.startStr;
     const end = selectionInfo.endStr;
 
-    const confirmAdd = window.confirm(
-      `Add availability from ${start} to ${end}?`,
-    );
-    if (!confirmAdd) return;
+    // const confirmAdd = window.confirm(
+    //   `Add availability from ${start} to ${end}?`,
+    // );
+    // if (!confirmAdd) return;
 
     if (!selectedLessonId) {
       alert("Please select a lesson before adding availability.");
@@ -301,7 +301,7 @@ export default function CalendarPage() {
               </option>
               {lessons.map((l) => (
                 <option key={l.id} value={l.id}>
-                  {l.name} - {l.levelName} - {l.durationMinutes}min
+                  {l.name} - {l.level?.name} - {l.durationMinutes}min
                 </option>
               ))}
             </select>

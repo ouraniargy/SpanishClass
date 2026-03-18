@@ -68,7 +68,7 @@ public class LessonRepository : ILessonRepository
     {
         return await _context.Professors
             .Include(p => p.User)
-            .FirstOrDefaultAsync(p => p.UserId == userId);
+            .FirstOrDefaultAsync(p => p.User.Id == userId);
     }
 
     public async Task<(bool Success, int StatusCode, string Message)> DeleteLessonAsync(
