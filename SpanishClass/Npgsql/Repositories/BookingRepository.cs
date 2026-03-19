@@ -18,6 +18,7 @@ public class BookingRepository : IBookingRepository
         return await _context.ProfessorAvailabilities
             .Include(a => a.Lesson)
                 .ThenInclude(l => l.Level)
+            .Include(l => l.Professor)
             .Include(a => a.Bookings)
             .FirstOrDefaultAsync(a => a.Id == availabilityId);
     }
@@ -40,7 +41,7 @@ public class BookingRepository : IBookingRepository
             .Include(a => a.Lesson)
                 .ThenInclude(l => l.Professor)
                     .ThenInclude(p => p.User)
-            .Include(a => a.Bookings)
+             .Include(a => a.Bookings)
                 .ThenInclude(b => b.Student)
                     .ThenInclude(s => s.User)
             .ToListAsync();

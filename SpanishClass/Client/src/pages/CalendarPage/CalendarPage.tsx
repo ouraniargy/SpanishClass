@@ -209,11 +209,6 @@ export default function CalendarPage() {
     const end = new Date(selectionInfo.endStr);
     const now = new Date();
 
-    // const confirmAdd = window.confirm(
-    //   `Add availability from ${start} to ${end}?`,
-    // );
-    // if (!confirmAdd) return;
-
     if (start < now) {
       alert("You can only add availability in the future");
       return;

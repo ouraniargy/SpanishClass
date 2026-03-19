@@ -211,7 +211,7 @@ public class BookingController : BaseController
         if (availability == null)
             return NotFound("Availability not found");
 
-        if (availability.Professor.UserId != userId)
+        if (availability.Professor.UserId != userId || availability.Professor == null)
             return StatusCode(403, "You can only delete your own availabilities");
 
         var affectedBookings = await _repo.GetBookingsByAvailabilityIdAsync(id);
