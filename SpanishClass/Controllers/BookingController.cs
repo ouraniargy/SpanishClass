@@ -245,9 +245,6 @@ public class BookingController : BaseController
     {
         var bookings = await _repo.GetBookingsByAvailabilityIdAsync(availabilityId);
 
-        if (bookings == null || !bookings.Any())
-            return NotFound();
-
         var result = bookings.Select(b => new
         {
             b.Student.UserId,
