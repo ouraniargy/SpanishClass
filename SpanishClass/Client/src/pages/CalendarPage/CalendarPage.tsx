@@ -32,11 +32,20 @@ export default function CalendarPage() {
     null,
   );
   const goBack = handleBack();
-  const isMobile = window.innerWidth < 768;
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 800);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const cardsPerView = 2;
+  const cardsPerView = isMobile ? 1 : 2;
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [qrCodes, setQrCodes] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 800);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const fetchQrCode = async (bookingId: string) => {
     try {
@@ -152,6 +161,11 @@ export default function CalendarPage() {
         `/booking/availabilities/${id}/students`,
       );
 
+      if (!students || students.length === 0) {
+        alert("No bookings yet for this availability");
+        return;
+      }
+
       setStudentsForAvailability(students || []);
       setSelectedAvailabilityTitle(title);
       setSelectedAvailability(clickInfo.event);
@@ -166,12 +180,20 @@ export default function CalendarPage() {
     const event = clickInfo.event;
     const { bookedSeats, maxSeats, bookedByMe } = event.extendedProps;
 
+    const eventDate = new Date(event.start);
+    const now = new Date();
+
+    if (eventDate < now) {
+      alert("You can only book future availabilities");
+      return;
+    }
+
     if (bookedSeats >= maxSeats && !bookedByMe) {
       alert("No seats available");
       return;
     }
 
-    if (event.extendedProps.bookedByMe) {
+    if (bookedByMe) {
       setSelectedAvailability({
         id: event.extendedProps.bookingId,
         ...event,
@@ -185,13 +207,19 @@ export default function CalendarPage() {
   };
 
   const handleSelect = (selectionInfo: any) => {
-    const start = selectionInfo.startStr;
-    const end = selectionInfo.endStr;
+    const start = new Date(selectionInfo.startStr);
+    const end = new Date(selectionInfo.endStr);
+    const now = new Date();
 
     // const confirmAdd = window.confirm(
     //   `Add availability from ${start} to ${end}?`,
     // );
     // if (!confirmAdd) return;
+
+    if (start < now) {
+      alert("You can only add availability in the future");
+      return;
+    }
 
     if (!selectedLessonId) {
       alert("Please select a lesson before adding availability.");
@@ -309,19 +337,20 @@ export default function CalendarPage() {
         )}
         <div className="calendar-wrapper">
           <div style={{ marginBottom: 12, width: "100%", maxWidth: "500px" }}>
-            <div style={{ display: "flex", gap: "10px", marginBottom: "15px" }}>
+            <div style={{ marginBottom: "10px" }}>
               <input
                 type="email"
                 placeholder="Enter email"
                 value={searchEmail}
                 onChange={(e) => setSearchEmail(e.target.value)}
                 style={{
-                  padding: "20px 30px",
-                  flex: 1,
+                  padding: "12px",
+                  width: "100%",
                   borderRadius: "6px",
                   border: "1px solid #ccc",
                   outline: "none",
                   fontSize: "14px",
+                  marginBottom: "10px",
                 }}
               />
 
@@ -330,19 +359,22 @@ export default function CalendarPage() {
                 value={searchMobilePhone}
                 onChange={(e) => setSearchMobilePhone(e.target.value)}
                 style={{
-                  padding: "20px 30px",
-                  flex: 1,
+                  padding: "12px",
+                  width: "100%",
                   borderRadius: "6px",
                   border: "1px solid #ccc",
                   outline: "none",
                   fontSize: "14px",
                 }}
               />
+            </div>
 
+            <div style={{ display: "flex", gap: "10px" }}>
               <button
                 onClick={handleSearch}
                 style={{
-                  padding: "10px 20px",
+                  flex: 1,
+                  padding: "12px",
                   borderRadius: "6px",
                   border: "none",
                   backgroundColor: "#3b82f6",
@@ -350,7 +382,6 @@ export default function CalendarPage() {
                   fontWeight: "500",
                   cursor: "pointer",
                   fontSize: "14px",
-                  transition: "background-color 0.2s",
                 }}
               >
                 Search Booking
@@ -385,9 +416,15 @@ export default function CalendarPage() {
                     setCurrentIndex((prev) => Math.max(prev - cardsPerView, 0))
                   }
                   disabled={currentIndex === 0}
+                  style={{
+                    padding: "10px",
+                    fontSize: "18px",
+                    cursor: "pointer",
+                  }}
                 >
                   ◀
                 </button>
+
                 <button
                   onClick={() =>
                     setCurrentIndex((prev) =>
@@ -398,6 +435,11 @@ export default function CalendarPage() {
                     )
                   }
                   disabled={currentIndex >= searchResult.length - cardsPerView}
+                  style={{
+                    padding: "10px",
+                    fontSize: "18px",
+                    cursor: "pointer",
+                  }}
                 >
                   ▶
                 </button>
@@ -410,9 +452,9 @@ export default function CalendarPage() {
                     <div
                       key={b.bookingCode}
                       style={{
-                        flex: "0 0 50%",
+                        flex: isMobile ? "0 0 100%" : "0 0 50%",
                         background: "#f5f5f5",
-                        padding: 20,
+                        padding: isMobile ? 15 : 20,
                         borderRadius: 8,
                         boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
                         display: "flex",
@@ -420,16 +462,16 @@ export default function CalendarPage() {
                         alignItems: "center",
                       }}
                     >
-                      <h3>Welcome {b.studentName}</h3>
+                      <h3 style={{ fontSize: isMobile ? "16px" : "18px" }}>
+                        Welcome {b.studentName}
+                      </h3>
 
                       <p>
                         <b>Lesson:</b> {b.lesson}
                       </p>
-
                       <p>
                         <b>Description:</b> {b.description}
                       </p>
-
                       <p>
                         <b>Date:</b> {new Date(b.date).toLocaleString()}
                       </p>
@@ -439,11 +481,25 @@ export default function CalendarPage() {
                           <img
                             src={`data:image/png;base64,${qrCodes[b.bookingCode]}`}
                             alt="Booking QR"
-                            style={{ marginTop: 15, width: 140, height: 140 }}
+                            style={{
+                              marginTop: 15,
+                              width: isMobile ? 120 : 140,
+                              height: isMobile ? 120 : 140,
+                            }}
                           />
-                          <br />
+
                           <button
                             onClick={() => handleDownloadQr(b.bookingCode)}
+                            style={{
+                              marginTop: 10,
+                              padding: "10px",
+                              width: "100%",
+                              borderRadius: "6px",
+                              border: "none",
+                              background: "#10b981",
+                              color: "white",
+                              cursor: "pointer",
+                            }}
                           >
                             Download QR
                           </button>
@@ -478,6 +534,18 @@ export default function CalendarPage() {
             eventDidMount={(info) => {
               const { bookedSeats, maxSeats, bookedByMe, isMine } =
                 info.event.extendedProps;
+              const eventStart = info.event.start;
+
+              if (!eventStart) return;
+              const eventDate = new Date(eventStart);
+              const now = new Date();
+
+              if (eventDate < now) {
+                info.el.style.backgroundColor = "#f10b1b";
+                info.el.style.opacity = "0.6";
+                info.el.style.pointerEvents = "none";
+                return;
+              }
 
               if (bookedByMe) {
                 info.el.style.backgroundColor = "#ffc107";
