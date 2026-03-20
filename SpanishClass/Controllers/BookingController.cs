@@ -21,21 +21,6 @@ public class BookingController : BaseController
         _emailService = emailService;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Create(Guid availabilityId)
-    {
-        var availability = await _repo.GetAvailabilityAsync(availabilityId);
-        if (availability == null)
-            return NotFound();
-
-        return View(new BookingFormViewModel
-        {
-            AvailabilityId = availabilityId,
-            LessonDate = availability.StartTime,
-            MaxSeats = availability.Lesson.MaxSeats
-        });
-    }
-
     [HttpPost]
     public async Task<IActionResult> Create(BookingFormViewModel model)
     {

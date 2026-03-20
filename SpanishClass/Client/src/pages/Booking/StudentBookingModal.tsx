@@ -135,6 +135,9 @@ export default function StudentBookingModal({
             <p>
               <strong>Seat:</strong> {booking.seatNumber}
             </p>
+            <p>
+              <strong>Unique number of reservation:</strong> {booking.bookingId}
+            </p>
 
             <button
               onClick={handleCancelBooking}

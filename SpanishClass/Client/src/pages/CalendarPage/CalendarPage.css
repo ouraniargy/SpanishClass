@@ -109,3 +109,7 @@
 .calendar-wrapper :global(.fc-daygrid-day-frame) {
   min-height: 120px;
 }
+
+.fc-event {
+  cursor: pointer;
+}

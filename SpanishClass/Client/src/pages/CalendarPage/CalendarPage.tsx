@@ -120,7 +120,7 @@ export default function CalendarPage() {
 
           return {
             id: a.id,
-            title: `${a.name} - ${a.description} - ${a.professorName} - ${a.bookedSeats}/${a.maxSeats}`,
+            title: `${a.name} - ${a.description} - ${a.professorName} - ${a.bookedSeats}/${a.maxSeats} - ${a.id}`,
             start,
             end,
             editable: !!isMine,
@@ -153,26 +153,29 @@ export default function CalendarPage() {
     fetchCalendarEvents();
   }, [fetchCalendarEvents]);
 
-  const handleProfessorEventClick = async (clickInfo: any) => {
-    const { id, title } = clickInfo.event;
-    const { isMine } = clickInfo.event.extendedProps;
+  const handleProfessorEventClick = useCallback(
+    async (clickInfo: any) => {
+      const { id, title } = clickInfo.event;
+      const { isMine } = clickInfo.event.extendedProps;
 
-    if (!isMine || role !== "Professor") return;
+      if (!isMine || role !== "Professor") return;
 
-    try {
-      const students = await apiGet<any[]>(
-        `/booking/availabilities/${id}/students`,
-      );
+      try {
+        const students = await apiGet<any[]>(
+          `/booking/availabilities/${id}/students`,
+        );
 
-      setStudentsForAvailability(students || []);
-      setSelectedAvailabilityTitle(title);
-      setSelectedAvailability(clickInfo.event);
-      setShowModal(true);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to load bookings");
-    }
-  };
+        setStudentsForAvailability(students || []);
+        setSelectedAvailabilityTitle(title);
+        setSelectedAvailability(clickInfo.event);
+        setShowModal(true);
+      } catch (err) {
+        console.error(err);
+        alert("Failed to load bookings");
+      }
+    },
+    [role],
+  );
 
   const handleStudentEventClick = (clickInfo: any) => {
     const event = clickInfo.event;
