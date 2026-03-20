@@ -146,7 +146,7 @@ export default function ViewBookingsPage() {
 
   return (
     <div style={containerStyle}>
-      <h2 style={titleStyle}>📚 My Bookings</h2>
+      <h2 style={titleStyle}>My Bookings</h2>
 
       <div style={navWrapper}>
         <button
@@ -178,7 +178,7 @@ export default function ViewBookingsPage() {
       <div style={cardsContainer}>
         {bookings.slice(currentIndex, currentIndex + cardsPerView).map((b) => (
           <div key={b.bookingId} style={cardStyle(isMobile)}>
-            <h3>👋 {b.studentName}</h3>
+            <h3>{b.studentName}</h3>
 
             <p>
               <span style={labelStyle}>Lesson:</span> {b.lessonName}
@@ -208,7 +208,7 @@ export default function ViewBookingsPage() {
                   style={downloadBtn}
                   onClick={() => handleDownloadQr(b.bookingId)}
                 >
-                  ⬇ Download QR
+                  Download QR
                 </button>
               </div>
             )}

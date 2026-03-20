@@ -12,6 +12,12 @@ export default function Navbar() {
 
   if (!user) return null;
 
+  const profileSrc = user.profilePicture
+    ? `https://localhost:7185/uploads/${user.profilePicture}`
+    : undefined;
+
+  console.log("USER:", user);
+  console.log("User profile picture URL:", profileSrc);
   return (
     <div
       style={{
@@ -51,9 +57,9 @@ export default function Navbar() {
           onClick={() => navigate("/profile")}
         >
           👤 {user.name} {user.surname} | {user.role}
-          {user.profilePicture && (
+          {profileSrc && (
             <img
-              src={`https://localhost:7185/uploads/${user.profilePicture}`}
+              src={profileSrc}
               alt="profile"
               style={{
                 width: "20px",

@@ -19,6 +19,7 @@ export default function Login() {
         role: string;
         name: string;
         surname: string;
+        profilePicture?: string;
       };
 
       console.log("Login response:", data);
@@ -28,6 +29,7 @@ export default function Login() {
         role: data.role,
         name: data.name,
         surname: data.surname,
+        profilePicture: data.profilePicture,
       });
 
       const role = data.role?.trim();

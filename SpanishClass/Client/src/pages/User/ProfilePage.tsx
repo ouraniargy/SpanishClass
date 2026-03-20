@@ -121,7 +121,7 @@ export default function ProfilePage() {
   const displayPhoto = photo
     ? URL.createObjectURL(photo)
     : formData.profilePicture
-      ? `https://localhost:7185/uploads/${user?.profilePicture}`
+      ? `https://localhost:7185/uploads/${formData?.profilePicture}`
       : null;
 
   return (

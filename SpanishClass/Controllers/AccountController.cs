@@ -114,7 +114,8 @@ namespace SpanishClass.Controllers
                 userId = user.Id,
                 name = user.Name,
                 surname = user.Surname,
-                role
+                role,
+                profilePicture = user.Photo
             });
         }
 
