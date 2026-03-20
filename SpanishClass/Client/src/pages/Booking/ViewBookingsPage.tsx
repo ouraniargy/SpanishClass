@@ -39,22 +39,22 @@ export default function ViewBookingsPage() {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const data = await apiGet<Booking[]>(`/booking/myAvailabilities`);
+        const data = await apiGet<any[]>("/booking/availabilities");
         setBookings(data);
 
         const qrPromises = data.map(async (b) => {
           const res = await apiGet<{ qrImageBase64: string }>(
-            `/booking/qrcode/${b.bookingCode}`,
+            `/booking/qrcode/${b.bookingId}`,
           );
           return {
-            bookingCode: b.bookingCode,
+            bookingId: b.bookingId,
             qrImageBase64: res.qrImageBase64,
           };
         });
 
         const qrResults = await Promise.all(qrPromises);
         const qrMap: Record<string, string> = {};
-        qrResults.forEach((q) => (qrMap[q.bookingCode] = q.qrImageBase64));
+        qrResults.forEach((q) => (qrMap[q.bookingId] = q.qrImageBase64));
         setQrCodes(qrMap);
       } catch (err) {
         console.error(err);
@@ -67,13 +67,13 @@ export default function ViewBookingsPage() {
     fetchBookings();
   }, [userId]);
 
-  const handleDownloadQr = (bookingCode: string) => {
-    const qrBase64 = qrCodes[bookingCode];
+  const handleDownloadQr = (bookingId: string) => {
+    const qrBase64 = qrCodes[bookingId];
     if (!qrBase64) return alert("QR code not loaded yet");
 
     const link = document.createElement("a");
     link.href = `data:image/png;base64,${qrBase64}`;
-    link.download = `Booking-${bookingCode}.png`;
+    link.download = `Booking-${bookingId}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -144,7 +144,7 @@ export default function ViewBookingsPage() {
 
       <div style={{ display: "flex", gap: 10, overflow: "hidden" }}>
         {bookings.slice(currentIndex, currentIndex + cardsPerView).map((b) => (
-          <div key={b.bookingCode} style={cardStyle(isMobile)}>
+          <div key={b.bookingId} style={cardStyle(isMobile)}>
             <h3 style={{ fontSize: isMobile ? 16 : 18 }}>
               Welcome {b.studentName}
             </h3>
@@ -158,10 +158,10 @@ export default function ViewBookingsPage() {
               <b>Date:</b> {new Date(b.start).toLocaleString()}
             </p>
 
-            {qrCodes[b.bookingCode] && (
+            {qrCodes[b.bookingId] && (
               <>
                 <img
-                  src={`data:image/png;base64,${qrCodes[b.bookingCode]}`}
+                  src={`data:image/png;base64,${qrCodes[b.bookingId]}`}
                   alt="Booking QR"
                   style={{
                     marginTop: 15,
@@ -171,7 +171,7 @@ export default function ViewBookingsPage() {
                 />
                 <button
                   style={downloadBtn}
-                  onClick={() => handleDownloadQr(b.bookingCode)}
+                  onClick={() => handleDownloadQr(b.bookingId)}
                 >
                   Download QR
                 </button>
