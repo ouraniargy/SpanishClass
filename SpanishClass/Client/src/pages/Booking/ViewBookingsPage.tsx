@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { apiGet } from "../../api/api";
+import { handleBack } from "../../shared/handleBack";
 
 interface Booking {
   id: string;
@@ -16,6 +17,48 @@ interface Booking {
   studentName: string;
 }
 
+const containerStyle: React.CSSProperties = {
+  maxWidth: "2000px",
+  margin: "0 auto",
+  padding: 15,
+};
+
+const titleStyle: React.CSSProperties = {
+  textAlign: "center",
+  marginBottom: 20,
+};
+
+const cardsContainer: React.CSSProperties = {
+  gap: 20,
+};
+
+const qrBox: React.CSSProperties = {
+  marginTop: 15,
+  padding: 15,
+  background: "#f9fafb",
+  borderRadius: 10,
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+};
+
+const labelStyle: React.CSSProperties = {
+  fontWeight: 600,
+};
+
+const cardStyle = (isMobile: boolean): React.CSSProperties => ({
+  flex: isMobile ? "0 0 100%" : "0 0 calc(50% - 10px)",
+  background: "#ffffff",
+  padding: 20,
+  borderRadius: 12,
+  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  marginBottom: 20,
+  marginTop: 20,
+});
+
 export default function ViewBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +68,7 @@ export default function ViewBookingsPage() {
   const [cardsPerView, setCardsPerView] = useState(
     window.innerWidth < 800 ? 1 : 2,
   );
-
+  const goBack = handleBack();
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const userId = user?.userId;
   const isMobile = window.innerWidth < 800;
@@ -101,20 +144,9 @@ export default function ViewBookingsPage() {
     cursor: "pointer",
   };
 
-  const cardStyle = (isMobile: boolean): React.CSSProperties => ({
-    flex: isMobile ? "0 0 100%" : "0 0 50%",
-    background: "#f5f5f5",
-    padding: isMobile ? 15 : 20,
-    borderRadius: 8,
-    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  });
-
   return (
-    <div style={{ padding: 20 }}>
-      <h2>My Bookings</h2>
+    <div style={containerStyle}>
+      <h2 style={titleStyle}>📚 My Bookings</h2>
 
       <div style={navWrapper}>
         <button
@@ -124,8 +156,9 @@ export default function ViewBookingsPage() {
           disabled={currentIndex === 0}
           style={navBtn}
         >
-          ◀
+          ◀ Previous
         </button>
+
         <button
           onClick={() =>
             setCurrentIndex(
@@ -138,47 +171,63 @@ export default function ViewBookingsPage() {
           disabled={currentIndex >= bookings.length - cardsPerView}
           style={navBtn}
         >
-          ▶
+          Next ▶
         </button>
       </div>
 
-      <div style={{ display: "flex", gap: 10, overflow: "hidden" }}>
+      <div style={cardsContainer}>
         {bookings.slice(currentIndex, currentIndex + cardsPerView).map((b) => (
           <div key={b.bookingId} style={cardStyle(isMobile)}>
-            <h3 style={{ fontSize: isMobile ? 16 : 18 }}>
-              Welcome {b.studentName}
-            </h3>
+            <h3>👋 {b.studentName}</h3>
+
             <p>
-              <b>Lesson:</b> {b.lessonName}
+              <span style={labelStyle}>Lesson:</span> {b.lessonName}
             </p>
+
             <p>
-              <b>Description:</b> {b.description}
+              <span style={labelStyle}>Description:</span> {b.description}
             </p>
+
             <p>
-              <b>Date:</b> {new Date(b.start).toLocaleString()}
+              <span style={labelStyle}>Date:</span>{" "}
+              {new Date(b.start).toLocaleString()}
             </p>
 
             {qrCodes[b.bookingId] && (
-              <>
+              <div style={qrBox}>
                 <img
                   src={`data:image/png;base64,${qrCodes[b.bookingId]}`}
                   alt="Booking QR"
                   style={{
-                    marginTop: 15,
                     width: isMobile ? 120 : 140,
                     height: isMobile ? 120 : 140,
                   }}
                 />
+
                 <button
                   style={downloadBtn}
                   onClick={() => handleDownloadQr(b.bookingId)}
                 >
-                  Download QR
+                  ⬇ Download QR
                 </button>
-              </>
+              </div>
             )}
           </div>
         ))}
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <button
+            type="button"
+            onClick={goBack}
+            style={{
+              marginTop: "20px",
+              padding: "10px 20px",
+              fontSize: "16px",
+              cursor: "pointer",
+            }}
+          >
+            Back
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { apiPost } from "../../api/api";
 import { useAuth } from "../../components/AuthContext";
+import { handleBack } from "../../shared/handleBack";
 
 interface UserProfile {
   name: string;
@@ -20,6 +21,7 @@ export default function ProfilePage() {
     newPassword: "",
     profilePicture: "",
   });
+  const goBack = handleBack();
   const [photo, setPhoto] = useState<File | null>(null);
 
   useEffect(() => {
@@ -187,6 +189,9 @@ export default function ProfilePage() {
           {error && <p style={{ color: "red" }}>{error}</p>}
 
           <button type="submit">Update Profile</button>
+          <button type="button" onClick={goBack}>
+            Back
+          </button>
         </form>
       </div>
     </div>
