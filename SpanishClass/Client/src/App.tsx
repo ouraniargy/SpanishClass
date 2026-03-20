@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./components/AuthContext";
 import Navbar from "./components/NavBar";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ViewBookingsPage from "./pages/Booking/ViewBookingsPage";
 import CalendarPage from "./pages/CalendarPage/CalendarPage";
 import GoogleRoleSelect from "./pages/GoogleRoleSelect";
 import CreateLessonPage from "./pages/Lesson/CreateLessonPage/CreateLessonPage";
@@ -89,6 +90,16 @@ function App() {
                 <ProtectedRoute
                   element={<ViewLevelsPage />}
                   allowedRoles={["Professor"]}
+                />
+              }
+            />
+
+            <Route
+              path="/viewBookings"
+              element={
+                <ProtectedRoute
+                  element={<ViewBookingsPage />}
+                  allowedRoles={["Student"]}
                 />
               }
             />

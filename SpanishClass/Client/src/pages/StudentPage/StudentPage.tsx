@@ -33,6 +33,9 @@ export default function StudentPage() {
         <h2>
           <Link to="/calendar">Calendar of Availabilities and Bookings</Link>
         </h2>
+        <h2>
+          <Link to="/viewBookings">View My Bookings</Link>
+        </h2>
       </div>
     </div>
   );

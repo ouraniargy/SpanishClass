@@ -105,10 +105,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("ReactCorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();
-app.UseCors("ReactCorsPolicy");
 
 app.UseSession();
 
