@@ -187,6 +187,9 @@ export default function ViewBookingsPage() {
             <p>
               <span style={labelStyle}>Description:</span> {b.description}
             </p>
+            <p>
+              <b>Unique number of reservation:</b> {b.id}
+            </p>
 
             <p>
               <span style={labelStyle}>Date:</span>{" "}

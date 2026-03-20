@@ -179,6 +179,9 @@ export default function BookingSearch({
                   <p>
                     <b>Date:</b> {new Date(b.date).toLocaleString()}
                   </p>
+                  <p>
+                    <b>Unique number of reservation:</b> {b.id}
+                  </p>
 
                   {qrCodes[b.bookingCode] && (
                     <>
