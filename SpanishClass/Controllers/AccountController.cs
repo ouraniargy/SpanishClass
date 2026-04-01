@@ -199,7 +199,7 @@ namespace SpanishClass.Controllers
                           await _accountRepo.IsProfessorAsync(user.Id) ? "Professor" :
                           "select-role";
 
-            var frontendUrl = $"http://localhost:3000/select-role?userId={user.Id}&role={role}&name={user.Name}&surname={user.Surname}";
+            var frontendUrl = $"http://localhost:3000/select-role?userId={user.Id}&role={role}&name={user.Name}&surname={user.Surname}&profilePicture={user.Photo}";
             return Redirect(frontendUrl);
         }
 
@@ -237,6 +237,7 @@ namespace SpanishClass.Controllers
             string? role = await _accountRepo.IsStudentAsync(user.Id) ? "Student" :
                            await _accountRepo.IsProfessorAsync(user.Id) ? "Professor" :
                            null;
+            var hasPassword = await _userManager.HasPasswordAsync(user);
 
             return Ok(new
             {
@@ -245,7 +246,8 @@ namespace SpanishClass.Controllers
                 surname = user.Surname,
                 email = user.Email,
                 profilePicture = user.Photo,
-                role
+                role,
+                hasPassword
             });
         }
 
@@ -254,7 +256,7 @@ namespace SpanishClass.Controllers
             [FromForm] string userId,
             [FromForm] string name,
             [FromForm] string surname,
-            [FromForm] string oldPassword,
+            [FromForm] string? oldPassword,
             [FromForm] string? newPassword,
             IFormFile? photo)
         {
@@ -262,8 +264,21 @@ namespace SpanishClass.Controllers
             if (user == null)
                 return NotFound();
 
-            if (string.IsNullOrEmpty(oldPassword) || !await _userManager.CheckPasswordAsync(user, oldPassword))
-                return BadRequest("Password is wrong.");
+            var hasPassword = await _userManager.HasPasswordAsync(user);
+
+            if (hasPassword)
+            {
+                if (string.IsNullOrEmpty(oldPassword) ||
+                    !await _userManager.CheckPasswordAsync(user, oldPassword))
+                {
+                    return BadRequest("Password is wrong.");
+                }
+            }
+
+            if (!hasPassword && !string.IsNullOrEmpty(newPassword))
+            {
+                await _userManager.AddPasswordAsync(user, newPassword);
+            }
 
             user.Name = name;
             user.Surname = surname;

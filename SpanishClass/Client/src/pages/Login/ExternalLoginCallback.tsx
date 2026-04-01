@@ -13,9 +13,16 @@ export default function ExternalLoginCallback() {
     const role = params.get("role");
     const name = params.get("name");
     const surname = params.get("surname");
+    const profilePicture = params.get("profilePicture");
 
     if (userId && role && name && surname) {
-      login({ userId, role, name, surname });
+      login({
+        userId,
+        role,
+        name,
+        surname,
+        profilePicture: profilePicture || undefined,
+      });
 
       if (role === "Student") navigate("/students", { replace: true });
       else if (role === "Professor") navigate("/professors", { replace: true });

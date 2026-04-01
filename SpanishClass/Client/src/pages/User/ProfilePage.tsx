@@ -8,6 +8,7 @@ interface UserProfile {
   surname: string;
   email: string;
   profilePicture?: string;
+  hasPassword: boolean;
 }
 
 export default function ProfilePage() {
@@ -23,6 +24,7 @@ export default function ProfilePage() {
   });
   const goBack = handleBack();
   const [photo, setPhoto] = useState<File | null>(null);
+  const [hasPassword, setHasPassword] = useState(true);
 
   useEffect(() => {
     if (!user?.userId) return;
@@ -41,6 +43,7 @@ export default function ProfilePage() {
           newPassword: "",
           profilePicture: data.profilePicture || "",
         });
+        setHasPassword(data.hasPassword);
       } catch (err) {
         console.error("Error fetching profile:", err);
       }
@@ -64,7 +67,9 @@ export default function ProfilePage() {
       form.append("name", formData.name || "");
       form.append("surname", formData.surname || "");
 
-      form.append("oldPassword", formData.oldPassword || "");
+      if (hasPassword) {
+        form.append("oldPassword", formData.oldPassword || "");
+      }
       if (formData.newPassword) {
         form.append("newPassword", formData.newPassword);
       }
@@ -161,14 +166,20 @@ export default function ProfilePage() {
             value={formData.email}
             onChange={handleChange}
           />
-          <input
-            name="oldPassword"
-            type="password"
-            placeholder="Current Password"
-            value={formData.oldPassword}
-            onChange={handleChange}
-          />
-
+          {hasPassword && (
+            <input
+              name="oldPassword"
+              type="password"
+              placeholder="Current Password"
+              value={formData.oldPassword}
+              onChange={handleChange}
+            />
+          )}
+          {!hasPassword && (
+            <p style={{ fontSize: "12px", color: "gray" }}>
+              You signed up with Google. You can set a password if you want.
+            </p>
+          )}
           <input
             name="newPassword"
             type="password"
