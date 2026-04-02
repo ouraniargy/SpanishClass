@@ -259,7 +259,7 @@ public class BookingController : BaseController
     [HttpPost("search-booking")]
     public async Task<IActionResult> SearchBooking([FromBody] SearchBookingRequest model)
     {
-        var bookings = await _repo.SearchBookingsAsync(model.Email, model.Phone);
+        var bookings = await _repo.SearchBookingsAsync(model.Email, model.Phone, model.Id);
 
         if (!bookings.Any())
             return NotFound(new { message = "No bookings found." });

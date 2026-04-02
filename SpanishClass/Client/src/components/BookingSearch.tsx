@@ -3,6 +3,8 @@ type Props = {
   setSearchEmail: (v: string) => void;
   searchMobilePhone: string;
   setSearchMobilePhone: (v: string) => void;
+  searchId: string;
+  setSearchId: (v: string) => void;
   handleSearch: () => void;
   showSearchResults: boolean;
   setShowSearchResults: (v: boolean) => void;
@@ -72,6 +74,8 @@ export default function BookingSearch({
   setSearchEmail,
   searchMobilePhone,
   setSearchMobilePhone,
+  searchId,
+  setSearchId,
   handleSearch,
   showSearchResults,
   setShowSearchResults,
@@ -111,6 +115,13 @@ export default function BookingSearch({
             placeholder="Enter mobile phone"
             value={searchMobilePhone}
             onChange={(e) => setSearchMobilePhone(e.target.value)}
+            style={inputStyle}
+          />
+
+          <input
+            placeholder="Enter id of booking"
+            value={searchId}
+            onChange={(e) => setSearchId(e.target.value)}
             style={inputStyle}
           />
         </div>
@@ -180,7 +191,7 @@ export default function BookingSearch({
                     <b>Date:</b> {new Date(b.date).toLocaleString()}
                   </p>
                   <p>
-                    <b>Unique number of reservation:</b> {b.id}
+                    <b>Unique number of reservation:</b> {b.bookingCode}
                   </p>
 
                   {qrCodes[b.bookingCode] && (

@@ -124,7 +124,7 @@ public class BookingRepository : IBookingRepository
             .ToListAsync();
     }
 
-    public async Task<List<Booking>> SearchBookingsAsync(string? email, string? phone)
+    public async Task<List<Booking>> SearchBookingsAsync(string? email, string? phone, string? id)
     {
         var query = _context.Bookings
             .Include(b => b.Student)
@@ -140,6 +140,11 @@ public class BookingRepository : IBookingRepository
         if (!string.IsNullOrEmpty(phone))
         {
             query = query.Where(b => b.Student.User.PhoneNumber == phone);
+        }
+
+        if (!string.IsNullOrWhiteSpace(id))
+        {
+            query = query.Where(b => b.Id.ToString() == id);
         }
 
         return await query.ToListAsync();

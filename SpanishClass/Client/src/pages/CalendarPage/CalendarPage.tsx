@@ -26,6 +26,7 @@ export default function CalendarPage() {
   );
   const [searchEmail, setSearchEmail] = useState("");
   const [searchMobilePhone, setSearchMobilePhone] = useState("");
+  const [searchId, setSearchId] = useState("");
   const [searchResult, setSearchResult] = useState<any[]>([]);
   const [selectedAvailabilityTitle, setSelectedAvailabilityTitle] =
     useState<string>("");
@@ -66,8 +67,8 @@ export default function CalendarPage() {
   };
 
   const handleSearch = async () => {
-    if (!searchEmail && !searchMobilePhone) {
-      alert("Enter email or phone to search");
+    if (!searchEmail && !searchMobilePhone && !searchId) {
+      alert("Enter email, phone, or ID to search");
       return;
     }
 
@@ -75,6 +76,7 @@ export default function CalendarPage() {
       const result = await apiPost<Booking[]>("/booking/search-booking", {
         email: searchEmail,
         phone: searchMobilePhone,
+        id: searchId,
       });
 
       setSearchResult(result);
@@ -316,6 +318,8 @@ export default function CalendarPage() {
               setSearchEmail={setSearchEmail}
               searchMobilePhone={searchMobilePhone}
               setSearchMobilePhone={setSearchMobilePhone}
+              searchId={searchId}
+              setSearchId={setSearchId}
               handleSearch={handleSearch}
               showSearchResults={showSearchResults}
               setShowSearchResults={setShowSearchResults}
