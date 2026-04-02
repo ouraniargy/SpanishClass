@@ -312,26 +312,25 @@ export default function CalendarPage() {
           lessons={lessons}
         />
         <div className="calendar-wrapper">
-          {user?.role === "Professor" && (
-            <BookingSearch
-              searchEmail={searchEmail}
-              setSearchEmail={setSearchEmail}
-              searchMobilePhone={searchMobilePhone}
-              setSearchMobilePhone={setSearchMobilePhone}
-              searchId={searchId}
-              setSearchId={setSearchId}
-              handleSearch={handleSearch}
-              showSearchResults={showSearchResults}
-              setShowSearchResults={setShowSearchResults}
-              searchResult={searchResult}
-              currentIndex={currentIndex}
-              setCurrentIndex={setCurrentIndex}
-              cardsPerView={cardsPerView}
-              isMobile={isMobile}
-              qrCodes={qrCodes}
-              handleDownloadQr={handleDownloadQr}
-            />
-          )}
+          <BookingSearch
+            searchEmail={searchEmail}
+            setSearchEmail={setSearchEmail}
+            searchMobilePhone={searchMobilePhone}
+            setSearchMobilePhone={setSearchMobilePhone}
+            searchId={searchId}
+            setSearchId={setSearchId}
+            handleSearch={handleSearch}
+            userRole={user.role}
+            showSearchResults={showSearchResults}
+            setShowSearchResults={setShowSearchResults}
+            searchResult={searchResult}
+            currentIndex={currentIndex}
+            setCurrentIndex={setCurrentIndex}
+            cardsPerView={cardsPerView}
+            isMobile={isMobile}
+            qrCodes={qrCodes}
+            handleDownloadQr={handleDownloadQr}
+          />
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView={isMobile ? "timeGridDay" : "timeGridWeek"}

@@ -6,6 +6,7 @@ type Props = {
   searchId: string;
   setSearchId: (v: string) => void;
   handleSearch: () => void;
+  userRole: string;
   showSearchResults: boolean;
   setShowSearchResults: (v: boolean) => void;
   searchResult: any[];
@@ -77,6 +78,7 @@ export default function BookingSearch({
   searchId,
   setSearchId,
   handleSearch,
+  userRole,
   showSearchResults,
   setShowSearchResults,
   searchResult,
@@ -103,27 +105,33 @@ export default function BookingSearch({
       {/* SEARCH INPUTS */}
       <div style={{ marginBottom: 12, width: "100%", maxWidth: "500px" }}>
         <div style={{ marginBottom: "10px" }}>
-          <input
-            type="email"
-            placeholder="Enter email"
-            value={searchEmail}
-            onChange={(e) => setSearchEmail(e.target.value)}
-            style={inputStyle}
-          />
+          {userRole === "Professor" && (
+            <>
+              <input
+                type="email"
+                placeholder="Enter email"
+                value={searchEmail}
+                onChange={(e) => setSearchEmail(e.target.value)}
+                style={inputStyle}
+              />
 
-          <input
-            placeholder="Enter mobile phone"
-            value={searchMobilePhone}
-            onChange={(e) => setSearchMobilePhone(e.target.value)}
-            style={inputStyle}
-          />
+              <input
+                placeholder="Enter mobile phone"
+                value={searchMobilePhone}
+                onChange={(e) => setSearchMobilePhone(e.target.value)}
+                style={inputStyle}
+              />
+            </>
+          )}
 
-          <input
-            placeholder="Enter id of booking"
-            value={searchId}
-            onChange={(e) => setSearchId(e.target.value)}
-            style={inputStyle}
-          />
+          <>
+            <input
+              placeholder="Enter id of booking"
+              value={searchId}
+              onChange={(e) => setSearchId(e.target.value)}
+              style={inputStyle}
+            />
+          </>
         </div>
 
         <div style={{ display: "flex", gap: "10px" }}>
