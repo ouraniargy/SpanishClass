@@ -100,7 +100,7 @@ public class BookingController : BaseController
             Description = availability.Lesson.Description,
             SeatNumber = availability.BookedSeats,
             Date = availability.StartTime,
-            RoomPhoto = availability.Lesson.RoomPhoto,
+            LessonPhoto = availability.Lesson.LessonPhoto,
             GuestsEmails = new List<string> { student.User.Email }
         };
 
@@ -174,6 +174,7 @@ public class BookingController : BaseController
             description = a.Lesson.Description,
             name = a.Lesson.Name,
             lessonName = a.Lesson.Name,
+            lessonPhoto = a.Lesson.LessonPhoto,
             bookedByMe = a.Bookings?.Any(b => b.StudentId == studentId) ?? false,
             bookingId = a.Bookings?.Where(b => b.StudentId == studentId)
                                    .Select(b => b.Id)
@@ -270,7 +271,7 @@ public class BookingController : BaseController
             bookingCode = b.Id,
             lesson = b.Lesson.Name,
             description = b.Lesson.Description,
-            roomPhoto = b.Lesson.RoomPhoto,
+            lessonPhoto = b.Lesson.LessonPhoto,
             date = b.CreatedAt
         }));
     }

@@ -4,12 +4,19 @@ import { apiDelete, apiGet, apiPut } from "../../../api/api";
 import { handleBack } from "../../../shared/handleBack";
 import "../../sharedStyles.css";
 
+interface UpdateLessonResponse {
+  message: string;
+  lessonPhoto: string | null;
+}
+
 export default function ViewLessonsPage() {
   const [lessons, setLessons] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<any>({});
+  const [editPhoto, setEditPhoto] = useState<File | null>(null);
+  const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const lessonsPerPage = 5;
@@ -48,14 +55,39 @@ export default function ViewLessonsPage() {
 
   const handleEditSave = async (lessonId: string) => {
     try {
-      await apiPut(`/lesson/${lessonId}`, editData);
-      setLessons((prev) =>
-        prev.map((l) => (l.id === lessonId ? { ...l, ...editData } : l)),
+      const formData = new FormData();
+      formData.append("Name", editData.name);
+      formData.append("Description", editData.description);
+      formData.append("DurationMinutes", editData.durationMinutes.toString());
+      formData.append("MaxSeats", editData.maxSeats.toString());
+      if (editPhoto) {
+        formData.append("LessonPhoto", editPhoto);
+      }
+
+      const updatedLesson = await apiPut<UpdateLessonResponse>(
+        `/lesson/${lessonId}`,
+        formData,
       );
+
+      setLessons((prev) =>
+        prev.map((l) =>
+          l.id === lessonId
+            ? {
+                ...l,
+                ...editData,
+                lessonPhoto: updatedLesson.lessonPhoto || l.lessonPhoto,
+              }
+            : l,
+        ),
+      );
+
       setEditingId(null);
+      setEditPhoto(null);
+      setPreviewPhoto(null);
+
       alert("Lesson updated successfully");
     } catch (err) {
-      console.error("Error updating lesson:", err);
+      console.error(err);
       alert("Failed to update lesson");
     }
   };
@@ -63,6 +95,8 @@ export default function ViewLessonsPage() {
   const handleEditCancel = () => {
     setEditingId(null);
     setEditData({});
+    setEditPhoto(null);
+    setPreviewPhoto(null);
   };
 
   useEffect(() => {
@@ -119,6 +153,7 @@ export default function ViewLessonsPage() {
                   <th style={{ padding: "10px" }}>Description</th>
                   <th style={{ padding: "10px" }}>Duration (min)</th>
                   <th style={{ padding: "10px" }}>Max Seats</th>
+                  <th style={{ padding: "10px" }}>Photo</th>
                   <th style={{ padding: "10px" }}>Actions</th>
                 </tr>
               </thead>
@@ -191,6 +226,48 @@ export default function ViewLessonsPage() {
                         />
                       ) : (
                         lesson.maxSeats
+                      )}
+                    </td>
+                    <td>
+                      {editingId === lesson.id ? (
+                        <>
+                          <input
+                            type="file"
+                            onChange={(e) => {
+                              if (!e.target.files) return;
+                              const file = e.target.files[0];
+                              setEditPhoto(file);
+                              setPreviewPhoto(URL.createObjectURL(file));
+                            }}
+                          />
+
+                          {(previewPhoto || lesson.lessonPhoto) && (
+                            <img
+                              src={
+                                previewPhoto ||
+                                `https://localhost:7185${lesson.lessonPhoto}`
+                              }
+                              alt="lesson"
+                              style={{
+                                width: "80px",
+                                height: "60px",
+                                objectFit: "cover",
+                              }}
+                            />
+                          )}
+                        </>
+                      ) : (
+                        lesson.lessonPhoto && (
+                          <img
+                            src={`https://localhost:7185${lesson.lessonPhoto}`}
+                            alt="lesson"
+                            style={{
+                              width: "80px",
+                              height: "60px",
+                              objectFit: "cover",
+                            }}
+                          />
+                        )
                       )}
                     </td>
                     <td style={{ padding: "10px" }}>

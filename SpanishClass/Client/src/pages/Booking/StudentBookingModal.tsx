@@ -55,6 +55,10 @@ export default function StudentBookingModal({
     }
   };
 
+  const imageUrl = availability?.extendedProps?.lessonPhoto
+    ? `https://localhost:7185${availability.extendedProps.lessonPhoto}`
+    : null;
+
   return (
     <div
       style={{
@@ -99,6 +103,19 @@ export default function StudentBookingModal({
         {!booking ? (
           <>
             <h2>Book this lesson: {availability.title}</h2>
+            {imageUrl && (
+              <div style={{ textAlign: "center", marginBottom: 16 }}>
+                <img
+                  src={imageUrl}
+                  alt={availability.title}
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "200px",
+                    borderRadius: 8,
+                  }}
+                />
+              </div>
+            )}
             <label>
               <input
                 type="checkbox"

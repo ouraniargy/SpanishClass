@@ -28,7 +28,7 @@ public class LessonController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateLesson([FromBody] CreateLessonDto model)
+    public async Task<IActionResult> CreateLesson([FromForm] CreateLessonDto model)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -42,6 +42,23 @@ public class LessonController : BaseController
         if (professor == null)
             return NotFound("Professor not found");
 
+        string? photoPath = null;
+
+        if (model.LessonPhoto != null)
+        {
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            var fileName = Guid.NewGuid() + Path.GetExtension(model.LessonPhoto.FileName);
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            using var stream = new FileStream(filePath, FileMode.Create);
+            await model.LessonPhoto.CopyToAsync(stream);
+
+            photoPath = "/uploads/" + fileName;
+        }
+
         var lesson = new Lesson
         {
             Id = Guid.NewGuid(),
@@ -50,7 +67,8 @@ public class LessonController : BaseController
             DurationMinutes = model.DurationMinutes,
             MaxSeats = model.MaxSeats,
             Name = model.Name,
-            Description = model.Description
+            Description = model.Description,
+            LessonPhoto = photoPath
         };
 
         await _lessonRepo.AddLessonAsync(lesson);
@@ -86,17 +104,18 @@ public class LessonController : BaseController
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateLesson(Guid id, [FromBody] UpdateLessonDto model)
+    public async Task<IActionResult> UpdateLesson(Guid id, [FromForm] UpdateLessonDto model)
     {
         var userId = LoggedInUserId;
         if (!userId.HasValue)
             return Unauthorized("User not logged in");
 
         var updated = await _lessonRepo.UpdateLessonAsync(id, userId.Value, model);
+
         if (!updated.Success)
             return StatusCode(updated.StatusCode, updated.Message);
 
-        return Ok(new { message = updated.Message });
+        return Ok(new { message = updated.Message, lessonPhoto = updated.LessonPhoto });
     }
 }
 

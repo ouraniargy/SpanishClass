@@ -18,7 +18,7 @@ public interface ILessonRepository
         IEmailService emailService
     );
 
-    Task<(bool Success, int StatusCode, string Message)> UpdateLessonAsync(
+    Task<(bool Success, int StatusCode, string Message, string? LessonPhoto)> UpdateLessonAsync(
         Guid lessonId,
         Guid userId,
         UpdateLessonDto model

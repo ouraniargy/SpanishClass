@@ -6,6 +6,6 @@ export interface BookingDetails {
   description: string;
   seatNumber: number;
   date: string;
-  roomPhoto: string;
+  lessonPhoto: string;
   guestsEmails: string[];
 }

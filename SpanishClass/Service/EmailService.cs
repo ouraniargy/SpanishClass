@@ -33,7 +33,7 @@ namespace SpanishClass.Services
                 <p><strong>Lesson:</strong> {booking.LessonName}</p>
                 <p><strong>Description:</strong> {booking.Description}</p>
                 <p><strong>Seat Number:</strong> {booking.SeatNumber}</p>
-                <img src='{booking.RoomPhoto}' alt='Room' style='max-width:400px;' />
+                <img src='{booking.LessonPhoto}' alt='Room' style='max-width:400px;' />
             ";
 
             await client.SendMailAsync(message);

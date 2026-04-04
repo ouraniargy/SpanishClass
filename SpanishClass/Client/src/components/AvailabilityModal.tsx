@@ -13,6 +13,7 @@ type Props = {
   students: Student[];
   availabilityId?: string;
   onDelete: (id: string) => void;
+  lessonImage?: string;
 };
 
 const overlayStyle: React.CSSProperties = {
@@ -65,6 +66,7 @@ export default function AvailabilityModal({
   students,
   availabilityId,
   onDelete,
+  lessonImage,
 }: Props) {
   if (!show) return null;
 
@@ -76,7 +78,19 @@ export default function AvailabilityModal({
         </button>
 
         <h3>Bookings for: {title}</h3>
-
+        {lessonImage && (
+          <div style={{ textAlign: "center", marginBottom: 16 }}>
+            <img
+              src={lessonImage}
+              alt={title}
+              style={{
+                maxWidth: "100%",
+                maxHeight: "200px",
+                borderRadius: 8,
+              }}
+            />
+          </div>
+        )}
         {students.length === 0 ? (
           <>
             <p>No students have booked yet.</p>

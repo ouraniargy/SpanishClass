@@ -133,6 +133,7 @@ export default function CalendarPage() {
               bookedSeats: a.bookedSeats,
               maxSeats: a.maxSeats,
               bookedByMe,
+              lessonPhoto: a.lessonPhoto,
               bookingDetails: bookedByMe ? a : null,
             },
           };
@@ -158,7 +159,7 @@ export default function CalendarPage() {
   const handleProfessorEventClick = useCallback(
     async (clickInfo: any) => {
       const { id, title } = clickInfo.event;
-      const { isMine } = clickInfo.event.extendedProps;
+      const { isMine, lessonPhoto } = clickInfo.event.extendedProps;
 
       if (!isMine || role !== "Professor") return;
 
@@ -166,10 +167,19 @@ export default function CalendarPage() {
         const students = await apiGet<any[]>(
           `/booking/availabilities/${id}/students`,
         );
-
         setStudentsForAvailability(students || []);
         setSelectedAvailabilityTitle(title);
-        setSelectedAvailability(clickInfo.event);
+
+        const photo = lessonPhoto || students[0]?.lessonPhoto || null;
+
+        setSelectedAvailability({
+          ...clickInfo.event,
+          extendedProps: {
+            ...clickInfo.event.extendedProps,
+            lessonPhoto: photo,
+          },
+        });
+
         setShowModal(true);
       } catch (err) {
         console.error(err);
@@ -299,6 +309,10 @@ export default function CalendarPage() {
     );
   };
 
+  const lessonImageUrl = selectedAvailability?.extendedProps?.lessonPhoto
+    ? `https://localhost:7185${selectedAvailability.extendedProps.lessonPhoto}`
+    : undefined;
+
   return (
     <div>
       <div className="calendar-container">
@@ -404,6 +418,7 @@ export default function CalendarPage() {
             students={studentsForAvailability}
             availabilityId={selectedAvailability?.id}
             onDelete={deleteAvailability}
+            lessonImage={lessonImageUrl}
           />
           {showStudentBookingModal && selectedAvailability?.id && (
             <StudentBookingModal

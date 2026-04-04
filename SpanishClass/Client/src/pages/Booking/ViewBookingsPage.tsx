@@ -15,6 +15,7 @@ interface Booking {
   bookedSeats: number;
   maxSeats: number;
   studentName: string;
+  lessonPhoto: string;
 }
 
 const containerStyle: React.CSSProperties = {
@@ -160,24 +161,23 @@ export default function ViewBookingsPage() {
         </button>
 
         <button
-          onClick={() =>
-            setCurrentIndex(
-              Math.min(
-                currentIndex + cardsPerView,
-                bookings.length - cardsPerView,
-              ),
-            )
-          }
-          disabled={currentIndex >= bookings.length - cardsPerView}
+          onClick={() => setCurrentIndex(currentIndex + cardsPerView)}
+          disabled={currentIndex + cardsPerView >= bookings.length}
           style={navBtn}
         >
           Next ▶
         </button>
       </div>
 
-      <div style={cardsContainer}>
+      <div key={currentIndex} style={cardsContainer}>
         {bookings.slice(currentIndex, currentIndex + cardsPerView).map((b) => (
-          <div key={b.bookingId} style={cardStyle(isMobile)}>
+          <div key={`${b.bookingId}-${b.id}`} style={cardStyle(isMobile)}>
+            {b.lessonPhoto && (
+              <img
+                src={`https://localhost:7185${b.lessonPhoto}`}
+                alt={b.lessonName}
+              />
+            )}
             <h3>{b.studentName}</h3>
 
             <p>

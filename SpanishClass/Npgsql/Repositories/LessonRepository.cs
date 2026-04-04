@@ -122,18 +122,34 @@ public class LessonRepository : ILessonRepository
         return (true, 200, "Lesson deleted and students notified");
     }
 
-    public async Task<(bool Success, int StatusCode, string Message)> UpdateLessonAsync(
-        Guid lessonId, Guid userId, UpdateLessonDto model)
+    public async Task<(bool Success, int StatusCode, string Message, string? LessonPhoto)> UpdateLessonAsync(
+    Guid lessonId, Guid userId, UpdateLessonDto model)
     {
         var lesson = await _context.Lessons
             .Include(l => l.Professor)
             .FirstOrDefaultAsync(l => l.Id == lessonId);
 
         if (lesson == null)
-            return (false, 404, "Lesson not found");
+            return (false, 404, "Lesson not found", null);
 
         if (lesson.Professor.UserId != userId)
-            return (false, 403, "You can only edit your own lessons");
+            return (false, 403, "You can only edit your own lessons", null);
+
+        if (model.LessonPhoto != null)
+        {
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            var fileName = Guid.NewGuid() + Path.GetExtension(model.LessonPhoto.FileName);
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            using var stream = new FileStream(filePath, FileMode.Create);
+            await model.LessonPhoto.CopyToAsync(stream);
+
+            lesson.LessonPhoto = "/uploads/" + fileName;
+        }
 
         lesson.Name = model.Name;
         lesson.Description = model.Description;
@@ -143,6 +159,6 @@ public class LessonRepository : ILessonRepository
         _context.Lessons.Update(lesson);
         await _context.SaveChangesAsync();
 
-        return (true, 200, "Lesson updated successfully");
+        return (true, 200, "Lesson updated successfully", lesson.LessonPhoto);
     }
 }

@@ -16,7 +16,7 @@
 
         public DateTime Date { get; set; }
 
-        public string? RoomPhoto { get; set; }
+        public string? LessonPhoto { get; set; }
 
         public List<string> GuestsEmails { get; set; } = new List<string>();
     }

@@ -6,5 +6,6 @@ public class CreateLessonDto
     public int MaxSeats { get; set; }
     public required string Name { get; set; }
     public required string Description { get; set; }
+    public IFormFile? LessonPhoto { get; set; }
 }
 

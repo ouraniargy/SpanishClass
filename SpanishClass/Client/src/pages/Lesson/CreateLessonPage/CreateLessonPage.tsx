@@ -10,6 +10,7 @@ export default function CreateLessonPage() {
   const [maxSeats, setMaxSeats] = useState(1);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [lessonPhoto, setLessonPhoto] = useState<File | null>(null);
   const goBack = handleBack();
 
   useEffect(() => {
@@ -28,13 +29,19 @@ export default function CreateLessonPage() {
     }
 
     try {
-      await apiPost("/lesson", {
-        levelId,
-        durationMinutes,
-        maxSeats,
-        name,
-        description,
-      });
+      const formData = new FormData();
+
+      formData.append("Name", name);
+      formData.append("Description", description);
+      formData.append("DurationMinutes", durationMinutes.toString());
+      formData.append("MaxSeats", maxSeats.toString());
+      formData.append("LevelId", levelId);
+
+      if (lessonPhoto) {
+        formData.append("LessonPhoto", lessonPhoto);
+      }
+
+      await apiPost("/lesson", formData);
 
       alert("Lesson created successfully");
       navigate("/viewLessons");
@@ -43,6 +50,11 @@ export default function CreateLessonPage() {
       alert("Failed to create lesson");
     }
   }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    setLessonPhoto(e.target.files[0]);
+  };
 
   return (
     <div className="page-center">
@@ -92,6 +104,17 @@ export default function CreateLessonPage() {
           value={maxSeats}
           onChange={(e) => setMaxSeats(Number(e.target.value))}
         />
+
+        <label>Lesson Photo</label>
+        <input type="file" accept="image/*" onChange={handleFileChange} />
+
+        {lessonPhoto && (
+          <img
+            src={URL.createObjectURL(lessonPhoto)}
+            alt="preview"
+            style={{ width: "100%", marginTop: "10px" }}
+          />
+        )}
 
         <button onClick={handleCreateLesson}>Create Lesson</button>
 
