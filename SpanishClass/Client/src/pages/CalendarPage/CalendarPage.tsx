@@ -344,6 +344,7 @@ export default function CalendarPage() {
             isMobile={isMobile}
             qrCodes={qrCodes}
             handleDownloadQr={handleDownloadQr}
+            lessonImage={lessonImageUrl}
           />
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}

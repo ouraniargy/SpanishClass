@@ -16,6 +16,7 @@ type Props = {
   isMobile: boolean;
   qrCodes: Record<string, string>;
   handleDownloadQr: (bookingCode: string) => void;
+  lessonImage?: string;
 };
 
 const inputStyle = {
@@ -88,6 +89,7 @@ export default function BookingSearch({
   isMobile,
   qrCodes,
   handleDownloadQr,
+  lessonImage,
 }: Props) {
   const cardStyle = (isMobile: boolean): React.CSSProperties => ({
     flex: isMobile ? "0 0 100%" : "0 0 50%",
@@ -201,6 +203,19 @@ export default function BookingSearch({
                   <p>
                     <b>Unique number of reservation:</b> {b.bookingCode}
                   </p>
+                  {b.lessonPhoto && (
+                    <div style={{ textAlign: "center", marginBottom: 16 }}>
+                      <img
+                        src={`https://localhost:7185${b.lessonPhoto}`}
+                        alt={b.lesson}
+                        style={{
+                          maxWidth: "100%",
+                          maxHeight: "200px",
+                          borderRadius: 8,
+                        }}
+                      />
+                    </div>
+                  )}
 
                   {qrCodes[b.bookingCode] && (
                     <>
