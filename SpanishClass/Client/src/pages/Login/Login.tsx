@@ -37,6 +37,8 @@ export default function Login() {
         navigate("/students", { replace: true });
       } else if (role === "Professor") {
         navigate("/professors", { replace: true });
+      } else if (role === "Admin") {
+        navigate("/admin", { replace: true });
       } else {
         alert(`Unknown user role: ${data.role}`);
       }

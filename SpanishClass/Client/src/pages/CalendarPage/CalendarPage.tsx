@@ -27,6 +27,8 @@ export default function CalendarPage() {
   const [searchEmail, setSearchEmail] = useState("");
   const [searchMobilePhone, setSearchMobilePhone] = useState("");
   const [searchId, setSearchId] = useState("");
+
+    const [searchLessonName, setSearchLessonName] = useState("");
   const [searchResult, setSearchResult] = useState<any[]>([]);
   const [selectedAvailabilityTitle, setSelectedAvailabilityTitle] =
     useState<string>("");
@@ -67,8 +69,8 @@ export default function CalendarPage() {
   };
 
   const handleSearch = async () => {
-    if (!searchEmail && !searchMobilePhone && !searchId) {
-      alert("Enter email, phone, or ID to search");
+    if (!searchEmail && !searchMobilePhone && !searchId && !searchLessonName) {
+      alert("Enter email, phone, ID, or lesson name to search");
       return;
     }
 
@@ -77,6 +79,7 @@ export default function CalendarPage() {
         email: searchEmail,
         phone: searchMobilePhone,
         id: searchId,
+        lessonName: searchLessonName,
       });
 
       setSearchResult(result);
@@ -173,11 +176,9 @@ export default function CalendarPage() {
         const photo = lessonPhoto || students[0]?.lessonPhoto || null;
 
         setSelectedAvailability({
-          ...clickInfo.event,
-          extendedProps: {
-            ...clickInfo.event.extendedProps,
-            lessonPhoto: photo,
-          },
+          id,
+          title,
+          lessonPhoto: photo,
         });
 
         setShowModal(true);
@@ -258,12 +259,18 @@ export default function CalendarPage() {
   };
 
   const deleteAvailability = async (availabilityId: string) => {
-    if (!availabilityId) return;
+    if (!availabilityId) {
+      console.error("No availabilityId provided");
+      return;
+    }
 
     try {
       await apiDelete(`/booking/availabilities/${availabilityId}`);
-      fetchCalendarEvents();
+
       setShowModal(false);
+      setSelectedAvailability(null);
+      fetchCalendarEvents();
+
       alert("Availability deleted successfully");
     } catch (err) {
       console.error("Error deleting availability:", err);
@@ -309,8 +316,8 @@ export default function CalendarPage() {
     );
   };
 
-  const lessonImageUrl = selectedAvailability?.extendedProps?.lessonPhoto
-    ? `https://localhost:7185${selectedAvailability.extendedProps.lessonPhoto}`
+  const lessonImageUrl = selectedAvailability?.lessonPhoto
+    ? `https://localhost:7185${selectedAvailability.lessonPhoto}`
     : undefined;
 
   return (
@@ -333,6 +340,8 @@ export default function CalendarPage() {
             setSearchMobilePhone={setSearchMobilePhone}
             searchId={searchId}
             setSearchId={setSearchId}
+            searchLessonName={searchLessonName}
+            setSearchLessonName={setSearchLessonName}
             handleSearch={handleSearch}
             userRole={user.role}
             showSearchResults={showSearchResults}
@@ -344,7 +353,6 @@ export default function CalendarPage() {
             isMobile={isMobile}
             qrCodes={qrCodes}
             handleDownloadQr={handleDownloadQr}
-            lessonImage={lessonImageUrl}
           />
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -412,15 +420,20 @@ export default function CalendarPage() {
               info.el.style.color = "#fff";
             }}
           />
-          <AvailabilityModal
-            show={showModal}
-            onClose={() => setShowModal(false)}
-            title={selectedAvailabilityTitle}
-            students={studentsForAvailability}
-            availabilityId={selectedAvailability?.id}
-            onDelete={deleteAvailability}
-            lessonImage={lessonImageUrl}
-          />
+          {selectedAvailability && (
+            <AvailabilityModal
+              show={showModal}
+              onClose={() => {
+                setShowModal(false);
+                setSelectedAvailability(null);
+              }}
+              title={selectedAvailabilityTitle}
+              students={studentsForAvailability}
+              availabilityId={selectedAvailability.id}
+              onDelete={deleteAvailability}
+              lessonImage={lessonImageUrl}
+            />
+          )}
           {showStudentBookingModal && selectedAvailability?.id && (
             <StudentBookingModal
               availability={selectedAvailability}

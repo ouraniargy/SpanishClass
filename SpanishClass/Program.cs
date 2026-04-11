@@ -67,11 +67,25 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.SameSite = SameSiteMode.None;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+
     options.Events.OnRedirectToLogin = ctx =>
     {
         if (ctx.Request.Path.StartsWithSegments("/api"))
         {
             ctx.Response.StatusCode = 401;
+        }
+        else
+        {
+            ctx.Response.Redirect(ctx.RedirectUri);
+        }
+        return Task.CompletedTask;
+    };
+
+    options.Events.OnRedirectToAccessDenied = ctx =>
+    {
+        if (ctx.Request.Path.StartsWithSegments("/api"))
+        {
+            ctx.Response.StatusCode = 403;
         }
         else
         {

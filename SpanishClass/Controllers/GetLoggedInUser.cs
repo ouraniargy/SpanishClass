@@ -32,14 +32,5 @@ namespace SpanishClass.Controllers
             var professor = await _bookingRepository.GetProfessorByUserIdAsync(userId);
             return professor != null;
         }
-
-        protected async Task<bool> IsStudentAsync()
-        {
-            if (!IsLoggedIn) return false;
-
-            var userId = LoggedInUserId!.Value;
-            var student = await _bookingRepository.GetStudentByUserIdAsync(userId);
-            return student != null;
-        }
     }
 }

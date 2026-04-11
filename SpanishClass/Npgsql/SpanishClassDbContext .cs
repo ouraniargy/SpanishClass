@@ -14,6 +14,7 @@ namespace SpanishClass.Npgsql
 
         public DbSet<Student> Students { get; set; }
         public DbSet<Professor> Professors { get; set; }
+        public DbSet<Admin> Admins { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<Level> Levels { get; set; }

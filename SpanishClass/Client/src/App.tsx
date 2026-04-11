@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./components/AuthContext";
 import Navbar from "./components/NavBar";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminAssignPage from "./pages/AdminAssignPage/AdminAssignPage";
 import ViewBookingsPage from "./pages/Booking/ViewBookingsPage";
 import CalendarPage from "./pages/CalendarPage/CalendarPage";
 import GoogleRoleSelect from "./pages/GoogleRoleSelect";
@@ -119,6 +120,15 @@ function App() {
               element={<ExternalLoginCallback />}
             />
             <Route path="/select-role" element={<GoogleRoleSelect />} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute
+                  element={<AdminAssignPage />}
+                  allowedRoles={["Admin"]}
+                />
+              }
+            />
             <Route
               path="/unauthorized"
               element={<h1>No access to this page.</h1>}

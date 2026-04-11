@@ -50,11 +50,9 @@ export default function Register() {
       localStorage.setItem("user", JSON.stringify(registeredUser));
       localStorage.setItem("role", registeredUser.role);
 
-      if (role === "Student") {
-        navigate("/students", { replace: true });
-      } else {
-        navigate("/professors", { replace: true });
-      }
+      if (role === "Student") navigate("/students");
+      else if (role === "Professor") navigate("/professors");
+      else if (role === "Admin") navigate("/admin");
     } catch (err) {
       alert(
         "Register failed: " +
@@ -88,6 +86,7 @@ export default function Register() {
         <select value={role} onChange={(e) => setRole(e.target.value)}>
           <option value="Student">Student</option>
           <option value="Professor">Professor</option>
+          <option value="Admin">Admin</option>
         </select>
 
         <h4>Photo</h4>

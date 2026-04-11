@@ -5,6 +5,8 @@ type Props = {
   setSearchMobilePhone: (v: string) => void;
   searchId: string;
   setSearchId: (v: string) => void;
+  searchLessonName: string;
+  setSearchLessonName: (v: string) => void;
   handleSearch: () => void;
   userRole: string;
   showSearchResults: boolean;
@@ -78,6 +80,8 @@ export default function BookingSearch({
   setSearchMobilePhone,
   searchId,
   setSearchId,
+  searchLessonName,
+  setSearchLessonName,
   handleSearch,
   userRole,
   showSearchResults,
@@ -89,7 +93,6 @@ export default function BookingSearch({
   isMobile,
   qrCodes,
   handleDownloadQr,
-  lessonImage,
 }: Props) {
   const cardStyle = (isMobile: boolean): React.CSSProperties => ({
     flex: isMobile ? "0 0 100%" : "0 0 50%",
@@ -123,17 +126,24 @@ export default function BookingSearch({
                 onChange={(e) => setSearchMobilePhone(e.target.value)}
                 style={inputStyle}
               />
+              <input
+                placeholder="Enter id of booking"
+                value={searchId}
+                onChange={(e) => setSearchId(e.target.value)}
+                style={inputStyle}
+              />
             </>
           )}
 
           <>
             <input
-              placeholder="Enter id of booking"
-              value={searchId}
-              onChange={(e) => setSearchId(e.target.value)}
+              placeholder="Enter lesson name"
+              value={searchLessonName}
+              onChange={(e) => setSearchLessonName(e.target.value)}
               style={inputStyle}
             />
           </>
+          <></>
         </div>
 
         <div style={{ display: "flex", gap: "10px" }}>

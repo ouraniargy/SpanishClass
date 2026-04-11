@@ -30,7 +30,7 @@ export default function CancelBookingModal({
       alert("Failed to cancel booking");
     }
   };
-
+  console.log(booking);
   return (
     <div
       style={{
@@ -52,7 +52,7 @@ export default function CancelBookingModal({
           background: "#fff",
           padding: "30px 24px",
           borderRadius: "12px",
-          maxWidth: "400px",
+          maxWidth: "1000px",
           width: "100%",
           boxShadow: "0 10px 25px rgba(0,0,0,0.3)",
           textAlign: "center",
@@ -62,7 +62,39 @@ export default function CancelBookingModal({
         }}
       >
         <h2 style={{ margin: 0 }}>Cancel Booking</h2>
-        <p style={{ margin: 0, fontSize: 14, color: "#555" }}>
+
+        <div style={{ textAlign: "left", fontSize: 14 }}>
+          <p>
+            <b>Lesson:</b> {booking._def.title}
+          </p>
+
+          <p>
+            <b>Date:</b>{" "}
+            {booking._instance?.range?.start
+              ? new Date(booking._instance.range.start).toLocaleString()
+              : "No date"}
+          </p>
+
+          {booking.extendedProps?.professorName && (
+            <p>
+              <b>Professor:</b> {booking.extendedProps.professorName}
+            </p>
+          )}
+
+          {booking.extendedProps?.studentName && (
+            <p>
+              <b>Student:</b> {booking.extendedProps.studentName}
+            </p>
+          )}
+
+          {booking.extendedProps?.bookingId && (
+            <p>
+              <b>Booking ID:</b> {booking.extendedProps.bookingId}
+            </p>
+          )}
+        </div>
+
+        <p style={{ fontSize: 13, color: "#777" }}>
           Are you sure you want to cancel this booking?
         </p>
 

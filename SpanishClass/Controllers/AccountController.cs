@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SpanishClass.Models;
+using SpanishClass.Models.RequestDtos;
 using SpanishClass.Npgsql.IRepositories;
 
 namespace SpanishClass.Controllers
@@ -67,13 +68,14 @@ namespace SpanishClass.Controllers
             if (!createResult.Succeeded)
                 return BadRequest(createResult.Errors);
 
-            if (model.Role == "Student")
-                await _accountRepo.AddStudentAsync(user.Id);
-            else if (model.Role == "Professor")
+            if (model.Role == "Professor")
                 await _accountRepo.AddProfessorAsync(user.Id);
+            else if (model.Role == "Student")
+                await _accountRepo.AddStudentAsync(user.Id);
+
+            await _signInManager.SignInAsync(user, false);
 
             await _accountRepo.SaveChangesAsync();
-            await _signInManager.SignInAsync(user, false);
 
             return Ok(new
             {
@@ -102,7 +104,8 @@ namespace SpanishClass.Controllers
             if (!signInResult.Succeeded)
                 return BadRequest("Invalid email or password.");
 
-            string role = await _accountRepo.IsStudentAsync(user.Id) ? "Student" :
+            string role = await _accountRepo.IsAdminAsync(user.Id) ? "Admin" :
+                          await _accountRepo.IsStudentAsync(user.Id) ? "Student" :
                           await _accountRepo.IsProfessorAsync(user.Id) ? "Professor" :
                           "Unknown";
 
@@ -128,7 +131,8 @@ namespace SpanishClass.Controllers
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null) return NotFound();
 
-            string role = await _accountRepo.IsStudentAsync(user.Id) ? "Student" :
+            string role = await _accountRepo.IsAdminAsync(user.Id) ? "Admin" :
+                          await _accountRepo.IsStudentAsync(user.Id) ? "Student" :
                           await _accountRepo.IsProfessorAsync(user.Id) ? "Professor" :
                           "Unknown";
 
@@ -195,7 +199,8 @@ namespace SpanishClass.Controllers
                 await _signInManager.SignInAsync(user, isPersistent: true);
             }
 
-            string role = await _accountRepo.IsStudentAsync(user.Id) ? "Student" :
+            string role = await _accountRepo.IsAdminAsync(user.Id) ? "Admin" :
+                          await _accountRepo.IsStudentAsync(user.Id) ? "Student" :
                           await _accountRepo.IsProfessorAsync(user.Id) ? "Professor" :
                           "select-role";
 
@@ -234,9 +239,11 @@ namespace SpanishClass.Controllers
             if (user == null)
                 return NotFound("User not found");
 
-            string? role = await _accountRepo.IsStudentAsync(user.Id) ? "Student" :
+            string? role = await _accountRepo.IsAdminAsync(user.Id) ? "Admin" :
+                           await _accountRepo.IsStudentAsync(user.Id) ? "Student" :
                            await _accountRepo.IsProfessorAsync(user.Id) ? "Professor" :
                            null;
+
             var hasPassword = await _userManager.HasPasswordAsync(user);
 
             return Ok(new
@@ -295,12 +302,51 @@ namespace SpanishClass.Controllers
                 using var stream = new FileStream(filePath, FileMode.Create);
                 await photo.CopyToAsync(stream);
 
-                user.Photo = fileName;
+                user.Photo = "/uploads/" + fileName;
             }
 
             await _userManager.UpdateAsync(user);
 
             return Ok(new { profilePicture = user.Photo });
+        }
+
+        [HttpPost("assign-role")]
+        public async Task<IActionResult> AssignRole([FromBody] AssignRoleRequest model)
+        {
+            var userId = LoggedInUserId;
+            if (!userId.HasValue)
+                return Unauthorized();
+
+            var isAdmin = await _accountRepo.IsAdminAsync(userId.Value);
+            if (!isAdmin)
+                return Forbid();
+
+            var user = await _userManager.FindByIdAsync(model.UserId.ToString());
+            if (user == null)
+                return NotFound("User not found");
+
+            if (model.UserId == userId.Value)
+                return BadRequest("You cannot change your own role");
+
+            await _accountRepo.RemoveStudentAsync(model.UserId);
+            await _accountRepo.RemoveProfessorAsync(model.UserId);
+            await _accountRepo.RemoveAdminAsync(model.UserId);
+
+            if (model.Role == "Student")
+                await _accountRepo.AddStudentAsync(model.UserId);
+
+            else if (model.Role == "Professor")
+                await _accountRepo.AddProfessorAsync(model.UserId);
+
+            else if (model.Role == "Admin")
+                await _accountRepo.AddAdminAsync(model.UserId);
+
+            else
+                return BadRequest("Invalid role");
+
+            await _accountRepo.SaveChangesAsync();
+
+            return Ok("Role updated successfully");
         }
     }
 }
