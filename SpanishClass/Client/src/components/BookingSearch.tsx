@@ -132,17 +132,31 @@ export default function BookingSearch({
                 onChange={(e) => setSearchId(e.target.value)}
                 style={inputStyle}
               />
+              <input
+                placeholder="Enter lesson name"
+                value={searchLessonName}
+                onChange={(e) => setSearchLessonName(e.target.value)}
+                style={inputStyle}
+              />
             </>
           )}
 
-          <>
-            <input
-              placeholder="Enter lesson name"
-              value={searchLessonName}
-              onChange={(e) => setSearchLessonName(e.target.value)}
-              style={inputStyle}
-            />
-          </>
+          {userRole === "Student" && (
+            <>
+              <input
+                placeholder="Enter id of booking"
+                value={searchId}
+                onChange={(e) => setSearchId(e.target.value)}
+                style={inputStyle}
+              />
+              <input
+                placeholder="Enter lesson name"
+                value={searchLessonName}
+                onChange={(e) => setSearchLessonName(e.target.value)}
+                style={inputStyle}
+              />
+            </>
+          )}
           <></>
         </div>
 

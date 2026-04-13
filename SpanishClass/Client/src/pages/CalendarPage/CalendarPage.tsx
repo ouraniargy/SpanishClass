@@ -84,9 +84,7 @@ export default function CalendarPage() {
         userId: userId,
         role: role,
       });
-      console.log(role);
-      console.log(userId);
-      console.log(role === "Student");
+
       setSearchResult(result);
       await Promise.all(result.map((b) => fetchQrCode(b.bookingCode)));
 
