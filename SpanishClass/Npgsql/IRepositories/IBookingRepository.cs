@@ -17,8 +17,15 @@ public interface IBookingRepository
     Task SaveChangesAsync();
     Task<Lesson?> GetLessonWithProfessorAsync(Guid lessonId);
     Task<List<Booking>> GetBookingsByAvailabilityIdAsync(Guid availabilityId);
-    Task<List<Booking>> SearchBookingsAsync(string? email, string? phone, string? Id);
-
+    Task<List<Booking>> SearchBookingsAsync(
+        string? email,
+        string? phone,
+        string? id,
+        string? lessonName,
+        Guid? userId,
+        string? role,
+        bool onlyMine
+    );
     Task<Booking?> GetBookingByIdAsync(Guid bookingId);
     Task MarkBookingAsUsedAsync(Booking booking);
 }

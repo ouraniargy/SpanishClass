@@ -124,27 +124,36 @@ public class BookingRepository : IBookingRepository
             .ToListAsync();
     }
 
-    public async Task<List<Booking>> SearchBookingsAsync(string? email, string? phone, string? id)
+    public async Task<List<Booking>> SearchBookingsAsync(
+         string? email,
+         string? phone,
+         string? id,
+         string? lessonName,
+         Guid? userId,
+         string? role,
+         bool onlyMine)
     {
         var query = _context.Bookings
-            .Include(b => b.Student)
-                .ThenInclude(s => s.User)
             .Include(b => b.Lesson)
+            .Include(b => b.Student)
+            .ThenInclude(s => s.User)
             .AsQueryable();
 
-        if (!string.IsNullOrEmpty(email))
-        {
-            query = query.Where(b => b.Student.User.Email == email);
-        }
+        if (!string.IsNullOrWhiteSpace(email))
+            query = query.Where(b => b.Student.User.Email.Contains(email));
 
-        if (!string.IsNullOrEmpty(phone))
-        {
-            query = query.Where(b => b.Student.User.PhoneNumber == phone);
-        }
+        if (!string.IsNullOrWhiteSpace(phone))
+            query = query.Where(b => b.Student.User.PhoneNumber.Contains(phone));
 
-        if (!string.IsNullOrWhiteSpace(id))
+        if (!string.IsNullOrWhiteSpace(id) && Guid.TryParse(id, out var guid))
+            query = query.Where(b => b.Id == guid);
+
+        if (!string.IsNullOrWhiteSpace(lessonName))
+            query = query.Where(b => b.Lesson.Name.Contains(lessonName));
+
+        if (onlyMine && userId.HasValue)
         {
-            query = query.Where(b => b.Id.ToString() == id);
+            query = query.Where(b => b.Student.UserId == userId);
         }
 
         return await query.ToListAsync();

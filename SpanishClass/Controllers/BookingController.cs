@@ -260,7 +260,25 @@ public class BookingController : BaseController
     [HttpPost("search-booking")]
     public async Task<IActionResult> SearchBooking([FromBody] SearchBookingRequest model)
     {
-        var bookings = await _repo.SearchBookingsAsync(model.Email, model.Phone, model.Id);
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        Guid? userId = null;
+
+        if (Guid.TryParse(userIdClaim, out var parsed))
+        {
+            userId = parsed;
+        }
+        var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+        var bookings = await _repo.SearchBookingsAsync(
+            model.Email,
+            model.Phone,
+            model.Id,
+            model.LessonName,
+            userId,
+            role,
+            model.OnlyMine
+        );
 
         if (!bookings.Any())
             return NotFound(new { message = "No bookings found." });
@@ -272,7 +290,7 @@ public class BookingController : BaseController
             lesson = b.Lesson.Name,
             description = b.Lesson.Description,
             lessonPhoto = b.Lesson.LessonPhoto,
-            date = b.CreatedAt
+            date = b.CreatedAt,
         }));
     }
 

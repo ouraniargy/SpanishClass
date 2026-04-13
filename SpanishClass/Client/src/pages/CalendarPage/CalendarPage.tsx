@@ -28,7 +28,7 @@ export default function CalendarPage() {
   const [searchMobilePhone, setSearchMobilePhone] = useState("");
   const [searchId, setSearchId] = useState("");
 
-    const [searchLessonName, setSearchLessonName] = useState("");
+  const [searchLessonName, setSearchLessonName] = useState("");
   const [searchResult, setSearchResult] = useState<any[]>([]);
   const [selectedAvailabilityTitle, setSelectedAvailabilityTitle] =
     useState<string>("");
@@ -75,13 +75,18 @@ export default function CalendarPage() {
     }
 
     try {
-      const result = await apiPost<Booking[]>("/booking/search-booking", {
+      let result = await apiPost<Booking[]>("/booking/search-booking", {
         email: searchEmail,
         phone: searchMobilePhone,
         id: searchId,
-        lessonName: searchLessonName,
+        lessonName: searchLessonName.trim(),
+        onlyMine: role === "Student",
+        userId: userId,
+        role: role,
       });
-
+      console.log(role);
+      console.log(userId);
+      console.log(role === "Student");
       setSearchResult(result);
       await Promise.all(result.map((b) => fetchQrCode(b.bookingCode)));
 
