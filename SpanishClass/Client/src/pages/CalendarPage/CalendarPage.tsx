@@ -117,15 +117,13 @@ export default function CalendarPage() {
     apiGet<any[]>("/booking/availabilities")
       .then((data) => {
         const mapped = (data || []).map((a: any) => {
-          const start = a.startTime ?? a.start ?? a.date ?? a.startDate;
-          const end = a.endTime ?? a.end ?? a.endDate;
+          const start = a.start;
+          const end = a.end;
 
           const isMine =
             role === "Professor" &&
             a.professorUserId?.toLowerCase() === userId?.toLowerCase();
-
-          const bookedByMe = a.bookedByMe;
-
+          console.log("EVENT:", a);
           return {
             id: a.id,
             title: `${a.name} - ${a.description} - ${a.professorName} - ${a.bookedSeats}/${a.maxSeats} - ${a.id}`,
@@ -136,11 +134,12 @@ export default function CalendarPage() {
               bookingId: a.bookingId,
               professorUserId: a.professorUserId,
               isMine,
+              date: a.start,
               bookedSeats: a.bookedSeats,
               maxSeats: a.maxSeats,
-              bookedByMe,
+              bookedByMe: a.bookedByMe,
               lessonPhoto: a.lessonPhoto,
-              bookingDetails: bookedByMe ? a : null,
+              bookingDetails: a.bookedByMe ? a : null,
             },
           };
         });
@@ -211,10 +210,7 @@ export default function CalendarPage() {
     }
 
     if (bookedByMe) {
-      setSelectedAvailability({
-        id: event.extendedProps.bookingId,
-        ...event,
-      });
+      setSelectedAvailability(event);
       setShowCancelBookingModal(true);
       return;
     }
@@ -454,7 +450,7 @@ export default function CalendarPage() {
               booking={selectedAvailability}
               onClose={() => {
                 setShowCancelBookingModal(false);
-                unmarkBookingAsMine(selectedAvailability.id);
+                unmarkBookingAsMine(selectedAvailability);
                 fetchCalendarEvents();
               }}
               refreshCalendar={fetchCalendarEvents}

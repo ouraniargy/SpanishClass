@@ -18,7 +18,7 @@ export default function CancelBookingModal({
     if (!confirmCancel) return;
 
     try {
-      await apiDelete(`/booking/${booking.id}`);
+      await apiDelete(`/booking/${booking.extendedProps.bookingId}`);
       if (markBookingAsMine && booking.extendedProps?.bookingId) {
         markBookingAsMine(booking.id, booking.extendedProps.bookingId);
       }
@@ -65,13 +65,13 @@ export default function CancelBookingModal({
 
         <div style={{ textAlign: "left", fontSize: 14 }}>
           <p>
-            <b>Lesson:</b> {booking._def.title}
+            <b>Lesson:</b> {booking.title}
           </p>
 
           <p>
             <b>Date:</b>{" "}
-            {booking._instance?.range?.start
-              ? new Date(booking._instance.range.start).toLocaleString()
+            {booking.start
+              ? new Date(booking.start).toLocaleString()
               : "No date"}
           </p>
 

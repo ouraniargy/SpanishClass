@@ -83,7 +83,7 @@ public class BookingController : BaseController
             AvailabilityId = availabilityId,
             StudentId = student.Id,
             LessonId = availability.LessonId,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
         };
 
         await _repo.AddBookingAsync(booking);
@@ -101,7 +101,9 @@ public class BookingController : BaseController
             SeatNumber = availability.BookedSeats,
             Date = availability.StartTime,
             LessonPhoto = availability.Lesson.LessonPhoto,
-            GuestsEmails = new List<string> { student.User.Email }
+            GuestsEmails = new List<string> { student.User.Email },
+            ProfessorName = availability.Lesson?.Professor?.User?.Name,
+            ProfessorSurname = availability.Lesson?.Professor?.User?.Surname
         };
 
         if (sendEmail)

@@ -59,6 +59,7 @@ export default function StudentBookingModal({
     ? `https://localhost:7185${availability.extendedProps.lessonPhoto}`
     : null;
 
+  console.log(booking);
   return (
     <div
       style={{
@@ -151,6 +152,10 @@ export default function StudentBookingModal({
             </p>
             <p>
               <strong>Seat:</strong> {booking.seatNumber}
+            </p>
+            <p>
+              <strong>Professor:</strong>
+              {`${booking.professorName ?? ""} ${booking.professorSurname ?? ""}`}
             </p>
             <p>
               <strong>Unique number of reservation:</strong> {booking.bookingId}
