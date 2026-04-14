@@ -56,7 +56,7 @@ namespace SpanishClass.Controllers
 
                 using var stream = new FileStream(filePath, FileMode.Create);
                 await model.Photo.CopyToAsync(stream);
-                photoPath = "/uploads/" + fileName;
+                photoPath = fileName;
             }
 
             var user = new ApplicationUser
@@ -314,7 +314,7 @@ namespace SpanishClass.Controllers
                 using var stream = new FileStream(filePath, FileMode.Create);
                 await photo.CopyToAsync(stream);
 
-                user.Photo = "/uploads/" + fileName;
+                user.Photo = fileName;
             }
 
             await _userManager.UpdateAsync(user);

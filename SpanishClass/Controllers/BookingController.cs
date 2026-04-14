@@ -42,13 +42,15 @@ public class BookingController : BaseController
 
         if (bookedSeats >= maxSeats)
             return BadRequest("No seats available");
+        var seatNumber = (availability.Bookings?.Count ?? 0) + 1;
 
         var booking = new Booking
         {
             Id = Guid.NewGuid(),
             AvailabilityId = model.AvailabilityId,
             StudentId = student.Id,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            SeatNumber = seatNumber
         };
 
         await _repo.AddBookingAsync(booking);
@@ -59,9 +61,9 @@ public class BookingController : BaseController
 
     [HttpPost("{availabilityId}")]
     public async Task<IActionResult> BookAvailability(
-    Guid availabilityId,
-    [FromQuery] Guid studentUserId,
-    [FromQuery] bool sendEmail = false)
+        Guid availabilityId,
+        [FromQuery] Guid studentUserId,
+        [FromQuery] bool sendEmail = false)
     {
         var availability = await _repo.GetAvailabilityAsync(availabilityId);
         if (availability == null)
@@ -73,6 +75,7 @@ public class BookingController : BaseController
         var student = await _repo.GetStudentByUserIdAsync(studentUserId);
         if (student == null)
             return BadRequest("Student profile not found");
+        var seatNumber = (availability.Bookings?.Count ?? 0) + 1;
 
         if (await _repo.StudentHasBookingAsync(availabilityId, student.Id))
             return BadRequest("You already booked this lesson");
@@ -84,6 +87,7 @@ public class BookingController : BaseController
             StudentId = student.Id,
             LessonId = availability.LessonId,
             CreatedAt = DateTime.UtcNow,
+            SeatNumber = seatNumber
         };
 
         await _repo.AddBookingAsync(booking);
@@ -104,7 +108,8 @@ public class BookingController : BaseController
             LessonPhoto = availability.Lesson.LessonPhoto,
             GuestsEmails = new List<string> { student.User.Email },
             ProfessorName = availability.Lesson?.Professor?.User?.Name,
-            ProfessorSurname = availability.Lesson?.Professor?.User?.Surname
+            ProfessorSurname = availability.Lesson?.Professor?.User?.Surname,
+            Level = booking.Lesson.Level.Name
         };
 
         if (sendEmail)
@@ -172,7 +177,7 @@ public class BookingController : BaseController
             end = a.EndTime,
             maxSeats = a.Lesson.MaxSeats,
             bookedSeats = a.Bookings?.Count ?? 0,
-            ProfessorName = a.Lesson.Professor.User.Name + " " + a.Lesson.Professor.User.Surname,
+            professorName = a.Lesson.Professor.User.Name + " " + a.Lesson.Professor.User.Surname,
             professorUserId = a.Lesson.Professor.UserId,
             description = a.Lesson.Description,
             name = a.Lesson.Name,
@@ -294,7 +299,8 @@ public class BookingController : BaseController
             model.LessonName,
             userId,
             role,
-            model.OnlyMine
+            model.OnlyMine,
+            model.SeatNumber
         );
 
         if (!bookings.Any())
@@ -308,6 +314,7 @@ public class BookingController : BaseController
             description = b.Lesson.Description,
             lessonPhoto = b.Lesson.LessonPhoto,
             date = b.CreatedAt,
+            seatNumber = b.SeatNumber
         }));
     }
 

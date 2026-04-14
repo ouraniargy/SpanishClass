@@ -215,6 +215,18 @@ export default function BookingSearch({
                     Welcome {b.studentName}
                   </h3>
 
+                  <p
+                    style={{
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      color: "#2c3e50",
+                    }}
+                  >
+                    <strong>Seat:</strong>{" "}
+                    <span style={{ color: "#e74c3c", fontSize: "18px" }}>
+                      {b.seatNumber}
+                    </span>
+                  </p>
                   <p>
                     <b>Lesson:</b> {b.lesson}
                   </p>

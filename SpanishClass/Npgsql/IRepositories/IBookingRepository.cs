@@ -24,7 +24,8 @@ public interface IBookingRepository
         string? lessonName,
         Guid? userId,
         string? role,
-        bool onlyMine
+        bool onlyMine,
+        int seatNumber
     );
     Task<Booking?> GetBookingByIdAsync(Guid bookingId);
     Task MarkBookingAsUsedAsync(Booking booking);

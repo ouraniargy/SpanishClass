@@ -21,6 +21,8 @@
         public List<string> GuestsEmails { get; set; } = new List<string>();
         public string ProfessorName { get; set; } = string.Empty;
         public string ProfessorSurname { get; set; } = string.Empty;
+        public Guid LevelId { get; set; }
+        public string Level { get; set; } = null!;
 
     }
 }

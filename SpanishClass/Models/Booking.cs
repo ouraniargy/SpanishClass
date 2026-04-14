@@ -15,5 +15,6 @@
         public ProfessorAvailability Availability { get; set; } = null!;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public int SeatNumber { get; set; }
     }
 }

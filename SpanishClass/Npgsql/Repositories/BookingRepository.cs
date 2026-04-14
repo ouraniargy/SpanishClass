@@ -134,12 +134,18 @@ public class BookingRepository : IBookingRepository
          string? lessonName,
          Guid? userId,
          string? role,
-         bool onlyMine)
+         bool onlyMine,
+         int seatNumber)
     {
         var query = _context.Bookings
             .Include(b => b.Lesson)
             .Include(b => b.Student)
             .ThenInclude(s => s.User)
+            .Include(a => a.Lesson)
+                .ThenInclude(l => l.Level)
+            .Include(a => a.Lesson)
+                .ThenInclude(l => l.Professor)
+                    .ThenInclude(p => p.User)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(email))

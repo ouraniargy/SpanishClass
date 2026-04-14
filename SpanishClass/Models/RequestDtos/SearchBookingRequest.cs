@@ -7,4 +7,5 @@ public class SearchBookingRequest
     public string? Id { get; set; }
     public string? LessonName { get; set; }
     public bool OnlyMine { get; set; }
+    public int SeatNumber { get; set; }
 }

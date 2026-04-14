@@ -9,4 +9,5 @@ export interface BookingDetails {
   lessonPhoto: string;
   professorName: string;
   professorSurname: string;
+  level: string;
 }
