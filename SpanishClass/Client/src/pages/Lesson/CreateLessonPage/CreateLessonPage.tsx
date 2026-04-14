@@ -112,7 +112,7 @@ export default function CreateLessonPage() {
           <img
             src={URL.createObjectURL(lessonPhoto)}
             alt="preview"
-            style={{ width: "100%", marginTop: "10px" }}
+            style={{ maxWidth: "100%", maxHeight: "200px", borderRadius: 8 }}
           />
         )}
 
