@@ -272,12 +272,12 @@ namespace SpanishClass.Controllers
 
         [HttpPut("update-user")]
         public async Task<IActionResult> UpdateUser(
-            [FromForm] string userId,
-            [FromForm] string name,
-            [FromForm] string surname,
-            [FromForm] string? oldPassword,
-            [FromForm] string? newPassword,
-            IFormFile? photo)
+    [FromForm] string userId,
+    [FromForm] string name,
+    [FromForm] string surname,
+    [FromForm] string? oldPassword,
+    [FromForm] string? newPassword,
+    IFormFile? photo)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
@@ -285,17 +285,20 @@ namespace SpanishClass.Controllers
 
             var hasPassword = await _userManager.HasPasswordAsync(user);
 
+            if (hasPassword)
+            {
+                if (string.IsNullOrEmpty(oldPassword))
+                    return BadRequest("Password is required.");
+
+                var isValid = await _userManager.CheckPasswordAsync(user, oldPassword);
+                if (!isValid)
+                    return BadRequest("Password is incorrect.");
+            }
+
             if (!string.IsNullOrEmpty(newPassword))
             {
                 if (hasPassword)
                 {
-                    if (string.IsNullOrEmpty(oldPassword))
-                        return BadRequest("Old password is required.");
-
-                    var isValid = await _userManager.CheckPasswordAsync(user, oldPassword);
-                    if (!isValid)
-                        return BadRequest("Old password is incorrect.");
-
                     var result = await _userManager.ChangePasswordAsync(
                         user,
                         oldPassword,
