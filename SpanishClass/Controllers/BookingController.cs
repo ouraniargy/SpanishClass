@@ -90,6 +90,7 @@ public class BookingController : BaseController
         availability.BookedSeats += 1;
         await _repo.SaveChangesAsync();
 
+
         var bookingDetails = new BookingDetails
         {
             BookingId = booking.Id,
@@ -256,6 +257,20 @@ public class BookingController : BaseController
         await _repo.DeleteBookingAsync(bookingId);
         await _repo.SaveChangesAsync();
 
+        var email = booking.Student?.User?.Email;
+
+        if (!string.IsNullOrWhiteSpace(email))
+        {
+            await _emailService.SendNotificationEmailAsync(
+                email,
+                "Booking Cancelled",
+                $@"
+                <h2>Booking Cancelled</h2>
+                <p>Your booking for <strong>{booking.Lesson?.Name}</strong> has been cancelled.</p>
+                <p>Date: {booking.Availability?.StartTime:dd/MM/yyyy HH:mm}</p>
+                "
+            );
+        }
         return Ok(new { message = "Booking cancelled" });
     }
 

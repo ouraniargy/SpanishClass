@@ -14,6 +14,8 @@ export default function Register() {
   const [surname, setSurname] = useState("");
   const [role, setRole] = useState("Student");
   const [mobilePhone, setMobilePhone] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [serverError, setServerError] = useState("");
 
   async function handleRegister() {
     try {
@@ -36,7 +38,19 @@ export default function Register() {
         credentials: "include",
       });
 
-      if (!res.ok) throw new Error("Register failed");
+      if (!res.ok) {
+        const data = await res.json();
+
+        if (data.code === "EMAIL_EXISTS") {
+          setServerError("This email is already registered");
+        } else if (data.errors) {
+          setServerError(data.errors.join(", "));
+        } else {
+          setServerError("Registration failed");
+        }
+
+        return;
+      }
 
       const registeredUser = await res.json();
 
@@ -121,7 +135,16 @@ export default function Register() {
           type="email"
           placeholder="Email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            setEmail(value);
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+              setEmailError("Invalid email format");
+            } else {
+              setEmailError("");
+            }
+          }}
         />
 
         <h4>Password</h4>
@@ -132,7 +155,24 @@ export default function Register() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button onClick={handleRegister}>Register</button>
+        {emailError && <p style={{ color: "red" }}>{emailError}</p>}
+        {serverError && <p style={{ color: "red" }}>{serverError}</p>}
+        <button
+          onClick={handleRegister}
+          disabled={!!emailError || !email || !password || !name || !surname}
+          style={{
+            opacity:
+              !!emailError || !email || !password || !name || !surname
+                ? 0.5
+                : 1,
+            cursor:
+              !!emailError || !email || !password || !name || !surname
+                ? "not-allowed"
+                : "pointer",
+          }}
+        >
+          Register
+        </button>
         <a
           href="https://localhost:7185/api/account/external-login?provider=Google"
           style={{

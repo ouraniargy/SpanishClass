@@ -7,7 +7,7 @@ namespace SpanishClass.Services
     public class EmailService : IEmailService
     {
         private readonly string _smtpUser = "ouraniargy@gmail.com";
-        private readonly string _smtpPass = "qzwn voax nhlg xolx";
+        private readonly string _smtpPass = "qzwnvoaxnhlgxolx";
         private readonly string _smtpHost = "smtp.gmail.com";
         private readonly int _smtpPort = 587;
 
@@ -22,22 +22,43 @@ namespace SpanishClass.Services
             var message = new MailMessage();
             message.From = new MailAddress(_smtpUser, "Booking System");
 
-            foreach (var email in booking?.GuestsEmails)
-                message.To.Add(email);
+            if (booking?.GuestsEmails != null && booking.GuestsEmails.Any())
+            {
+                foreach (var email in booking.GuestsEmails)
+                {
+                    if (MailAddress.TryCreate(email, out _))
+                        message.To.Add(email);
+                }
+            }
+
+            if (message.To.Count == 0)
+            {
+                message.To.Add(_smtpUser);
+            }
 
             message.Subject = "Booking Confirmation";
             message.IsBodyHtml = true;
             message.Body = $@"
                 <h2>Booking Confirmation</h2>
-                <p><strong>Date:</strong> {booking.Date:dd/MM/yyyy HH:mm}</p>
-                <p><strong>Lesson:</strong> {booking.LessonName}</p>
-                <p><strong>Description:</strong> {booking.Description}</p>
-                <p><strong>Seat Number:</strong> {booking.SeatNumber}</p>
-                <img src='{booking.LessonPhoto}' alt='Room' style='max-width:400px;' />
+                <p><strong>Date:</strong> {booking?.Date:dd/MM/yyyy HH:mm}</p>
+                <p><strong>Lesson:</strong> {booking?.LessonName}</p>
+                <p><strong>Description:</strong> {booking?.Description}</p>
+                <p><strong>Seat Number:</strong> {booking?.SeatNumber}</p>
             ";
 
-            await client.SendMailAsync(message);
+            try
+            {
+                message.CC.Add("ouraniargy@gmail.com");
+                await client.SendMailAsync(message);
+                Console.WriteLine("EMAIL SENT SUCCESSFULLY");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("EMAIL ERROR: " + ex.Message);
+                throw;
+            }
         }
+
         public async Task SendNotificationEmailAsync(string email, string subject, string body)
         {
             if (!MailAddress.TryCreate(email, out _))

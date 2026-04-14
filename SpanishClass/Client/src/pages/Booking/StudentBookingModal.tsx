@@ -21,7 +21,7 @@ export default function StudentBookingModal({
   const handleBook = async () => {
     try {
       const result = await apiPost<BookingDetails>(
-        `/booking/${availability.id}?studentUserId=${studentUserId}`,
+        `/booking/${availability.id}?studentUserId=${studentUserId}&sendEmail=${sendEmail}`,
         {},
       );
 
@@ -154,8 +154,10 @@ export default function StudentBookingModal({
               <strong>Seat:</strong> {booking.seatNumber}
             </p>
             <p>
-              <strong>Professor:</strong>{" "}
-              {`${booking.professorName ?? ""} ${booking.professorSurname ?? ""}`}
+              <strong>Professor: </strong>
+              {[booking.professorName, booking.professorSurname]
+                .filter(Boolean)
+                .join(" ")}
             </p>
             <p>
               <strong>Unique number of reservation:</strong> {booking.bookingId}

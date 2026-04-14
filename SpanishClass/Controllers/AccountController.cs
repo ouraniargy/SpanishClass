@@ -35,7 +35,13 @@ namespace SpanishClass.Controllers
 
             var existingUser = await _userManager.FindByEmailAsync(model.Email);
             if (existingUser != null)
-                return BadRequest("Email already registered.");
+            {
+                return BadRequest(new
+                {
+                    code = "EMAIL_EXISTS",
+                    message = "Email already registered."
+                });
+            }
 
             string? photoPath = null;
 
@@ -66,7 +72,13 @@ namespace SpanishClass.Controllers
 
             var createResult = await _userManager.CreateAsync(user, model.Password);
             if (!createResult.Succeeded)
-                return BadRequest(createResult.Errors);
+            {
+                return BadRequest(new
+                {
+                    code = "VALIDATION_ERROR",
+                    errors = createResult.Errors.Select(e => e.Description)
+                });
+            }
 
             if (model.Role == "Professor")
                 await _accountRepo.AddProfessorAsync(user.Id);
