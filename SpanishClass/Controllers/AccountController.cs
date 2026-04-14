@@ -285,18 +285,33 @@ namespace SpanishClass.Controllers
 
             var hasPassword = await _userManager.HasPasswordAsync(user);
 
-            if (hasPassword)
+            if (!string.IsNullOrEmpty(newPassword))
             {
-                if (string.IsNullOrEmpty(oldPassword) ||
-                    !await _userManager.CheckPasswordAsync(user, oldPassword))
+                if (hasPassword)
                 {
-                    return BadRequest("Password is wrong.");
-                }
-            }
+                    if (string.IsNullOrEmpty(oldPassword))
+                        return BadRequest("Old password is required.");
 
-            if (!hasPassword && !string.IsNullOrEmpty(newPassword))
-            {
-                await _userManager.AddPasswordAsync(user, newPassword);
+                    var isValid = await _userManager.CheckPasswordAsync(user, oldPassword);
+                    if (!isValid)
+                        return BadRequest("Old password is incorrect.");
+
+                    var result = await _userManager.ChangePasswordAsync(
+                        user,
+                        oldPassword,
+                        newPassword
+                    );
+
+                    if (!result.Succeeded)
+                        return BadRequest(result.Errors);
+                }
+                else
+                {
+                    var result = await _userManager.AddPasswordAsync(user, newPassword);
+
+                    if (!result.Succeeded)
+                        return BadRequest(result.Errors);
+                }
             }
 
             user.Name = name;
