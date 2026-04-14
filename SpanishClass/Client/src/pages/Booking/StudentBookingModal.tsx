@@ -170,7 +170,19 @@ export default function StudentBookingModal({
             <p>
               <strong>Unique number of reservation:</strong> {booking.bookingId}
             </p>
-
+            {imageUrl && (
+              <div style={{ textAlign: "center", marginBottom: 16 }}>
+                <img
+                  src={imageUrl}
+                  alt={availability.title}
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "200px",
+                    borderRadius: 8,
+                  }}
+                />
+              </div>
+            )}
             <button
               onClick={handleCancelBooking}
               style={{

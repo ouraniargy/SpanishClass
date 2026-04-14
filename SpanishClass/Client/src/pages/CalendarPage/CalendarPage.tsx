@@ -410,7 +410,7 @@ export default function CalendarPage() {
               }
 
               if (isMine && role === "Professor") {
-                info.el.style.backgroundColor = "#28a745";
+                info.el.style.backgroundColor = "#2855a7";
                 info.el.style.color = "#fff";
                 return;
               }
