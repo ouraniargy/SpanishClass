@@ -154,7 +154,7 @@ export default function StudentBookingModal({
               <strong>Seat:</strong> {booking.seatNumber}
             </p>
             <p>
-              <strong>Professor:</strong>
+              <strong>Professor:</strong>{" "}
               {`${booking.professorName ?? ""} ${booking.professorSurname ?? ""}`}
             </p>
             <p>
