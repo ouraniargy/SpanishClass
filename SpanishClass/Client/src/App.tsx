@@ -110,7 +110,7 @@ function App() {
               element={
                 <ProtectedRoute
                   element={<ProfilePage />}
-                  allowedRoles={["Student", "Professor"]}
+                  allowedRoles={["Student", "Professor", "Admin"]}
                 />
               }
             />
@@ -121,7 +121,7 @@ function App() {
             />
             <Route path="/select-role" element={<GoogleRoleSelect />} />
             <Route
-              path="/admin"
+              path="/admins"
               element={
                 <ProtectedRoute
                   element={<AdminAssignPage />}
@@ -133,8 +133,6 @@ function App() {
               path="/unauthorized"
               element={<h1>No access to this page.</h1>}
             />
-            {/* <Levels />
-          <Bookings /> */}
           </Routes>
         </BrowserRouter>
       </AuthProvider>

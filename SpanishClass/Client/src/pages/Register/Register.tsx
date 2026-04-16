@@ -66,7 +66,7 @@ export default function Register() {
 
       if (role === "Student") navigate("/students");
       else if (role === "Professor") navigate("/professors");
-      else if (role === "Admin") navigate("/admin");
+      else if (role === "Admin") navigate("/admins");
     } catch (err) {
       alert(
         "Register failed: " +

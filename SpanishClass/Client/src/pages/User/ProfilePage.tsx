@@ -166,6 +166,17 @@ export default function ProfilePage() {
             value={formData.email}
             onChange={handleChange}
           />
+
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              if (e.target.files) {
+                setPhoto(e.target.files[0]);
+              }
+            }}
+          />
+
           {hasPassword && (
             <input
               name="oldPassword"
@@ -188,15 +199,6 @@ export default function ProfilePage() {
             onChange={handleChange}
           />
 
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              if (e.target.files) {
-                setPhoto(e.target.files[0]);
-              }
-            }}
-          />
           {error && <p style={{ color: "red" }}>{error}</p>}
 
           <button type="submit">Update Profile</button>

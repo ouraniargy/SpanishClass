@@ -18,6 +18,7 @@ export default function Navbar() {
 
   console.log("USER:", user);
   console.log("User profile picture URL:", profileSrc);
+
   return (
     <div
       style={{

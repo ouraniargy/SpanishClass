@@ -230,6 +230,8 @@ namespace SpanishClass.Controllers
                 await _accountRepo.AddStudentAsync(user.Id);
             else if (model.Role == "Professor")
                 await _accountRepo.AddProfessorAsync(user.Id);
+            else if (model.Role == "Admin")
+                await _accountRepo.AddAdminAsync(user.Id);
             else
                 return BadRequest("Invalid role");
 

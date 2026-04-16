@@ -6,7 +6,7 @@ import { useAuth } from "../components/AuthContext";
 export default function GoogleRoleSelect() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, user } = useAuth(); // <-- check if user already exists
+  const { login, user } = useAuth();
 
   const queryParams = new URLSearchParams(location.search);
   const userId = queryParams.get("userId");
@@ -17,7 +17,6 @@ export default function GoogleRoleSelect() {
   useEffect(() => {
     async function initUser() {
       if (!userId || user) {
-        // already have user or no userId → skip fetching
         setLoading(false);
         return;
       }
@@ -41,6 +40,7 @@ export default function GoogleRoleSelect() {
           if (res.role === "Student") navigate("/students", { replace: true });
           else if (res.role === "Professor")
             navigate("/professors", { replace: true });
+          else if (res.role === "Admin") navigate("/admins", { replace: true });
         }
       } catch (err) {
         console.error("Failed to init user:", err);
@@ -74,6 +74,7 @@ export default function GoogleRoleSelect() {
         if (role === "Student") navigate("/students", { replace: true });
         else if (role === "Professor")
           navigate("/professors", { replace: true });
+        else if (role === "Admin") navigate("/admins", { replace: true });
       }
     } catch (err) {
       alert(
@@ -95,6 +96,7 @@ export default function GoogleRoleSelect() {
         <select value={role} onChange={(e) => setRole(e.target.value)}>
           <option value="Student">Student</option>
           <option value="Professor">Professor</option>
+          <option value="Admin">Admin</option>
         </select>
 
         <button style={{ marginTop: "20px" }} onClick={handleRoleSelect}>

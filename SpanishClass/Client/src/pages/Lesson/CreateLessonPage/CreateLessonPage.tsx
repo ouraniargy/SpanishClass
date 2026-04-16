@@ -7,7 +7,7 @@ export default function CreateLessonPage() {
   const [levels, setLevels] = useState<any[]>([]);
   const [levelId, setLevelId] = useState("");
   const [durationMinutes, setDurationMinutes] = useState(60);
-  const [maxSeats, setMaxSeats] = useState(1);
+  const [maxSeats, setMaxSeats] = useState(30);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [lessonPhoto, setLessonPhoto] = useState<File | null>(null);
