@@ -314,7 +314,10 @@ public class BookingController : BaseController
             description = b.Lesson.Description,
             lessonPhoto = b.Lesson.LessonPhoto,
             date = b.CreatedAt,
-            seatNumber = b.SeatNumber
+            seatNumber = b.SeatNumber,
+            studentName = b.Student.User.Name,
+            studentSurname = b.Student.User.Surname,
+            level = b.Lesson.Level
         }));
     }
 

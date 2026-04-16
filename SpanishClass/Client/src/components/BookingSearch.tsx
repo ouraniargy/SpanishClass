@@ -212,7 +212,7 @@ export default function BookingSearch({
               .map((b: any) => (
                 <div key={b.bookingCode} style={cardStyle(isMobile)}>
                   <h3 style={{ fontSize: isMobile ? "16px" : "18px" }}>
-                    Welcome {b.studentName}
+                    Welcome {b.studentName} {b.studentSurname}
                   </h3>
 
                   <p
@@ -232,6 +232,9 @@ export default function BookingSearch({
                   </p>
                   <p>
                     <b>Description:</b> {b.description}
+                  </p>
+                  <p>
+                    <b>Level:</b> {b.level.name}
                   </p>
                   <p>
                     <b>Date:</b> {new Date(b.date).toLocaleString()}
