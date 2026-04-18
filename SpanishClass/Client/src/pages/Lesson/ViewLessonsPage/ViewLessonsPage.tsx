@@ -159,28 +159,26 @@ export default function ViewLessonsPage() {
               </thead>
               <tbody>
                 {currentLessons.map((lesson) => (
-                  <tr
-                    key={lesson.id}
-                    style={{ borderBottom: "1px solid #ddd" }}
-                  >
-                    <td style={{ padding: "10px" }}>{lesson.level.name}</td>
-                    <td style={{ padding: "10px" }}>
+                  <tr key={lesson.id}>
+                    <td data-label="Level" style={{ padding: "10px" }}>
+                      {lesson.level?.name}
+                    </td>
+
+                    <td data-label="Name" style={{ padding: "10px" }}>
                       {editingId === lesson.id ? (
                         <input
                           type="text"
                           value={editData.name}
                           onChange={(e) =>
-                            setEditData({
-                              ...editData,
-                              name: e.target.value,
-                            })
+                            setEditData({ ...editData, name: e.target.value })
                           }
                         />
                       ) : (
                         lesson.name
                       )}
                     </td>
-                    <td style={{ padding: "10px" }}>
+
+                    <td data-label="Description" style={{ padding: "10px" }}>
                       {editingId === lesson.id ? (
                         <input
                           type="text"
@@ -196,7 +194,8 @@ export default function ViewLessonsPage() {
                         lesson.description
                       )}
                     </td>
-                    <td style={{ padding: "10px" }}>
+
+                    <td data-label="Duration (min)" style={{ padding: "10px" }}>
                       {editingId === lesson.id ? (
                         <input
                           type="number"
@@ -212,7 +211,8 @@ export default function ViewLessonsPage() {
                         lesson.durationMinutes
                       )}
                     </td>
-                    <td style={{ padding: "10px" }}>
+
+                    <td data-label="Max Seats" style={{ padding: "10px" }}>
                       {editingId === lesson.id ? (
                         <input
                           type="number"
@@ -228,7 +228,8 @@ export default function ViewLessonsPage() {
                         lesson.maxSeats
                       )}
                     </td>
-                    <td>
+
+                    <td data-label="Photo" style={{ padding: "10px" }}>
                       {editingId === lesson.id ? (
                         <>
                           <input
@@ -270,7 +271,8 @@ export default function ViewLessonsPage() {
                         )
                       )}
                     </td>
-                    <td style={{ padding: "10px" }}>
+
+                    <td data-label="Actions" style={{ padding: "10px" }}>
                       {editingId === lesson.id ? (
                         <>
                           <button

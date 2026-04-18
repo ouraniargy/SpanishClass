@@ -31,6 +31,11 @@ export default function CancelBookingModal({
     }
   };
   console.log(booking);
+
+  const imageUrl = booking?.extendedProps?.lessonPhoto
+    ? `https://localhost:7185${booking.extendedProps.lessonPhoto}`
+    : null;
+
   return (
     <div
       style={{
@@ -91,6 +96,20 @@ export default function CancelBookingModal({
             <p>
               <b>Booking ID:</b> {booking.extendedProps.bookingId}
             </p>
+          )}
+
+          {imageUrl && (
+            <div style={{ textAlign: "center", marginBottom: 16 }}>
+              <img
+                src={imageUrl}
+                alt={booking.title}
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "200px",
+                  borderRadius: 8,
+                }}
+              />
+            </div>
           )}
         </div>
 

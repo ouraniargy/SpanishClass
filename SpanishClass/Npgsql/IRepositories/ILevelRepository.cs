@@ -8,5 +8,4 @@ public interface ILevelRepository
     Task AddLevelAsync(Level level);
     Task<(bool Success, int StatusCode, string Message)> UpdateLevelAsync(Guid levelId, Level model);
     Task<(bool Success, int StatusCode, string Message)> DeleteLevelAsync(Guid levelId, IEmailService emailService);
-    Task SaveChangesAsync();
 }

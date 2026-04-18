@@ -4,7 +4,6 @@ namespace SpanishClass.Npgsql.IRepositories;
 
 public interface IAccountRepository
 {
-    Task<ApplicationUser?> GetUserByEmailAsync(string email);
     Task<bool> IsStudentAsync(Guid userId);
     Task<bool> IsProfessorAsync(Guid userId);
     Task<bool> IsAdminAsync(Guid userId);

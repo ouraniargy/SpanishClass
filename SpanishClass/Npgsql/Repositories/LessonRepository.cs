@@ -14,15 +14,6 @@ public class LessonRepository : ILessonRepository
         _context = context;
     }
 
-    public async Task<Lesson?> GetLessonByIdAsync(Guid lessonId)
-    {
-        return await _context.Lessons
-            .Include(l => l.Professor)
-            .Include(l => l.Level)
-            .Include(l => l.ProfessorAvailabilities)
-            .FirstOrDefaultAsync(l => l.Id == lessonId);
-    }
-
     public async Task<List<Lesson>> GetLessonsByProfessorUserIdAsync(Guid userId)
     {
         return await _context.Lessons
@@ -37,32 +28,6 @@ public class LessonRepository : ILessonRepository
     {
         _context.Lessons.Add(lesson);
         await _context.SaveChangesAsync();
-    }
-
-    public async Task UpdateLessonAsync(Lesson lesson)
-    {
-        _context.Lessons.Update(lesson);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task DeleteLessonAsync(Lesson lesson)
-    {
-        _context.Lessons.Remove(lesson);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task<List<Booking>> GetBookingsForLessonAsync(Guid lessonId)
-    {
-        var lesson = await _context.Lessons
-            .Include(l => l.ProfessorAvailabilities)
-            .ThenInclude(a => a.Bookings)
-                .ThenInclude(b => b.Student)
-                    .ThenInclude(s => s.User)
-            .FirstOrDefaultAsync(l => l.Id == lessonId);
-
-        return lesson?.ProfessorAvailabilities
-                     .SelectMany(a => a.Bookings)
-                     .ToList() ?? new List<Booking>();
     }
 
     public async Task<Professor?> GetProfessorByUserIdAsync(Guid userId)

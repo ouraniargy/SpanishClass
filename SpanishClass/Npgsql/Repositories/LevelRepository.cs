@@ -81,9 +81,4 @@ public class LevelRepository : ILevelRepository
         await _context.SaveChangesAsync();
         return (true, 200, "Level deleted successfully and affected users were notified");
     }
-
-    public async Task SaveChangesAsync()
-    {
-        await _context.SaveChangesAsync();
-    }
 }

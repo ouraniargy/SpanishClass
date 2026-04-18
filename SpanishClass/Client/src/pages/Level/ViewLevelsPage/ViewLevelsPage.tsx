@@ -121,24 +121,22 @@ export default function ViewLevelsPage() {
               </thead>
               <tbody>
                 {currentLevels.map((level) => (
-                  <tr key={level.id} style={{ borderBottom: "1px solid #ddd" }}>
-                    <td style={{ padding: "10px" }}>
+                  <tr key={level.id}>
+                    <td data-label="Level Name" style={{ padding: "10px" }}>
                       {editingId === level.id ? (
                         <input
                           type="text"
                           value={editData.name}
                           onChange={(e) =>
-                            setEditData({
-                              ...editData,
-                              name: e.target.value,
-                            })
+                            setEditData({ ...editData, name: e.target.value })
                           }
                         />
                       ) : (
                         level.name
                       )}
                     </td>
-                    <td style={{ padding: "10px" }}>
+
+                    <td data-label="Description" style={{ padding: "10px" }}>
                       {editingId === level.id ? (
                         <input
                           type="text"
@@ -154,7 +152,8 @@ export default function ViewLevelsPage() {
                         level.description
                       )}
                     </td>
-                    <td style={{ padding: "10px" }}>
+
+                    <td data-label="Price" style={{ padding: "10px" }}>
                       {editingId === level.id ? (
                         <input
                           type="number"
@@ -170,7 +169,8 @@ export default function ViewLevelsPage() {
                         level.price
                       )}
                     </td>
-                    <td style={{ padding: "10px" }}>
+
+                    <td data-label="Actions" style={{ padding: "10px" }}>
                       {editingId === level.id ? (
                         <>
                           <button
