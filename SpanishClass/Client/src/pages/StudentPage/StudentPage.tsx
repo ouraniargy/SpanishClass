@@ -36,6 +36,9 @@ export default function StudentPage() {
         <h2>
           <Link to="/viewBookings">View My Bookings</Link>
         </h2>
+        <h2>
+          <Link to="/validateTicket">Validate Ticket</Link>
+        </h2>
       </div>
     </div>
   );

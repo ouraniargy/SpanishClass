@@ -19,4 +19,5 @@ public interface ILessonRepository
         Guid userId,
         UpdateLessonDto model
     );
+    Task<List<EntryLog>> GetEntryLogsByLessonIdAsync(Guid lessonId);
 }

@@ -1,9 +1,11 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using QRCoder;
 using SpanishClass.Models;
 using SpanishClass.Models.RequestDtos;
+using SpanishClass.Models.ResponseDtos;
 using SpanishClass.Npgsql.IRepositories;
 
 namespace SpanishClass.Controllers;
@@ -335,7 +337,10 @@ public class BookingController : BaseController
     [HttpPost("validate-ticket")]
     public async Task<IActionResult> ValidateTicket([FromBody] ValidateTicketRequest model)
     {
-        var booking = await _repo.GetBookingByIdAsync(model.BookingId);
+        if (!Guid.TryParse(model.BookingId.ToString(), out var bookingId))
+            return BadRequest("Invalid booking id");
+
+        var booking = await _repo.GetBookingWithStudentAsync(bookingId);
 
         if (booking == null)
             return NotFound(new { message = "Booking not found" });
@@ -345,7 +350,21 @@ public class BookingController : BaseController
 
         await _repo.MarkBookingAsUsedAsync(booking);
 
-        return Ok(new { message = "Ticket valid, welcome!" });
+        var log = new EntryLog
+        {
+            Id = Guid.NewGuid(),
+            BookingId = booking.Id,
+            UserId = booking.Student.UserId,
+            EntryTime = DateTime.UtcNow
+        };
+
+        await _repo.AddEntryLogAsync(log);
+
+        return Ok(new
+        {
+            message = "Ticket valid",
+            bookingId = booking.Id
+        });
     }
 
     [HttpPost("qrcode/downloaded")]

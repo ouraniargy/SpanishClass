@@ -180,4 +180,18 @@ public class BookingRepository : IBookingRepository
         booking.Used = true;
         await _context.SaveChangesAsync();
     }
+
+    public async Task<Booking?> GetBookingWithStudentAsync(Guid bookingId)
+    {
+        return await _context.Bookings
+            .Include(b => b.Student)
+            .ThenInclude(s => s.User)
+            .FirstOrDefaultAsync(b => b.Id == bookingId);
+    }
+
+    public async Task AddEntryLogAsync(EntryLog log)
+    {
+        _context.EntryLogs.Add(log);
+        await _context.SaveChangesAsync();
+    }
 }

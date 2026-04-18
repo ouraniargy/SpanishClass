@@ -117,5 +117,21 @@ public class LessonController : BaseController
 
         return Ok(new { message = updated.Message, lessonPhoto = updated.LessonPhoto });
     }
+
+
+    [HttpGet("{lessonId}/entries")]
+    public async Task<IActionResult> GetLessonEntries(Guid lessonId)
+    {
+        var logs = await _lessonRepo.GetEntryLogsByLessonIdAsync(lessonId);
+
+        var result = logs.Select(l => new
+        {
+            studentName = l.Booking.Student.User.Name + " " + l.Booking.Student.User.Surname,
+            entryTime = l.EntryTime,
+            seatNumber = l.Booking.SeatNumber
+        });
+
+        return Ok(result);
+    }
 }
 

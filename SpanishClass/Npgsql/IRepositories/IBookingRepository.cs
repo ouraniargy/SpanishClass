@@ -29,4 +29,6 @@ public interface IBookingRepository
     );
     Task<Booking?> GetBookingByIdAsync(Guid bookingId);
     Task MarkBookingAsUsedAsync(Booking booking);
+    Task<Booking?> GetBookingWithStudentAsync(Guid bookingId);
+    Task AddEntryLogAsync(EntryLog log);
 }

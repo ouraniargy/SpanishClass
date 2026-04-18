@@ -1,4 +1,4 @@
-﻿namespace SpanishClass.Models
+﻿namespace SpanishClass.Models.ResponseDtos
 {
     public class LoginViewModel
     {

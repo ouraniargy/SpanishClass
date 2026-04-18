@@ -21,6 +21,7 @@ namespace SpanishClass.Npgsql
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<ProfessorAvailability> ProfessorAvailabilities { get; set; }
 
+        public DbSet<EntryLog> EntryLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

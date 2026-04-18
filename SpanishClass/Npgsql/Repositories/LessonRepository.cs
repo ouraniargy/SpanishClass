@@ -127,4 +127,18 @@ public class LessonRepository : ILessonRepository
 
         return (true, 200, "Lesson updated successfully", lesson.LessonPhoto);
     }
+
+
+    public async Task<List<EntryLog>> GetEntryLogsByLessonIdAsync(Guid lessonId)
+    {
+        return await _context.EntryLogs
+            .Include(e => e.Booking)
+                .ThenInclude(b => b.Lesson)
+            .Include(e => e.Booking)
+                .ThenInclude(b => b.Student)
+                    .ThenInclude(s => s.User)
+            .Where(e => e.Booking.LessonId == lessonId)
+            .OrderByDescending(e => e.EntryTime)
+            .ToListAsync();
+    }
 }

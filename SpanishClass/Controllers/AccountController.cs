@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SpanishClass.Models;
 using SpanishClass.Models.RequestDtos;
+using SpanishClass.Models.ResponseDtos;
 using SpanishClass.Npgsql.IRepositories;
 
 namespace SpanishClass.Controllers
