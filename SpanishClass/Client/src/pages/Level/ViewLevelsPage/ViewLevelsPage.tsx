@@ -122,7 +122,6 @@ export default function ViewLevelsPage() {
               <tbody>
                 {currentLevels.map((level) => (
                   <tr key={level.id} style={{ borderBottom: "1px solid #ddd" }}>
-                    {/* <td style={{ padding: "10px" }}>{level.levelName}</td> */}
                     <td style={{ padding: "10px" }}>
                       {editingId === level.id ? (
                         <input

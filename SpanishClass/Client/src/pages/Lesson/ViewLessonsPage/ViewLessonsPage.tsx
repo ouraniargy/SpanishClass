@@ -163,7 +163,7 @@ export default function ViewLessonsPage() {
                     key={lesson.id}
                     style={{ borderBottom: "1px solid #ddd" }}
                   >
-                    <td style={{ padding: "10px" }}>{lesson.levelName}</td>
+                    <td style={{ padding: "10px" }}>{lesson.level.name}</td>
                     <td style={{ padding: "10px" }}>
                       {editingId === lesson.id ? (
                         <input
