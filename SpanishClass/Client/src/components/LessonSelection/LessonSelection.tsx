@@ -1,3 +1,5 @@
+import "./LessonSelection.css";
+
 type Props = {
   role: string;
   selectedLessonId: string;
@@ -23,18 +25,17 @@ export default function LessonSelection({
   }
 
   return (
-    <div style={{ marginBottom: 12, width: "100%", maxWidth: "500px" }}>
-      <label style={{ display: "block", marginBottom: 4 }}>
-        Select Lesson:
-      </label>
+    <div className="lesson-select">
+      <label>Select Lesson:</label>
+
       <select
         value={selectedLessonId}
         onChange={(e) => setSelectedLessonId(e.target.value)}
-        style={{ width: "100%", padding: "6px", boxSizing: "border-box" }}
       >
         <option value="" disabled>
           Select lesson
         </option>
+
         {lessons.map((l) => (
           <option key={l.id} value={l.id}>
             {l.name} - {l.level?.name} - {l.durationMinutes}min

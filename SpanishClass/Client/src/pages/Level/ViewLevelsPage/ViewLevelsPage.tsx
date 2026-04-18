@@ -113,18 +113,16 @@ export default function ViewLevelsPage() {
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ borderBottom: "2px solid #ccc" }}>
-                  <th style={{ padding: "10px" }}>Level</th>
-                  <th style={{ padding: "10px" }}>Lesson Name</th>
+                  <th style={{ padding: "10px" }}>Level Name</th>
                   <th style={{ padding: "10px" }}>Description</th>
-                  <th style={{ padding: "10px" }}>Duration (min)</th>
-                  <th style={{ padding: "10px" }}>Max Seats</th>
+                  <th style={{ padding: "10px" }}>Price</th>
                   <th style={{ padding: "10px" }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {currentLevels.map((level) => (
                   <tr key={level.id} style={{ borderBottom: "1px solid #ddd" }}>
-                    <td style={{ padding: "10px" }}>{level.levelName}</td>
+                    {/* <td style={{ padding: "10px" }}>{level.levelName}</td> */}
                     <td style={{ padding: "10px" }}>
                       {editingId === level.id ? (
                         <input

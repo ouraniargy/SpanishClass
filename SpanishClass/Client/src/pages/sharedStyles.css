@@ -4,8 +4,7 @@ body {
 }
 
 body {
-  justify-content: center;
-  align-items: center;
+  margin: 0;
   background: linear-gradient(to bottom right, purple, indigo);
   font-family: sans-serif;
 }
@@ -70,4 +69,48 @@ body {
 
 .card button:hover {
   background-color: darkviolet;
+}
+
+table {
+  table-layout: fixed;
+}
+
+td,
+th {
+  word-break: break-word;
+  white-space: normal;
+}
+
+@media (max-width: 768px) {
+  table,
+  thead,
+  tbody,
+  tr,
+  td,
+  th {
+    display: block;
+    width: 100%;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tr {
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
+  }
+
+  td {
+    text-align: left;
+    padding: 8px 0;
+  }
+
+  .actions-cell {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+  }
 }

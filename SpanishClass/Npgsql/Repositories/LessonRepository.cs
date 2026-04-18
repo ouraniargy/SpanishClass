@@ -18,6 +18,7 @@ public class LessonRepository : ILessonRepository
     {
         return await _context.Lessons
             .Include(l => l.Professor)
+            .Include(l => l.Level)
             .Include(l => l.ProfessorAvailabilities)
             .FirstOrDefaultAsync(l => l.Id == lessonId);
     }

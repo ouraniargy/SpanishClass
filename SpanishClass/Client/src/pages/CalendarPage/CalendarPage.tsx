@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { apiDelete, apiGet, apiPost } from "../../api/api";
 import AvailabilityModal from "../../components/AvailabilityModal";
 import BookingSearch from "../../components/BookingSearch";
-import LessonSelection from "../../components/LessonSelection";
+import LessonSelection from "../../components/LessonSelection/LessonSelection";
 import { handleBack } from "../../shared/handleBack";
 import { Booking, QrResponse } from "../../shared/types";
 import CancelBookingModal from "../Booking/CancelBookingModal";

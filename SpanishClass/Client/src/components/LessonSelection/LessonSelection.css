@@ -1,0 +1,22 @@
+.lesson-select {
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+  padding: 0 12px;
+}
+
+.lesson-select label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.lesson-select select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  font-size: 16px;
+}
