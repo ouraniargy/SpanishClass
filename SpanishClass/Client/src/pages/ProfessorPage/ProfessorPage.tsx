@@ -20,6 +20,9 @@ export default function ProfessorPage() {
         <h2>
           <Link to="/viewLevels">View levels</Link>
         </h2>
+        <h2>
+          <Link to="/validateTicket">Validate Ticket</Link>
+        </h2>
       </div>
     </div>
   );

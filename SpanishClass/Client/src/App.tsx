@@ -112,7 +112,7 @@ function App() {
               element={
                 <ProtectedRoute
                   element={<ValidateTicketPage />}
-                  allowedRoles={["Student"]}
+                  allowedRoles={["Professor"]}
                 />
               }
             />
