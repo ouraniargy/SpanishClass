@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { apiPost } from "../api/api";
 
 type Student = {
   studentUserId?: string;
@@ -16,6 +17,7 @@ type Props = {
   lessonImage?: string;
   entries?: any[];
   totalCheckedIn?: number;
+  onValidateSuccess?: () => void;
 };
 
 const overlayStyle: React.CSSProperties = {
@@ -71,9 +73,38 @@ export default function AvailabilityModal({
   lessonImage,
   entries,
   totalCheckedIn,
+  onValidateSuccess,
 }: Props) {
-  if (!show) return null;
+  const [bookingInput, setBookingInput] = useState("");
+  const [loading, setLoading] = useState(false);
 
+  if (!show) return null;
+  const handleValidate = async () => {
+    if (!bookingInput) {
+      alert("Enter booking ID");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      await apiPost("/booking/validate-ticket", {
+        bookingId: bookingInput,
+      });
+
+      alert("✅ Checked in successfully");
+
+      setBookingInput("");
+
+      if (onValidateSuccess) {
+        onValidateSuccess();
+      }
+    } catch (err) {
+      alert("❌ Invalid or already used ticket");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div style={overlayStyle}>
       <div style={modalStyle}>
@@ -127,6 +158,33 @@ export default function AvailabilityModal({
             </table>
 
             <hr style={{ margin: "20px 0" }} />
+
+            <hr style={{ margin: "20px 0" }} />
+
+            <h3>Check-in</h3>
+
+            <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
+              <input
+                placeholder="Scan or enter booking ID"
+                value={bookingInput}
+                onChange={(e) => setBookingInput(e.target.value)}
+                style={{ flex: 1, padding: "8px" }}
+              />
+
+              <button
+                onClick={handleValidate}
+                disabled={loading}
+                style={{
+                  background: "#28a745",
+                  color: "white",
+                  border: "none",
+                  padding: "8px 12px",
+                  cursor: "pointer",
+                }}
+              >
+                {loading ? "Checking..." : "Validate"}
+              </button>
+            </div>
 
             <h3>Check-ins</h3>
 

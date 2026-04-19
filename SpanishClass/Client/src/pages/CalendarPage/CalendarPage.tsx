@@ -46,6 +46,19 @@ export default function CalendarPage() {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [qrCodes, setQrCodes] = useState<Record<string, string>>({});
 
+  const fetchEntries = async (availabilityId: string) => {
+    try {
+      const res = await apiGet<any>(
+        `/booking/availability/${availabilityId}/entries`,
+      );
+
+      setEntries(res.entries);
+      setTotalCheckedIn(res.totalCheckedIn);
+    } catch (err) {
+      console.error("Failed to fetch entries", err);
+    }
+  };
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 800);
@@ -176,7 +189,7 @@ export default function CalendarPage() {
         );
         setStudentsForAvailability(students || []);
         setSelectedAvailabilityTitle(title);
-
+        await fetchEntries(id);
         const photo = lessonPhoto || students[0]?.lessonPhoto || null;
 
         const entriesRes = await apiGet<any>(
@@ -441,6 +454,7 @@ export default function CalendarPage() {
               lessonImage={lessonImageUrl}
               entries={entries}
               totalCheckedIn={totalCheckedIn}
+              onValidateSuccess={() => fetchEntries(selectedAvailability.id)}
             />
           )}
           {showStudentBookingModal && selectedAvailability?.id && (
