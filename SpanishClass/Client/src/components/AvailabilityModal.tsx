@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { apiPost } from "../api/api";
+import QRScanner from "../shared/QRScanner";
 
 type Student = {
   studentUserId?: string;
@@ -183,6 +184,8 @@ export default function AvailabilityModal({
                 {loading ? "Checking..." : "Validate"}
               </button>
             </div>
+
+            <QRScanner onSuccess={onValidateSuccess} />
 
             <h3>Check-ins</h3>
 
