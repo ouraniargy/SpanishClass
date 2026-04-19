@@ -3,9 +3,9 @@ import { apiPost } from "../api/api";
 import QRScanner from "../shared/QRScanner";
 
 type Student = {
-  studentUserId?: string;
+  userId?: string;
   studentName: string;
-  studentEmail: string;
+  email: string;
 };
 
 type Props = {
@@ -149,10 +149,10 @@ export default function AvailabilityModal({
               </thead>
               <tbody>
                 {students.map((s, index) => (
-                  <tr key={s.studentUserId || index}>
+                  <tr key={s.userId || index}>
                     <td style={thTd}>{index + 1}</td>
                     <td style={thTd}>{s.studentName}</td>
-                    <td style={thTd}>{s.studentEmail}</td>
+                    <td style={thTd}>{s.email}</td>
                   </tr>
                 ))}
               </tbody>
