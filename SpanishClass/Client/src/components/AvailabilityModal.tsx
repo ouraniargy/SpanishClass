@@ -159,8 +159,6 @@ export default function AvailabilityModal({
 
             <hr style={{ margin: "20px 0" }} />
 
-            <hr style={{ margin: "20px 0" }} />
-
             <h3>Check-in</h3>
 
             <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
