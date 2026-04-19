@@ -372,5 +372,24 @@ public class BookingController : BaseController
     {
         return Ok(new { success = true });
     }
+
+    [HttpGet("availability/{availabilityId}/entries")]
+    public async Task<IActionResult> GetAvailabilityEntries(Guid availabilityId)
+    {
+        var logs = await _repo.GetEntryLogsByAvailabilityIdAsync(availabilityId);
+
+        var entries = logs.Select(l => new
+        {
+            studentName = l.Booking.Student.User.Name + " " + l.Booking.Student.User.Surname,
+            entryTime = l.EntryTime,
+            seatNumber = l.Booking.SeatNumber
+        }).ToList();
+
+        return Ok(new
+        {
+            totalCheckedIn = entries.Count,
+            entries
+        });
+    }
 }
 

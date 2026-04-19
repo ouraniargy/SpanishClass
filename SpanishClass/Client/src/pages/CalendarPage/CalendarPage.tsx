@@ -37,6 +37,8 @@ export default function CalendarPage() {
   const [selectedAvailability, setSelectedAvailability] = useState<any | null>(
     null,
   );
+  const [entries, setEntries] = useState<any[]>([]);
+  const [totalCheckedIn, setTotalCheckedIn] = useState(0);
   const goBack = handleBack();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 800);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -177,6 +179,12 @@ export default function CalendarPage() {
 
         const photo = lessonPhoto || students[0]?.lessonPhoto || null;
 
+        const entriesRes = await apiGet<any>(
+          `/booking/availability/${id}/entries`,
+        );
+
+        setEntries(entriesRes.entries);
+        setTotalCheckedIn(entriesRes.totalCheckedIn);
         setSelectedAvailability({
           id,
           title,
@@ -431,6 +439,8 @@ export default function CalendarPage() {
               availabilityId={selectedAvailability.id}
               onDelete={deleteAvailability}
               lessonImage={lessonImageUrl}
+              entries={entries}
+              totalCheckedIn={totalCheckedIn}
             />
           )}
           {showStudentBookingModal && selectedAvailability?.id && (

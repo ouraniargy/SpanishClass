@@ -194,4 +194,14 @@ public class BookingRepository : IBookingRepository
         _context.EntryLogs.Add(log);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<List<EntryLog>> GetEntryLogsByAvailabilityIdAsync(Guid availabilityId)
+    {
+        return await _context.EntryLogs
+            .Include(l => l.Booking)
+                .ThenInclude(b => b.Student)
+                    .ThenInclude(s => s.User)
+            .Where(l => l.Booking.AvailabilityId == availabilityId)
+            .ToListAsync();
+    }
 }

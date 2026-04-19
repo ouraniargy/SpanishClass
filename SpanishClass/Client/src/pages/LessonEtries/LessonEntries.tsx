@@ -8,8 +8,15 @@ type EntryLog = {
   seatNumber: number;
 };
 
+type Response = {
+  totalCheckedIn: number;
+  entries: EntryLog[];
+};
+
 export default function LessonEntries() {
   const [entries, setEntries] = useState<EntryLog[]>([]);
+  const [total, setTotal] = useState(0);
+
   const { lessonId } = useParams<{ lessonId: string }>();
 
   useEffect(() => {
@@ -17,9 +24,10 @@ export default function LessonEntries() {
 
     const fetchEntries = async () => {
       try {
-        const res = await apiGet<EntryLog[]>(`/lesson/${lessonId}/entries`);
+        const res = await apiGet<Response>(`/lesson/${lessonId}/entries`);
 
-        setEntries(res);
+        setEntries(res.entries);
+        setTotal(res.totalCheckedIn);
       } catch (err) {
         console.error("Failed to load entries:", err);
       }
@@ -32,6 +40,8 @@ export default function LessonEntries() {
     <div className="page-center">
       <div className="card">
         <h2>Validated Tickets</h2>
+
+        <h3>Total checked in: {total}</h3>
 
         {!lessonId ? (
           <p>Invalid lesson</p>

@@ -124,14 +124,18 @@ public class LessonController : BaseController
     {
         var logs = await _lessonRepo.GetEntryLogsByLessonIdAsync(lessonId);
 
-        var result = logs.Select(l => new
+        var entries = logs.Select(l => new
         {
             studentName = l.Booking.Student.User.Name + " " + l.Booking.Student.User.Surname,
             entryTime = l.EntryTime,
             seatNumber = l.Booking.SeatNumber
-        });
+        }).ToList();
 
-        return Ok(result);
+        return Ok(new
+        {
+            totalCheckedIn = entries.Count,
+            entries = entries
+        });
     }
 }
 

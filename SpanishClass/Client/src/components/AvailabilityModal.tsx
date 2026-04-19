@@ -14,6 +14,8 @@ type Props = {
   availabilityId?: string;
   onDelete: (id: string) => void;
   lessonImage?: string;
+  entries?: any[];
+  totalCheckedIn?: number;
 };
 
 const overlayStyle: React.CSSProperties = {
@@ -67,6 +69,8 @@ export default function AvailabilityModal({
   availabilityId,
   onDelete,
   lessonImage,
+  entries,
+  totalCheckedIn,
 }: Props) {
   if (!show) return null;
 
@@ -121,6 +125,41 @@ export default function AvailabilityModal({
                 ))}
               </tbody>
             </table>
+
+            <hr style={{ margin: "20px 0" }} />
+
+            <h3>Check-ins</h3>
+
+            <p>
+              <b>Total checked in:</b> {totalCheckedIn ?? 0}
+            </p>
+
+            {entries && entries.length > 0 ? (
+              <table style={tableStyle}>
+                <thead>
+                  <tr>
+                    <th style={thTd}>#</th>
+                    <th style={thTd}>Student</th>
+                    <th style={thTd}>Seat</th>
+                    <th style={thTd}>Entry Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {entries.map((e, index) => (
+                    <tr key={index}>
+                      <td style={thTd}>{index + 1}</td>
+                      <td style={thTd}>{e.studentName}</td>
+                      <td style={thTd}>{e.seatNumber}</td>
+                      <td style={thTd}>
+                        {new Date(e.entryTime).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p>No one has checked in yet</p>
+            )}
 
             <button
               onClick={() => availabilityId && onDelete(availabilityId)}

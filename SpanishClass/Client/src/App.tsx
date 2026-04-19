@@ -8,6 +8,7 @@ import CalendarPage from "./pages/CalendarPage/CalendarPage";
 import GoogleRoleSelect from "./pages/GoogleRoleSelect";
 import CreateLessonPage from "./pages/Lesson/CreateLessonPage/CreateLessonPage";
 import ViewLessonsPage from "./pages/Lesson/ViewLessonsPage/ViewLessonsPage";
+import LessonEntries from "./pages/LessonEtries/LessonEntries";
 import CreateLevelPage from "./pages/Level/CreateLevelPage/CreateLevelPage";
 import ViewLevelsPage from "./pages/Level/ViewLevelsPage/ViewLevelsPage";
 import ExternalLoginCallback from "./pages/Login/ExternalLoginCallback";
@@ -16,6 +17,7 @@ import ProfessorPage from "./pages/ProfessorPage/ProfessorPage";
 import Register from "./pages/Register/Register";
 import StudentPage from "./pages/StudentPage/StudentPage";
 import ProfilePage from "./pages/User/ProfilePage";
+import ValidateTicketPage from "./pages/ValidateTicketPage/ValidateTicketPage";
 
 function App() {
   return (
@@ -101,6 +103,26 @@ function App() {
                 <ProtectedRoute
                   element={<ViewBookingsPage />}
                   allowedRoles={["Student"]}
+                />
+              }
+            />
+
+            <Route
+              path="/validateTicket"
+              element={
+                <ProtectedRoute
+                  element={<ValidateTicketPage />}
+                  allowedRoles={["Student"]}
+                />
+              }
+            />
+
+            <Route
+              path="/lessonEntries/:lessonId"
+              element={
+                <ProtectedRoute
+                  element={<LessonEntries />}
+                  allowedRoles={["Professor"]}
                 />
               }
             />
