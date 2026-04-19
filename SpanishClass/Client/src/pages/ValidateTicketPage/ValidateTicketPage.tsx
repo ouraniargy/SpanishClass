@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { apiPost } from "../../api/api";
+import { handleBack } from "../../shared/handleBack";
 
 export default function ValidateTicketPage() {
   const [bookingId, setBookingId] = useState("");
   const [result, setResult] = useState<any>();
+  const goBack = handleBack();
 
   const handleValidateTicket = async (id: string) => {
     try {
@@ -35,6 +37,11 @@ export default function ValidateTicketPage() {
         {result && (
           <p style={{ color: "green" }}>Ticket validated: {result.received}</p>
         )}
+        <div>
+          <button type="button" onClick={goBack}>
+            Back
+          </button>
+        </div>
       </div>
     </div>
   );

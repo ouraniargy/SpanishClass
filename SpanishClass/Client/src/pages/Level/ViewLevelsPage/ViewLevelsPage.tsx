@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiDelete, apiGet, apiPut } from "../../../api/api";
 import { handleBack } from "../../../shared/handleBack";
-import "../../sharedStyles.css";
+import "../Level.css";
 
 export default function ViewLevelsPage() {
   const [levels, setLevels] = useState<any[]>([]);

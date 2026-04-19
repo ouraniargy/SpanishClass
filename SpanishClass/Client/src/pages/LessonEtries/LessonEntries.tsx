@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { apiGet } from "../../api/api";
+import { handleBack } from "../../shared/handleBack";
 
 type EntryLog = {
   studentName: string;
@@ -16,7 +17,7 @@ type Response = {
 export default function LessonEntries() {
   const [entries, setEntries] = useState<EntryLog[]>([]);
   const [total, setTotal] = useState(0);
-
+  const goBack = handleBack();
   const { lessonId } = useParams<{ lessonId: string }>();
 
   useEffect(() => {
@@ -57,6 +58,11 @@ export default function LessonEntries() {
             ))}
           </ul>
         )}
+        <div>
+          <button type="button" onClick={goBack}>
+            Back
+          </button>
+        </div>
       </div>
     </div>
   );

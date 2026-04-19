@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { apiDelete, apiGet, apiPut } from "../../../api/api";
 import { handleBack } from "../../../shared/handleBack";
-import "../../sharedStyles.css";
+import "../Lesson.css";
 
 interface UpdateLessonResponse {
   message: string;

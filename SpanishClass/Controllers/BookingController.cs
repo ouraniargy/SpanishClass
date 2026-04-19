@@ -380,6 +380,7 @@ public class BookingController : BaseController
 
         var entries = logs.Select(l => new
         {
+            bookingId = l.BookingId,
             studentName = l.Booking.Student.User.Name + " " + l.Booking.Student.User.Surname,
             entryTime = l.EntryTime,
             seatNumber = l.Booking.SeatNumber
