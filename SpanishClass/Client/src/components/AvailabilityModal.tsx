@@ -19,6 +19,7 @@ type Props = {
   entries?: any[];
   totalCheckedIn?: number;
   onValidateSuccess?: () => void;
+  isPastMineEvent?: boolean;
 };
 
 const overlayStyle: React.CSSProperties = {
@@ -75,6 +76,7 @@ export default function AvailabilityModal({
   entries,
   totalCheckedIn,
   onValidateSuccess,
+  isPastMineEvent,
 }: Props) {
   const [bookingInput, setBookingInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -129,13 +131,16 @@ export default function AvailabilityModal({
         )}
         {students.length === 0 ? (
           <>
-            <p>No students have booked yet.</p>
-            <button
-              onClick={() => availabilityId && onDelete(availabilityId)}
-              style={{ marginTop: 12 }}
-            >
-              Delete Availability
-            </button>
+            <p>No students have booked this availability.</p>
+
+            {!isPastMineEvent && (
+              <button
+                onClick={() => availabilityId && onDelete(availabilityId)}
+                style={{ marginTop: 12 }}
+              >
+                Delete Availability
+              </button>
+            )}
           </>
         ) : (
           <>

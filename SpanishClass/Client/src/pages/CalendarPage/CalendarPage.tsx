@@ -29,6 +29,7 @@ export default function CalendarPage() {
   const [searchId, setSearchId] = useState("");
 
   const [searchLessonName, setSearchLessonName] = useState("");
+  const [isPastMineEvent, setIsPastMineEvent] = useState(false);
   const [searchResult, setSearchResult] = useState<any[]>([]);
   const [selectedAvailabilityTitle, setSelectedAvailabilityTitle] =
     useState<string>("");
@@ -180,7 +181,12 @@ export default function CalendarPage() {
     async (clickInfo: any) => {
       const { id, title } = clickInfo.event;
       const { isMine, lessonPhoto } = clickInfo.event.extendedProps;
+      const eventDate = new Date(clickInfo.event.start);
+      const now = new Date();
 
+      const isPastMine = eventDate < now && isMine;
+
+      setIsPastMineEvent(isPastMine);
       if (!isMine || role !== "Professor") return;
 
       try {
@@ -404,6 +410,12 @@ export default function CalendarPage() {
               const eventDate = new Date(eventStart);
               const now = new Date();
 
+              if (eventDate < now && isMine) {
+                info.el.style.backgroundColor = "#00ff0d";
+                info.el.style.opacity = "0.6";
+                return;
+              }
+
               if (eventDate < now) {
                 info.el.style.backgroundColor = "#f10b1b";
                 info.el.style.opacity = "0.6";
@@ -455,6 +467,7 @@ export default function CalendarPage() {
               entries={entries}
               totalCheckedIn={totalCheckedIn}
               onValidateSuccess={() => fetchEntries(selectedAvailability.id)}
+              isPastMineEvent={isPastMineEvent}
             />
           )}
           {showStudentBookingModal && selectedAvailability?.id && (
