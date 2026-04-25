@@ -111,7 +111,8 @@ public class BookingController : BaseController
             GuestsEmails = new List<string> { student.User.Email },
             ProfessorName = availability.Lesson?.Professor?.User?.Name,
             ProfessorSurname = availability.Lesson?.Professor?.User?.Surname,
-            Level = booking.Lesson.Level.Name
+            Level = booking.Lesson.Level.Name,
+            Price = booking.Lesson.Level.Price
         };
 
         if (sendEmail)
@@ -144,7 +145,6 @@ public class BookingController : BaseController
             LessonId = lesson.Id,
             StartTime = dto.StartTime,
             EndTime = dto.EndTime,
-            MaxSeats = dto.MaxSeats
         };
 
         await _repo.AddAvailabilityAsync(avail);
@@ -155,7 +155,7 @@ public class BookingController : BaseController
             id = avail.Id,
             startTime = avail.StartTime,
             endTime = avail.EndTime,
-            maxSeats = avail.MaxSeats
+            maxSeats = avail.Lesson.MaxSeats
         });
     }
 
@@ -188,7 +188,8 @@ public class BookingController : BaseController
             bookedByMe = a.Bookings?.Any(b => b.StudentId == studentId) ?? false,
             bookingId = a.Bookings?.Where(b => b.StudentId == studentId)
                                    .Select(b => b.Id)
-                                   .FirstOrDefault()
+                                   .FirstOrDefault(),
+            price = a.Lesson.Level.Price
         });
 
         return Ok(result);
