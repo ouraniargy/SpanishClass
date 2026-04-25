@@ -220,7 +220,7 @@ export default function ViewLessonsPage() {
                           onChange={(e) =>
                             setEditData({
                               ...editData,
-                              maxSeats: Number(e.target.value),
+                              maxSeats: e.target.value,
                             })
                           }
                         />
