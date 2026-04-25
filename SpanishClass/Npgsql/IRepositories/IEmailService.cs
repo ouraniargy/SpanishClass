@@ -1,4 +1,4 @@
-﻿using SpanishClass.Models;
+﻿using SpanishClass.Models.ResponseDtos;
 
 public interface IEmailService
 {

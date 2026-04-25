@@ -1,4 +1,4 @@
-﻿namespace SpanishClass.Models
+﻿namespace SpanishClass.Models.ResponseDtos
 {
     public class BookingDetails
     {
@@ -23,6 +23,6 @@
         public string ProfessorSurname { get; set; } = string.Empty;
         public Guid LevelId { get; set; }
         public string Level { get; set; } = null!;
-
+        public decimal Price { get; set; }
     }
 }

@@ -10,4 +10,5 @@ export interface BookingDetails {
   professorName: string;
   professorSurname: string;
   level: string;
+  price: number;
 }

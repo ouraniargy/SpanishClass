@@ -16,6 +16,7 @@ interface Booking {
   maxSeats: number;
   studentName: string;
   lessonPhoto: string;
+  price: number;
 }
 
 const containerStyle: React.CSSProperties = {
@@ -189,6 +190,9 @@ export default function ViewBookingsPage() {
             </p>
             <p>
               <b>Unique number of reservation:</b> {b.id}
+            </p>
+            <p>
+              <strong>Price:</strong> {b.price} €
             </p>
 
             <p>

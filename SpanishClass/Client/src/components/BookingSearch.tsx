@@ -242,6 +242,9 @@ export default function BookingSearch({
                   <p>
                     <b>Unique number of reservation:</b> {b.bookingCode}
                   </p>
+                  <p>
+                    <b>Price:</b> {b.price} €
+                  </p>
                   {b.lessonPhoto && (
                     <div style={{ textAlign: "center", marginBottom: 16 }}>
                       <img

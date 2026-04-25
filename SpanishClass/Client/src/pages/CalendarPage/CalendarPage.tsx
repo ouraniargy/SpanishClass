@@ -142,7 +142,7 @@ export default function CalendarPage() {
           console.log("EVENT:", a);
           return {
             id: a.id,
-            title: `${a.name} - ${a.description} - ${a.professorName} - ${a.bookedSeats}/${a.maxSeats} - ${a.id}`,
+            title: `${a.name} - ${a.description} - ${a.professorName} - ${a.bookedSeats}/${a.maxSeats} - ${a.id} - ${a.price} €`,
             start,
             end,
             editable: !!isMine,
@@ -156,6 +156,7 @@ export default function CalendarPage() {
               bookedByMe: a.bookedByMe,
               lessonPhoto: a.lessonPhoto,
               bookingDetails: a.bookedByMe ? a : null,
+              price: a.price,
             },
           };
         });

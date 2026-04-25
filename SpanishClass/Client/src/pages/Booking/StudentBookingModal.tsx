@@ -170,6 +170,9 @@ export default function StudentBookingModal({
             <p>
               <strong>Unique number of reservation:</strong> {booking.bookingId}
             </p>
+            <p>
+              <strong>Price:</strong> {booking.price} €
+            </p>
             {imageUrl && (
               <div style={{ textAlign: "center", marginBottom: 16 }}>
                 <img
