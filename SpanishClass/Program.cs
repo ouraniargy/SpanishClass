@@ -53,15 +53,15 @@ builder.Services
 
 builder.Services.AddAuthentication(options =>
 {
-options.DefaultScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultScheme = IdentityConstants.ApplicationScheme;
 })
 .AddCookie()
 .AddGoogle(options =>
-    {
-    options.ClientId = "311751176999-v6i6inu9cd0dbbb7ecb0rric64fr33qs.apps.googleusercontent.com";
-        options.ClientSecret = "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";
-        options.CallbackPath = "/signin-google";
-    });
+{
+    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    options.CallbackPath = "/signin-google";
+});
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
