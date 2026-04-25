@@ -31,9 +31,10 @@ export default function LessonSelection({
       <select
         value={selectedLessonId}
         onChange={(e) => setSelectedLessonId(e.target.value)}
+        disabled={lessons.length === 0}
       >
-        <option value="" disabled>
-          Select lesson
+        <option value="" hidden>
+          {lessons.length === 0 ? "No lessons available" : "Select lesson"}
         </option>
 
         {lessons.map((l) => (

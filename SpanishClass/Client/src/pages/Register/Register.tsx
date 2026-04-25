@@ -159,14 +159,31 @@ export default function Register() {
         {serverError && <p style={{ color: "red" }}>{serverError}</p>}
         <button
           onClick={handleRegister}
-          disabled={!!emailError || !email || !password || !name || !surname}
+          disabled={
+            !!emailError ||
+            !email ||
+            !password ||
+            !name ||
+            !surname ||
+            !mobilePhone
+          }
           style={{
             opacity:
-              !!emailError || !email || !password || !name || !surname
+              !!emailError ||
+              !email ||
+              !password ||
+              !name ||
+              !surname ||
+              !mobilePhone
                 ? 0.5
                 : 1,
             cursor:
-              !!emailError || !email || !password || !name || !surname
+              !!emailError ||
+              !email ||
+              !password ||
+              !name ||
+              !surname ||
+              !mobilePhone
                 ? "not-allowed"
                 : "pointer",
           }}
