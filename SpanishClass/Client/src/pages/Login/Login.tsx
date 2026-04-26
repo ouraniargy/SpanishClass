@@ -47,35 +47,6 @@ export default function Login() {
     }
   }
 
-  // useEffect(() => {
-  //   async function fetchProfile() {
-  //     const res = await fetch("/api/account/profile", {
-  //       credentials: "include",
-  //     });
-
-  //     if (res.ok) {
-  //       const contentType = res.headers.get("content-type");
-  //       if (contentType?.includes("application/json")) {
-  //         const data = await res.json();
-  //         login({
-  //           userId: data.userId,
-  //           role: data.role,
-  //           name: data.name,
-  //           surname: data.surname,
-  //         });
-  //         if (data.role === "Student") navigate("/students");
-  //         else if (data.role === "Professor") navigate("/professors");
-  //       } else {
-  //         console.warn(
-  //           "Profile endpoint did not return JSON, skipping fetchProfile",
-  //         );
-  //       }
-  //     }
-  //   }
-
-  //   fetchProfile();
-  // }, [login, navigate]);
-
   return (
     <div className="page-center">
       <div className="card">

@@ -119,10 +119,6 @@ export default function ProfilePage() {
     }
   };
 
-  //   const profileSrc = formData.profilePicture?.startsWith("/uploads/")
-  //     ? formData.profilePicture
-  //     : "/uploads/" + formData.profilePicture;
-
   const displayPhoto = photo
     ? URL.createObjectURL(photo)
     : formData.profilePicture
