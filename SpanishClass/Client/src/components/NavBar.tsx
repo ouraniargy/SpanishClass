@@ -16,9 +16,6 @@ export default function Navbar() {
     ? `https://localhost:7185/uploads/${user.profilePicture}`
     : undefined;
 
-  console.log("USER:", user);
-  console.log("User profile picture URL:", profileSrc);
-
   return (
     <div
       style={{

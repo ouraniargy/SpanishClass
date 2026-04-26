@@ -104,7 +104,6 @@ export default function ViewLessonsPage() {
       try {
         setLoading(true);
         const data = await apiGet<any[]>("/lesson");
-        console.log("LESSONS FROM API:", data);
         setLessons(data);
         setError(null);
       } catch (err) {

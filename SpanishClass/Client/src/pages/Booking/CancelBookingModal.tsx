@@ -30,7 +30,6 @@ export default function CancelBookingModal({
       alert("Failed to cancel booking");
     }
   };
-  console.log(booking);
 
   const imageUrl = booking?.extendedProps?.lessonPhoto
     ? `https://localhost:7185${booking.extendedProps.lessonPhoto}`

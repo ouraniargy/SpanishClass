@@ -22,8 +22,6 @@ export default function Login() {
         profilePicture?: string;
       };
 
-      console.log("Login response:", data);
-
       login({
         userId: data.userId,
         role: data.role,

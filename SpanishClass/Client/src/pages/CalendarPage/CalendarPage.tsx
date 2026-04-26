@@ -73,8 +73,6 @@ export default function CalendarPage() {
     try {
       const res = await apiGet<QrResponse>(`/booking/qrcode/${bookingId}`);
 
-      console.log("QR RESPONSE:", res);
-
       setQrCodes((prev) => ({
         ...prev,
         [bookingId]: res.qrImageBase64,
@@ -139,7 +137,6 @@ export default function CalendarPage() {
           const isMine =
             role === "Professor" &&
             a.professorUserId?.toLowerCase() === userId?.toLowerCase();
-          console.log("EVENT:", a);
           return {
             id: a.id,
             title: `${a.name} - ${a.description} - ${a.professorName} - ${a.bookedSeats}/${a.maxSeats} - ${a.id} - ${a.price} €`,

@@ -28,8 +28,6 @@ export default function QRScanner({ onSuccess }: Props) {
         processingRef.current = true;
 
         try {
-          console.log("QR scanned:", decodedText);
-
           await apiPost("/booking/validate-ticket", {
             bookingId: decodedText,
           });

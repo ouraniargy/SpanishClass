@@ -59,7 +59,6 @@ export default function StudentBookingModal({
     ? `https://localhost:7185${availability.extendedProps.lessonPhoto}`
     : null;
 
-  console.log(booking);
   return (
     <div
       style={{
