@@ -85,6 +85,8 @@ namespace SpanishClass.Controllers
                 await _accountRepo.AddProfessorAsync(user.Id);
             else if (model.Role == "Student")
                 await _accountRepo.AddStudentAsync(user.Id);
+            else if (model.Role == "Admin")
+                await _accountRepo.AddAdminAsync(user.Id);
 
             await _signInManager.SignInAsync(user, false);
 
@@ -350,13 +352,12 @@ namespace SpanishClass.Controllers
             if (!userId.HasValue)
                 return Unauthorized();
 
+            var user = await _userManager.FindByIdAsync(model.UserId.ToString());
+            if (user == null) return NotFound("User not found");
+
             var isAdmin = await _accountRepo.IsAdminAsync(userId.Value);
             if (!isAdmin)
                 return Forbid();
-
-            var user = await _userManager.FindByIdAsync(model.UserId.ToString());
-            if (user == null)
-                return NotFound("User not found");
 
             if (model.UserId == userId.Value)
                 return BadRequest("You cannot change your own role");
