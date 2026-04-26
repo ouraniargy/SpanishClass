@@ -274,6 +274,7 @@ export default function CalendarPage() {
       endTime: new Date(end).toISOString(),
       maxSeats: 1,
       lessonId: selectedLessonId,
+      date: new Date().toISOString(),
     })
       .then((newEvent: any) => {
         fetchCalendarEvents();

@@ -145,6 +145,7 @@ public class BookingController : BaseController
             LessonId = lesson.Id,
             StartTime = dto.StartTime,
             EndTime = dto.EndTime,
+            Date = dto.Date
         };
 
         await _repo.AddAvailabilityAsync(avail);
@@ -155,7 +156,8 @@ public class BookingController : BaseController
             id = avail.Id,
             startTime = avail.StartTime,
             endTime = avail.EndTime,
-            maxSeats = avail.Lesson.MaxSeats
+            maxSeats = avail.Lesson.MaxSeats,
+            date = avail.Date
         });
     }
 

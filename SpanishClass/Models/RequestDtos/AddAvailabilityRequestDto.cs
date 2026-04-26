@@ -6,4 +6,5 @@ public class AddAvailabilityRequestDto
     public DateTime EndTime { get; set; }
     public int MaxSeats { get; set; }
     public Guid ProfessorId { get; set; }
+    public DateTime Date { get; set; }
 }
